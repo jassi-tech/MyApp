@@ -48,3 +48,50 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+## SINGLE, SECURE, PROFESSIONAL FOLDER STRUCTURE
+app/
+├─ _layout.tsx            # Root layout (theme, auth guard)
+├─ index.tsx              # App entry (redirect logic)
+
+├─ screens/               # ALL screens in one place
+│  ├─ home.tsx
+│  ├─ explore.tsx
+│  ├─ share.tsx
+│  ├─ profile.tsx
+│  ├─ login.tsx
+│  ├─ register.tsx
+│  ├─ settings.tsx
+│  └─ details.tsx
+
+├─ components/
+│  ├─ ui/
+│  │  ├─ icon-symbol.tsx
+│  │  ├─ button.tsx
+│  │  └─ input.tsx
+│  └─ haptic-tab.tsx
+
+├─ services/              # API + security logic
+│  ├─ api.ts              # Axios / fetch wrapper
+│  ├─ auth.service.ts     # Login, logout, token refresh
+│  └─ secure-storage.ts   # Encrypted storage
+
+├─ store/
+│  └─ auth.store.ts       # Auth state only
+
+├─ hooks/
+│  ├─ use-auth.ts
+│  └─ use-color-scheme.ts
+
+├─ constants/
+│  ├─ theme.ts
+│  └─ config.ts           # ENV-safe config
+
+├─ utils/
+│  ├─ crypto.ts           # Hashing / encryption helpers
+│  └─ validators.ts
+
+assets/
+├─ images/
+└─ fonts/
+
