@@ -49,7 +49,7 @@ export default function GetStarted() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Palette.deepPurple, // Deep Purple background
+    // backgroundColor: Palette.deepPurple, // Deep Purple background
   },
   contentContainer: {
     flex: 1,
