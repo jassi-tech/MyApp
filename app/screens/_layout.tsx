@@ -17,6 +17,27 @@ export default function ScreensLayout() {
       
       <Stack.Screen name="details" options={{ headerShown: false }} />
       <Stack.Screen name="notification" options={{ headerShown: false }} />
+      <Stack.Screen name="categories" options={{ headerShown: false }} />
+      <Stack.Screen name="attendance" options={{ headerShown: false }} />
+      <Stack.Screen name="quiz" options={{ headerShown: false }} />
+      <Stack.Screen name="quiz-details" options={{ headerShown: false }} />
+      <Stack.Screen name="categories/timetable" options={{ headerShown: false }} />
+      <Stack.Screen name="categories/inbox" options={{ headerShown: false }} />
+      <Stack.Screen name="categories/fees" options={{ headerShown: false }} />
+      <Stack.Screen name="categories/notice" options={{ headerShown: false }} />
+      <Stack.Screen name="categories/homework" options={{ headerShown: false }} />
+      <Stack.Screen name="categories/syllabus" options={{ headerShown: false }} />
+      <Stack.Screen name="categories/circular" options={{ headerShown: false }} />
+      <Stack.Screen name="categories/leave-request" options={{ headerShown: false }} />
+      <Stack.Screen name="categories/examination" options={{ headerShown: false }} />
+      <Stack.Screen name="settings/account" options={{ headerShown: false }} />
+      <Stack.Screen name="settings/appearance" options={{ headerShown: false }} />
+      <Stack.Screen name="settings/language" options={{ headerShown: false }} />
+      <Stack.Screen name="settings/push-notifications" options={{ headerShown: false }} />
+      <Stack.Screen name="settings/email-notifications" options={{ headerShown: false }} />
+      <Stack.Screen name="settings/help-center" options={{ headerShown: false }} />
+      <Stack.Screen name="settings/report-problem" options={{ headerShown: false }} />
+      <Stack.Screen name="course-details" options={{ headerShown: false }} />
     </Stack>
   );
 }

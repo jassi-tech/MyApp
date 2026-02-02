@@ -15,12 +15,12 @@ export default function Settings() {
   return (
     <ScreenContainer header={<ScreenHeader title="Settings" />}>
         <SettingsSection title="General">
-          <MenuItem icon="person-outline" title="Account" onPress={() => {}} />
-          <MenuItem icon="moon-outline" title="Appearance" onPress={() => {}} />
+          <MenuItem icon="person-outline" title="Account" onPress={() => router.push("/screens/settings/account")} />
+          <MenuItem icon="moon-outline" title="Appearance" onPress={() => router.push("/screens/settings/appearance")} />
           <MenuItem
             icon="language-outline"
             title="Language"
-            onPress={() => {}}
+            onPress={() => router.push("/screens/settings/language")}
           />
         </SettingsSection>
 
@@ -28,12 +28,12 @@ export default function Settings() {
           <MenuItem
             icon="notifications-outline"
             title="Push Notifications"
-            onPress={() => {}}
+            onPress={() => router.push("/screens/settings/push-notifications")}
           />
           <MenuItem
             icon="mail-outline"
             title="Email Notifications"
-            onPress={() => {}}
+            onPress={() => router.push("/screens/settings/email-notifications")}
           />
         </SettingsSection>
 
@@ -41,12 +41,12 @@ export default function Settings() {
           <MenuItem
             icon="help-circle-outline"
             title="Help Center"
-            onPress={() => {}}
+            onPress={() => router.push("/screens/settings/help-center")}
           />
           <MenuItem
             icon="alert-circle-outline"
             title="Report a Problem"
-            onPress={() => {}}
+            onPress={() => router.push("/screens/settings/report-problem")}
           />
         </SettingsSection>
 

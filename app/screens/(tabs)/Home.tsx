@@ -57,9 +57,21 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.grid}>
-        <CategoryItem icon="grid-outline" label="Category" />
-        <CategoryItem icon="calendar-outline" label="Attendance" />
-        <CategoryItem icon="help-circle-outline" label="Quiz" />
+        <CategoryItem
+          icon="grid-outline"
+          label="Category"
+          onPress={() => router.push("/screens/categories")}
+        />
+        <CategoryItem
+          icon="calendar-outline"
+          label="Attendance"
+          onPress={() => router.push("/screens/attendance")}
+        />
+        <CategoryItem
+          icon="help-circle-outline"
+          label="Quiz"
+          onPress={() => router.push("/screens/quiz")}
+        />
       </View>
 
       <CoursesScreen />
@@ -67,8 +79,16 @@ export default function HomeScreen() {
   );
 }
 
-const CategoryItem = ({ icon, label }: { icon: any; label: string }) => (
-  <TouchableOpacity style={styles.categoryItem}>
+const CategoryItem = ({
+  icon,
+  label,
+  onPress,
+}: {
+  icon: any;
+  label: string;
+  onPress?: () => void;
+}) => (
+  <TouchableOpacity style={styles.categoryItem} onPress={onPress}>
     <View style={styles.iconContainer}>
       <Ionicons name={icon} size={20} color={Palette.white} />
     </View>

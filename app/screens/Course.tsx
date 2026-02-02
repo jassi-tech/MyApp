@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -46,6 +47,8 @@ const COMPLETED_COURSES: CourseItem[] = [
 ];
 
 export default function CoursesScreen() {
+  const router = useRouter();
+
   return (
     <ScreenContainer scrollable>
       <View style={styles.section}>
@@ -56,7 +59,7 @@ export default function CoursesScreen() {
             title={course.title}
             subtitle={`Instructor: ${course.instructor}`}
             image={course.image}
-            onPress={() => {}}
+            onPress={() => router.push(`/screens/course-details?id=${course.id}`)}
           >
             <View style={styles.progressRow}>
               <View style={styles.progressBarContainer}>
@@ -77,7 +80,7 @@ export default function CoursesScreen() {
             title={course.title}
             subtitle={`Instructor: ${course.instructor}`}
             image={course.image}
-            onPress={() => {}}
+            onPress={() => router.push(`/screens/course-details?id=${course.id}`)}
           >
             <ThemedText style={styles.statusLabelCompleted}>{course.status}</ThemedText>
           </Card>
