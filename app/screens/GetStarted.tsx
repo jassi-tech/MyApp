@@ -14,7 +14,6 @@ export default function GetStarted() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.contentContainer}>
-        {/* Illustration */}
         <View style={styles.imageContainer}>
           <Image
             source={require('../../assets/svg/SoftSkill.svg')}
@@ -34,8 +33,6 @@ export default function GetStarted() {
         <Button
           label="Get Started"
           onPress={() => {
-            // TODO: Future implementation - Redirect to Login page here before Home
-            // For now, navigate directly to Home for progression
             router.push('/screens/Home');
           }}
           style={styles.button}
@@ -49,7 +46,6 @@ export default function GetStarted() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: Palette.deepPurple, // Deep Purple background
   },
   contentContainer: {
     flex: 1,
@@ -76,17 +72,15 @@ const styles = StyleSheet.create({
     color: Palette.white,
     textAlign: 'center',
     lineHeight: 34,
-    // fontSize and fontWeight handled by ThemedText type="title", but keeping usage of style for color and specific tweaks if needed
   },
   button: {
     backgroundColor: Palette.white,
     width: '100%',
     maxWidth: 200,
     borderRadius: 8,
-    // padding handled by Button component size
   },
   buttonText: {
-    color: Palette.deepPurple, // Same as background
+    color: Palette.deepPurple,
     fontSize: 18,
     fontWeight: 'bold',
   },

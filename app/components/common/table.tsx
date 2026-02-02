@@ -1,13 +1,13 @@
 import React, { ReactNode, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  type StyleProp,
-  type TextStyle,
-  type ViewStyle,
+    ActivityIndicator,
+    FlatList,
+    StyleSheet,
+    TouchableOpacity,
+    View,
+    type StyleProp,
+    type TextStyle,
+    type ViewStyle,
 } from "react-native";
 
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -17,6 +17,7 @@ export type TableColumn = {
   key: string;
   title: string;
   width?: number | string;
+  flex?: number;
   align?: "left" | "center" | "right";
   sortable?: boolean;
   render?: (value: any, item?: any) => ReactNode;
@@ -98,7 +99,11 @@ export default function Table({
           key={col.key}
           activeOpacity={col.sortable ? 0.7 : 1}
           onPress={() => handleHeaderPress(col)}
-          style={[styles.cell, typeof col.width === "number" ? { width: col.width } : {}]}
+          style={[
+            styles.cell, 
+            col.flex ? { flex: col.flex } : {},
+            typeof col.width === "number" ? { width: col.width } : {}
+          ]}
         >
           <View style={styles.headerCellInner}>
             <ThemedText
@@ -129,7 +134,11 @@ export default function Table({
         {columns.map((col) => (
           <View
             key={col.key}
-            style={[styles.cell, typeof col.width === "number" ? { width: col.width } : {}]}
+            style={[
+              styles.cell, 
+              col.flex ? { flex: col.flex } : {},
+              typeof col.width === "number" ? { width: col.width } : {}
+            ]}
           >
             {col.render ? (
               col.render(item[col.key], item)

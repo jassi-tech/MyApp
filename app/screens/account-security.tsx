@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet, Switch, TouchableOpacity, View } from "react-native";
 
@@ -9,7 +8,6 @@ import { ThemedText } from "@/components/themed-text";
 import { Palette } from "@/constants/theme";
 
 export default function AccountSecurity() {
-  const router = useRouter();
   const [is2FAEnabled, setIs2FAEnabled] = useState(true);
 
   return (

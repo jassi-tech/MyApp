@@ -14,7 +14,6 @@ export default function Settings() {
 
   return (
     <ScreenContainer header={<ScreenHeader title="Settings" />}>
-        {/* General Section */}
         <SettingsSection title="General">
           <MenuItem icon="person-outline" title="Account" onPress={() => {}} />
           <MenuItem icon="moon-outline" title="Appearance" onPress={() => {}} />
@@ -25,7 +24,6 @@ export default function Settings() {
           />
         </SettingsSection>
 
-        {/* Notifications Section */}
         <SettingsSection title="Notifications">
           <MenuItem
             icon="notifications-outline"
@@ -39,7 +37,6 @@ export default function Settings() {
           />
         </SettingsSection>
 
-        {/* Support Section */}
         <SettingsSection title="Support">
           <MenuItem
             icon="help-circle-outline"
@@ -111,8 +108,6 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   sectionContent: {
-    //   backgroundColor: Palette.darkGray,
-    //   borderRadius: 16,
     overflow: "hidden",
   },
   menuItem: {
@@ -122,7 +117,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    // borderBottomColor: '#333',
   },
   row: {
     flexDirection: "row",

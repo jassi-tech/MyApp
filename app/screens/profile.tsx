@@ -14,11 +14,10 @@ export default function Profile() {
 
   return (
     <ScreenContainer header={<ScreenHeader title="Profile" />}>
-        {/* User Info */}
-        <View style={styles.profileSection}>
+      <View style={styles.profileSection}>
           <View style={styles.avatarContainer}>
             <Image
-              source="https://i.pravatar.cc/300?img=11" // Placeholder image
+              source="https://i.pravatar.cc/300?img=11"
               style={styles.avatar}
               contentFit="cover"
             />
@@ -30,7 +29,6 @@ export default function Profile() {
           <ThemedText style={styles.userEmail}>Email@gmail.com</ThemedText>
         </View>
 
-        {/* Menu Items */}
         <View style={styles.menuContainer}>
           <MenuItem
             icon="settings-outline"
@@ -38,7 +36,6 @@ export default function Profile() {
             onPress={() => router.push("/screens/settings")}
           />
 
-          {/* Account Security with Progress */}
           <TouchableOpacity 
             style={styles.securitySection}
             onPress={() => router.push("/screens/account-security")}

@@ -47,7 +47,6 @@ export default function ParallaxScrollView({
       ],
     };
   });
-  // If no header image provided, render a normal scroll view with content only
   if (!headerImage) {
     return (
       <Animated.ScrollView

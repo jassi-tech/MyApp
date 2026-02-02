@@ -1,11 +1,10 @@
-import { Tabs } from "expo-router";
-import React from "react";
-import { Platform } from "react-native";
-
 import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Tabs } from "expo-router";
+import React from "react";
+import { Platform } from "react-native";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -18,8 +17,7 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
         tabBarStyle: Platform.select({
           ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
+            position: "absolute",
           },
           default: {},
         }),
@@ -30,34 +28,25 @@ export default function TabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={20} name="house.fill" color={color} />
+            <IconSymbol size={24} name="house.fill" color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="reports"
         options={{
-          title: "Explore",
+          title: "Reports",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={20} name="paperplane.fill" color={color} />
+            <IconSymbol size={24} name="doc.fill" color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="share"
+        name="Store"
         options={{
-          title: "Share",
+          title: "Courses",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={20} name="square.and.arrow.up.fill" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={20} name="person.fill" color={color} />
+            <IconSymbol size={24} name="briefcase.fill" color={color} />
           ),
         }}
       />

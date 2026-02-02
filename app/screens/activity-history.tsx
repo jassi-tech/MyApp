@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import React from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 
@@ -52,7 +51,6 @@ const ACTIVITY_DATA = [
 ];
 
 export default function ActivityHistory() {
-  const router = useRouter();
 
   const renderItem = ({ item }: { item: typeof ACTIVITY_DATA[0] }) => (
     <View style={styles.activityItem}>

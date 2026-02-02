@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 
@@ -10,12 +9,11 @@ import { ThemedText } from "@/components/themed-text";
 import { Palette } from "@/constants/theme";
 
 export default function ContactUs() {
-  const router = useRouter();
 
   return (
     <ScreenContainer header={<ScreenHeader title="Contact Us" />}>
         <ThemedText style={styles.description}>
-            Have a question or need help? Send us a message and we'll get back to you as soon as possible.
+            Have a question or need help? Send us a message and we&apos;ll get back to you as soon as possible.
         </ThemedText>
 
         <View style={styles.formGroup}>

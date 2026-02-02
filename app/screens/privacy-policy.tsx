@@ -1,4 +1,3 @@
-import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -8,7 +7,6 @@ import { ThemedText } from "@/components/themed-text";
 import { Palette } from "@/constants/theme";
 
 export default function PrivacyPolicy() {
-  const router = useRouter();
 
   return (
     <ScreenContainer header={<ScreenHeader title="Privacy Policy" />}>
