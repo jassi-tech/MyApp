@@ -54,10 +54,10 @@ export default function Profile() {
               </View>
               <Ionicons name="chevron-forward" size={20} color={Palette.gray} />
             </View>
-            <View style={styles.progressContainer}>
-              <View style={[styles.progressBar, { width: "70%" }]} />
-            </View>
             <ThemedText style={styles.progressText}>Excellent</ThemedText>
+            <View style={styles.progressContainer}>
+              <View style={[styles.progressBar, { width: "90%", backgroundColor: Palette.green }]} />
+            </View>
           </TouchableOpacity>
 
           <MenuItem 
@@ -178,21 +178,21 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   progressContainer: {
-    height: 6,
+    height: 8,
     backgroundColor: Palette.darkGray,
-    borderRadius: 3,
-    marginTop: 10,
-    marginBottom: 6,
-    marginHorizontal: 40, // Indent to align with text
+    borderRadius: 4,
+    marginTop: 8,
+    marginBottom: 12,
   },
   progressBar: {
     height: "100%",
-    backgroundColor: Palette.red,
-    borderRadius: 3,
+    borderRadius: 4,
   },
   progressText: {
-    color: Palette.gray,
+    color: Palette.green,
     fontSize: 12,
-    marginLeft: 40,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
 });
