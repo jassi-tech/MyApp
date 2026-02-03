@@ -31,6 +31,7 @@ export type CardProps = {
   elevation?: number;
   loading?: boolean;
   disabled?: boolean;
+  variant?: "vertical" | "horizontal";
 };
 
 export default function Card({
@@ -48,9 +49,10 @@ export default function Card({
   elevation = 2,
   loading = false,
   disabled = false,
+  variant = "vertical",
 }: CardProps) {
   const backgroundColor = useThemeColor({}, "background") as string | undefined;
-  const borderColor = useThemeColor({}, "tint") as string | undefined;
+  const borderColor = "transparent"; // Removed border color for cleaner look, or use standard if preferred
 
   const Wrapper: any = onPress ? TouchableOpacity : View;
 
@@ -59,17 +61,19 @@ export default function Card({
       ? { uri: image }
       : (image as ImageSourcePropType | undefined);
 
+  const isHorizontal = variant === "horizontal";
+
   return (
     <Wrapper
       activeOpacity={onPress ? (disabled ? 1 : 0.8) : 1}
       onPress={onPress}
       style={[
-        styles.container,
+        isHorizontal ? styles.containerHorizontal : styles.container,
         {
-          backgroundColor,
+          backgroundColor: isHorizontal ? "transparent" : backgroundColor, // Horizontal cards might look better without background or transparent
           borderColor,
           borderRadius: rounded ? 12 : 6,
-          elevation,
+          elevation: isHorizontal ? 0 : elevation, // Remove elevation for horizontal list items usually
         },
         style,
       ]}
@@ -86,20 +90,20 @@ export default function Card({
               source={resolvedImageSource}
               resizeMode={imageResizeMode}
               style={[
-                styles.image,
-                rounded ? styles.imageRounded : undefined,
+                isHorizontal ? styles.imageHorizontal : styles.image,
+                rounded ? (isHorizontal ? styles.imageRoundedHorizontal : styles.imageRounded) : undefined,
                 imageStyle,
               ]}
             />
           ) : null}
 
-          <View style={styles.content}>
+          <View style={isHorizontal ? styles.contentHorizontal : styles.content}>
             {(title || headerRight) && (
               <View style={styles.headerRow}>
                 {title ? (
                   <ThemedText
                     type="subtitle"
-                    style={styles.title}
+                    style={[styles.title, isHorizontal && styles.titleHorizontal]}
                     numberOfLines={2}
                   >
                     {title}
@@ -118,7 +122,7 @@ export default function Card({
               <ThemedText
                 type="default"
                 style={styles.subtitle}
-                numberOfLines={2}
+                numberOfLines={1}
               >
                 {subtitle}
               </ThemedText>
@@ -127,7 +131,7 @@ export default function Card({
             {children ? <View style={styles.children}>{children}</View> : null}
           </View>
 
-          {footer ? <View style={styles.footer}>{footer}</View> : null}
+          {!isHorizontal && footer ? <View style={styles.footer}>{footer}</View> : null}
         </>
       )}
     </Wrapper>
@@ -144,33 +148,61 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.12,
     shadowRadius: 4,
   },
+  containerHorizontal: {
+    flexDirection: "row",
+    marginVertical: 8,
+    overflow: "hidden",
+    alignItems: "center", // Align items vertically in the row
+    backgroundColor: "transparent",
+  },
   center: { alignItems: "center", justifyContent: "center" },
   image: {
     width: "100%",
     height: 140,
   },
+  imageHorizontal: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+  },
   imageRounded: {
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
   },
+  imageRoundedHorizontal: {
+    borderRadius: 12, // Rounded corners for horizontal image
+  },
   content: {
     padding: 12,
   },
+  contentHorizontal: {
+    flex: 1,
+    paddingLeft: 12,
+    paddingVertical: 4,
+    justifyContent: "center",
+  },
   headerRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start", // Align top for text wrapping
     justifyContent: "space-between",
-    marginBottom: 6,
+    marginBottom: 4,
   },
   headerRight: {
     marginLeft: 8,
   },
   title: {
     flex: 1,
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  titleHorizontal: {
+    fontSize: 15, // Slightly smaller for horizontal list maybe
+    fontWeight: "bold",
   },
   subtitle: {
-    marginBottom: 8,
+    marginBottom: 4,
     color: "#666",
+    fontSize: 13,
   },
   children: {
     marginTop: 4,

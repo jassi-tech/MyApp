@@ -2,79 +2,135 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
+import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { Palette } from "@/constants/theme";
 
 const MESSAGES = [
-  { id: "1", sender: "Principal Office", subject: "Annual Day Celebration", date: "2 Feb", isRead: false, priority: "high" },
-  { id: "2", sender: "Class Teacher", subject: "Parent-Teacher Meeting", date: "1 Feb", isRead: false, priority: "normal" },
-  { id: "3", sender: "Accounts Department", subject: "Fee Payment Reminder", date: "31 Jan", isRead: true, priority: "normal" },
-  { id: "4", sender: "Sports Department", subject: "Inter-School Tournament", date: "30 Jan", isRead: true, priority: "normal" },
-  { id: "5", sender: "Library", subject: "Book Return Notice", date: "29 Jan", isRead: true, priority: "low" },
+  {
+    id: "1",
+    sender: "Principal Office",
+    subject: "Annual Day Celebration",
+    date: "2 Feb",
+    isRead: false,
+    priority: "high",
+  },
+  {
+    id: "2",
+    sender: "Class Teacher",
+    subject: "Parent-Teacher Meeting",
+    date: "1 Feb",
+    isRead: false,
+    priority: "normal",
+  },
+  {
+    id: "3",
+    sender: "Accounts Department",
+    subject: "Fee Payment Reminder",
+    date: "31 Jan",
+    isRead: true,
+    priority: "normal",
+  },
+  {
+    id: "4",
+    sender: "Sports Department",
+    subject: "Inter-School Tournament",
+    date: "30 Jan",
+    isRead: true,
+    priority: "normal",
+  },
+  {
+    id: "5",
+    sender: "Library",
+    subject: "Book Return Notice",
+    date: "29 Jan",
+    isRead: true,
+    priority: "low",
+  },
 ];
 
 export default function InboxScreen() {
   const router = useRouter();
   const [filter, setFilter] = useState<"all" | "unread">("all");
 
-  const filteredMessages = filter === "unread" 
-    ? MESSAGES.filter(m => !m.isRead)
-    : MESSAGES;
+  const filteredMessages =
+    filter === "unread" ? MESSAGES.filter((m) => !m.isRead) : MESSAGES;
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={Palette.white} />
-        </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Inbox</ThemedText>
-        <TouchableOpacity style={styles.filterButton}>
-          <Ionicons name="filter-outline" size={22} color={Palette.white} />
-        </TouchableOpacity>
-      </View>
+      <ScreenHeader
+        title="Inbox"
+        rightElement={
+          <TouchableOpacity style={styles.filterButton}>
+            <Ionicons name="filter-outline" size={22} color={Palette.white} />
+          </TouchableOpacity>
+        }
+      />
 
       <View style={styles.filterTabs}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.tab, filter === "all" && styles.activeTab]}
           onPress={() => setFilter("all")}
         >
-          <ThemedText style={[styles.tabText, filter === "all" && styles.activeTabText]}>
+          <ThemedText
+            style={[styles.tabText, filter === "all" && styles.activeTabText]}
+          >
             All ({MESSAGES.length})
           </ThemedText>
         </TouchableOpacity>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.tab, filter === "unread" && styles.activeTab]}
           onPress={() => setFilter("unread")}
         >
-          <ThemedText style={[styles.tabText, filter === "unread" && styles.activeTabText]}>
-            Unread ({MESSAGES.filter(m => !m.isRead).length})
+          <ThemedText
+            style={[
+              styles.tabText,
+              filter === "unread" && styles.activeTabText,
+            ]}
+          >
+            Unread ({MESSAGES.filter((m) => !m.isRead).length})
           </ThemedText>
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {filteredMessages.map((message) => (
           <TouchableOpacity key={message.id} style={styles.messageCard}>
             <View style={styles.messageHeader}>
               <View style={styles.senderRow}>
                 {!message.isRead && <View style={styles.unreadDot} />}
-                <ThemedText style={[styles.senderText, !message.isRead && styles.unreadText]}>
+                <ThemedText
+                  style={[
+                    styles.senderText,
+                    !message.isRead && styles.unreadText,
+                  ]}
+                >
                   {message.sender}
                 </ThemedText>
                 {message.priority === "high" && (
-                  <Ionicons name="alert-circle" size={16} color="#ef4444" style={{ marginLeft: 6 }} />
+                  <Ionicons
+                    name="alert-circle"
+                    size={16}
+                    color="#ef4444"
+                    style={{ marginLeft: 6 }}
+                  />
                 )}
               </View>
               <ThemedText style={styles.dateText}>{message.date}</ThemedText>
             </View>
-            <ThemedText style={[styles.subjectText, !message.isRead && styles.unreadText]}>
+            <ThemedText
+              style={[styles.subjectText, !message.isRead && styles.unreadText]}
+            >
               {message.subject}
             </ThemedText>
             <View style={styles.messageFooter}>
@@ -94,26 +150,7 @@ const styles = StyleSheet.create({
     backgroundColor: Palette.black,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#1a1a1a",
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Palette.darkGray,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: Palette.white,
+    // moved to common component
   },
   filterButton: {
     width: 40,

@@ -2,21 +2,46 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
+import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { Palette } from "@/constants/theme";
 
 const CIRCULARS = [
-  { id: "1", title: "Admission Process for New Session", date: "2 Feb 2026", category: "Admission", size: "245 KB" },
-  { id: "2", title: "Examination Guidelines 2026", date: "30 Jan 2026", category: "Examination", size: "180 KB" },
-  { id: "3", title: "Code of Conduct for Students", date: "25 Jan 2026", category: "General", size: "320 KB" },
-  { id: "4", title: "Sports Activity Schedule", date: "20 Jan 2026", category: "Sports", size: "156 KB" },
+  {
+    id: "1",
+    title: "Admission Process for New Session",
+    date: "2 Feb 2026",
+    category: "Admission",
+    size: "245 KB",
+  },
+  {
+    id: "2",
+    title: "Examination Guidelines 2026",
+    date: "30 Jan 2026",
+    category: "Examination",
+    size: "180 KB",
+  },
+  {
+    id: "3",
+    title: "Code of Conduct for Students",
+    date: "25 Jan 2026",
+    category: "General",
+    size: "320 KB",
+  },
+  {
+    id: "4",
+    title: "Sports Activity Schedule",
+    date: "20 Jan 2026",
+    category: "Sports",
+    size: "156 KB",
+  },
 ];
 
 export default function CircularScreen() {
@@ -24,15 +49,12 @@ export default function CircularScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={Palette.white} />
-        </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Circulars</ThemedText>
-        <View style={{ width: 40 }} />
-      </View>
+      <ScreenHeader title="Circulars" />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {CIRCULARS.map((circular) => (
           <TouchableOpacity key={circular.id} style={styles.circularCard}>
             <View style={styles.documentIcon}>
@@ -42,7 +64,9 @@ export default function CircularScreen() {
               <ThemedText style={styles.titleText}>{circular.title}</ThemedText>
               <View style={styles.metaRow}>
                 <View style={styles.categoryBadge}>
-                  <ThemedText style={styles.categoryText}>{circular.category}</ThemedText>
+                  <ThemedText style={styles.categoryText}>
+                    {circular.category}
+                  </ThemedText>
                 </View>
                 <ThemedText style={styles.sizeText}>{circular.size}</ThemedText>
               </View>
@@ -64,26 +88,7 @@ const styles = StyleSheet.create({
     backgroundColor: Palette.black,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#1a1a1a",
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Palette.darkGray,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: Palette.white,
+    // moved to common component
   },
   scrollContent: {
     padding: 16,

@@ -1,16 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
 import { ResizeMode, Video } from "expo-av";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
-    Dimensions,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
+import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { Palette } from "@/constants/theme";
 
@@ -21,53 +22,135 @@ const COURSE_DATA: Record<string, any> = {
     id: "1",
     title: "Mastering React Native Animation",
     instructor: "Sarah Johnson",
-    description: "Learn advanced animation techniques in React Native to create stunning user experiences.",
-    duration: "8 hours",
-    lessons: 24,
+    description:
+      "Learn advanced animation techniques in React Native to create stunning user experiences. This course covers everything from simple transitions to complex gesture-based interactions.",
+    duration: "8h 15m",
+    lessons: 5,
     rating: 4.8,
     students: 1234,
+    lastUpdated: "Feb 2024",
     lessons_list: [
-      { id: "1", title: "Introduction to Animations", duration: "12:30", completed: true, videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
-      { id: "2", title: "Understanding Animated API", duration: "18:45", completed: true, videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
-      { id: "3", title: "Spring Animations", duration: "15:20", completed: false, videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" },
-      { id: "4", title: "Timing Animations", duration: "20:10", completed: false, videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" },
-      { id: "5", title: "Gesture-Based Animations", duration: "25:30", completed: false, videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" },
+      {
+        id: "1",
+        title: "Introduction to Animations",
+        duration: "12:30",
+        completed: true,
+        videoUrl:
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      },
+      {
+        id: "2",
+        title: "Understanding Animated API",
+        duration: "18:45",
+        completed: true,
+        videoUrl:
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+      },
+      {
+        id: "3",
+        title: "Spring Animations",
+        duration: "15:20",
+        completed: false,
+        videoUrl:
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      },
+      {
+        id: "4",
+        title: "Timing Animations",
+        duration: "20:10",
+        completed: false,
+        videoUrl:
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+      },
+      {
+        id: "5",
+        title: "Gesture-Based Animations",
+        duration: "25:30",
+        completed: false,
+        videoUrl:
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+      },
     ],
   },
   "2": {
     id: "2",
     title: "Fullstack Development with Expo",
     instructor: "Michael Chen",
-    description: "Build complete mobile applications with Expo and modern backend technologies.",
-    duration: "12 hours",
+    description:
+      "Build complete mobile applications with Expo and modern backend technologies. A comprehensive guide to building scalable apps.",
+    duration: "12h 45m",
     lessons: 36,
     rating: 4.9,
     students: 2156,
+    lastUpdated: "Jan 2024",
     lessons_list: [
-      { id: "1", title: "Getting Started with Expo", duration: "10:00", completed: true, videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
-      { id: "2", title: "Setting Up Backend", duration: "22:15", completed: false, videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
-      { id: "3", title: "API Integration", duration: "18:30", completed: false, videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" },
+      {
+        id: "1",
+        title: "Getting Started with Expo",
+        duration: "10:00",
+        completed: true,
+        videoUrl:
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      },
+      {
+        id: "2",
+        title: "Setting Up Backend",
+        duration: "22:15",
+        completed: false,
+        videoUrl:
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+      },
+      {
+        id: "3",
+        title: "API Integration",
+        duration: "18:30",
+        completed: false,
+        videoUrl:
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      },
     ],
   },
   "3": {
     id: "3",
     title: "TypeScript for Beginners",
     instructor: "Elena Rodriguez",
-    description: "Master TypeScript fundamentals and advanced concepts for modern development.",
-    duration: "6 hours",
+    description:
+      "Master TypeScript fundamentals and advanced concepts for modern development. Essential for any React Native developer.",
+    duration: "6h",
     lessons: 18,
     rating: 4.7,
     students: 3421,
+    lastUpdated: "Mar 2024",
     lessons_list: [
-      { id: "1", title: "TypeScript Basics", duration: "14:20", completed: true, videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
-      { id: "2", title: "Types and Interfaces", duration: "16:45", completed: true, videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
-      { id: "3", title: "Generics", duration: "19:30", completed: true, videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" },
+      {
+        id: "1",
+        title: "TypeScript Basics",
+        duration: "14:20",
+        completed: true,
+        videoUrl:
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      },
+      {
+        id: "2",
+        title: "Types and Interfaces",
+        duration: "16:45",
+        completed: true,
+        videoUrl:
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+      },
+      {
+        id: "3",
+        title: "Generics",
+        duration: "19:30",
+        completed: true,
+        videoUrl:
+          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      },
     ],
   },
 };
 
 export default function CourseDetailsScreen() {
-  const router = useRouter();
   const params = useLocalSearchParams();
   const courseId = params.id as string;
   const course = COURSE_DATA[courseId];
@@ -78,27 +161,36 @@ export default function CourseDetailsScreen() {
   if (!course) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <ThemedText>Course not found</ThemedText>
+        <ScreenHeader title="Details" />
+        <View style={styles.centerContainer}>
+          <ThemedText>Course not found</ThemedText>
+        </View>
       </SafeAreaView>
     );
   }
 
-  const completedLessons = course.lessons_list.filter((l: any) => l.completed).length;
-  const progress = Math.round((completedLessons / course.lessons_list.length) * 100);
+  const completedLessons = course.lessons_list.filter(
+    (l: any) => l.completed,
+  ).length;
+  const progress = Math.round(
+    (completedLessons / course.lessons_list.length) * 100,
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={Palette.white} />
-        </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Course Details</ThemedText>
-        <TouchableOpacity style={styles.bookmarkButton}>
-          <Ionicons name="bookmark-outline" size={22} color={Palette.white} />
-        </TouchableOpacity>
-      </View>
+      <ScreenHeader
+        title="Details"
+        rightElement={
+          <TouchableOpacity>
+            <Ionicons name="bookmark-outline" size={24} color={Palette.white} />
+          </TouchableOpacity>
+        }
+      />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Video Player */}
         <View style={styles.videoContainer}>
           <Video
@@ -113,93 +205,156 @@ export default function CourseDetailsScreen() {
               }
             }}
           />
-          <View style={styles.videoOverlay}>
-            <ThemedText style={styles.videoTitle}>{selectedLesson.title}</ThemedText>
-          </View>
+          {!isPlaying && (
+            <View style={styles.videoOverlay}>
+              <View style={styles.playButton}>
+                <Ionicons name="play" size={32} color={Palette.white} />
+              </View>
+              {/* <ThemedText style={styles.videoTitle}>
+                {selectedLesson.title}
+              </ThemedText> */}
+            </View>
+          )}
         </View>
 
-        {/* Course Info */}
-        <View style={styles.courseInfo}>
-          <ThemedText style={styles.courseTitle}>{course.title}</ThemedText>
-          <ThemedText style={styles.instructor}>by {course.instructor}</ThemedText>
-          <ThemedText style={styles.description}>{course.description}</ThemedText>
-
-          <View style={styles.statsRow}>
-            <View style={styles.statItem}>
-              <Ionicons name="star" size={16} color="#f59e0b" />
-              <ThemedText style={styles.statText}>{course.rating}</ThemedText>
-            </View>
-            <View style={styles.statItem}>
-              <Ionicons name="people-outline" size={16} color="#888" />
-              <ThemedText style={styles.statText}>{course.students.toLocaleString()}</ThemedText>
-            </View>
-            <View style={styles.statItem}>
-              <Ionicons name="time-outline" size={16} color="#888" />
-              <ThemedText style={styles.statText}>{course.duration}</ThemedText>
-            </View>
-            <View style={styles.statItem}>
-              <Ionicons name="book-outline" size={16} color="#888" />
-              <ThemedText style={styles.statText}>{course.lessons} lessons</ThemedText>
+        <View style={styles.contentContainer}>
+          {/* Main Info */}
+          <View style={styles.headerInfo}>
+            <ThemedText type="title" style={styles.courseTitle}>
+              {course.title}
+            </ThemedText>
+            <View style={styles.instructorRow}>
+              <ThemedText style={styles.instructorLabel}>Created by</ThemedText>
+              <ThemedText style={styles.instructorName}>
+                {course.instructor}
+              </ThemedText>
             </View>
           </View>
 
-          {/* Progress */}
-          <View style={styles.progressSection}>
-            <View style={styles.progressHeader}>
-              <ThemedText style={styles.progressLabel}>Your Progress</ThemedText>
-              <ThemedText style={styles.progressPercent}>{progress}%</ThemedText>
+          {/* Stats Grid */}
+          <View style={styles.statsGrid}>
+            <View style={styles.statItem}>
+              <Ionicons name="star" size={18} color="#f59e0b" />
+              <View>
+                <ThemedText style={styles.statValue}>
+                  {course.rating}
+                </ThemedText>
+                <ThemedText style={styles.statLabel}>Rating</ThemedText>
+              </View>
             </View>
-            <View style={styles.progressBarBg}>
-              <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Ionicons name="people" size={18} color={Palette.gray} />
+              <View>
+                <ThemedText style={styles.statValue}>
+                  {course.students.toLocaleString()}
+                </ThemedText>
+                <ThemedText style={styles.statLabel}>Students</ThemedText>
+              </View>
             </View>
-            <ThemedText style={styles.progressText}>
-              {completedLessons} of {course.lessons_list.length} lessons completed
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Ionicons name="time" size={18} color={Palette.gray} />
+              <View>
+                <ThemedText style={styles.statValue}>
+                  {course.duration}
+                </ThemedText>
+                <ThemedText style={styles.statLabel}>Duration</ThemedText>
+              </View>
+            </View>
+          </View>
+
+          {/* About */}
+          <View style={styles.section}>
+            <ThemedText type="subtitle" style={styles.sectionHeader}>
+              About Course
+            </ThemedText>
+            <ThemedText style={styles.description}>
+              {course.description}
             </ThemedText>
           </View>
-        </View>
 
-        {/* Lessons List */}
-        <View style={styles.lessonsSection}>
-          <ThemedText style={styles.sectionTitle}>COURSE CONTENT</ThemedText>
-          {course.lessons_list.map((lesson: any, index: number) => (
-            <TouchableOpacity
-              key={lesson.id}
-              style={[
-                styles.lessonCard,
-                selectedLesson.id === lesson.id && styles.lessonCardActive,
-              ]}
-              onPress={() => setSelectedLesson(lesson)}
-            >
-              <View style={styles.lessonLeft}>
-                <View style={[
-                  styles.lessonNumber,
-                  lesson.completed && styles.lessonNumberCompleted,
-                  selectedLesson.id === lesson.id && styles.lessonNumberActive,
-                ]}>
-                  {lesson.completed ? (
-                    <Ionicons name="checkmark" size={16} color={Palette.white} />
-                  ) : (
-                    <ThemedText style={styles.lessonNumberText}>{index + 1}</ThemedText>
-                  )}
-                </View>
-                <View style={styles.lessonInfo}>
-                  <ThemedText style={[
-                    styles.lessonTitle,
-                    selectedLesson.id === lesson.id && styles.lessonTitleActive,
-                  ]}>
-                    {lesson.title}
-                  </ThemedText>
-                  <View style={styles.lessonMeta}>
-                    <Ionicons name="time-outline" size={12} color="#666" />
-                    <ThemedText style={styles.lessonDuration}>{lesson.duration}</ThemedText>
-                  </View>
-                </View>
-              </View>
-              {selectedLesson.id === lesson.id && (
-                <Ionicons name="play-circle" size={24} color="#00bfff" />
-              )}
-            </TouchableOpacity>
-          ))}
+          {/* Lessons */}
+          <View style={styles.section}>
+            <View style={styles.lessonsHeaderRow}>
+              <ThemedText type="subtitle" style={styles.sectionHeader}>
+                Lessons
+              </ThemedText>
+              <ThemedText style={styles.lessonsCount}>
+                {course.lessons} videos
+              </ThemedText>
+            </View>
+
+            <View style={styles.lessonsList}>
+              {course.lessons_list.map((lesson: any, index: number) => {
+                const isActive = selectedLesson.id === lesson.id;
+                return (
+                  <TouchableOpacity
+                    key={lesson.id}
+                    style={[
+                      styles.lessonItem,
+                      isActive && styles.lessonItemActive,
+                    ]}
+                    onPress={() => setSelectedLesson(lesson)}
+                  >
+                    <View style={styles.lessonLeft}>
+                      <View
+                        style={[
+                          styles.indexCircle,
+                          lesson.completed && styles.indexCircleCompleted,
+                          isActive && styles.indexCircleActive,
+                        ]}
+                      >
+                        {lesson.completed ? (
+                          <Ionicons
+                            name="checkmark"
+                            size={12}
+                            color={Palette.white}
+                          />
+                        ) : (
+                          <ThemedText
+                            style={[
+                              styles.indexText,
+                              isActive && styles.indexTextActive,
+                            ]}
+                          >
+                            {index + 1}
+                          </ThemedText>
+                        )}
+                      </View>
+                      <View style={styles.lessonInfo}>
+                        <ThemedText
+                          style={[
+                            styles.lessonTitle,
+                            isActive && styles.lessonTitleActive,
+                          ]}
+                          numberOfLines={1}
+                        >
+                          {lesson.title}
+                        </ThemedText>
+                        <ThemedText style={styles.lessonDuration}>
+                          {lesson.duration}
+                        </ThemedText>
+                      </View>
+                    </View>
+                    {isActive ? (
+                      <Ionicons
+                        name="pause-circle"
+                        size={24}
+                        color={Palette.primary}
+                      />
+                    ) : (
+                      <Ionicons
+                        name="play-circle-outline"
+                        size={24}
+                        color={Palette.gray}
+                      />
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -209,35 +364,10 @@ export default function CourseDetailsScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
+    backgroundColor: Palette.background,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#1a1a1a",
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Palette.darkGray,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: Palette.white,
-  },
-  bookmarkButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Palette.darkGray,
+  centerContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -246,7 +376,7 @@ const styles = StyleSheet.create({
   },
   videoContainer: {
     width: width,
-    height: width * 9 / 16,
+    height: width * 0.5625, // 16:9 aspect ratio
     backgroundColor: "#000",
     position: "relative",
   },
@@ -255,161 +385,169 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   videoOverlay: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 16,
-    backgroundColor: "rgba(0,0,0,0.7)",
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.3)",
   },
-  videoTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: Palette.white,
-  },
-  courseInfo: {
-    padding: 16,
-  },
-  courseTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: Palette.white,
-    marginBottom: 8,
-  },
-  instructor: {
-    fontSize: 14,
-    color: "#00bfff",
+  playButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 12,
   },
-  description: {
-    fontSize: 14,
-    color: "#ccc",
-    lineHeight: 20,
-    marginBottom: 16,
+  // videoTitle: {
+  //   position: "absolute",
+  //   bottom: 0,
+  //   left: 0,
+  //   right: 0,
+  //   padding: 16,
+  //   backgroundColor:
+  //     "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%)", // Simple gradient fallback
+  //   color: Palette.white,
+  //   fontSize: 14,
+  //   fontWeight: "600",
+  // },
+  contentContainer: {
+    padding: 20,
   },
-  statsRow: {
+  headerInfo: {
+    marginBottom: 24,
+  },
+  courseTitle: {
+    fontSize: 22,
+    lineHeight: 30,
+    marginBottom: 8,
+  },
+  instructorRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 16,
-    marginBottom: 20,
+    alignItems: "center",
+  },
+  instructorLabel: {
+    color: Palette.gray,
+    fontSize: 14,
+    marginRight: 6,
+  },
+  instructorName: {
+    color: Palette.primary,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  statsGrid: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#1E1E1E", // Slightly lighter than background
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 24,
   },
   statItem: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 10,
+    flex: 1,
+    justifyContent: "center",
   },
-  statText: {
-    fontSize: 13,
-    color: "#888",
-  },
-  progressSection: {
-    backgroundColor: Palette.darkGray,
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#2a2a2a",
-  },
-  progressHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  progressLabel: {
+  statValue: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "700",
     color: Palette.white,
   },
-  progressPercent: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#00bfff",
-  },
-  progressBarBg: {
-    height: 8,
-    backgroundColor: "#2a2a2a",
-    borderRadius: 4,
-    marginBottom: 8,
-  },
-  progressBarFill: {
-    height: "100%",
-    backgroundColor: "#00bfff",
-    borderRadius: 4,
-  },
-  progressText: {
+  statLabel: {
     fontSize: 12,
-    color: "#888",
+    color: Palette.gray,
   },
-  lessonsSection: {
-    padding: 16,
-    paddingTop: 8,
+  statDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: "#333",
   },
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#666",
-    marginBottom: 16,
-    letterSpacing: 1,
+  section: {
+    marginBottom: 28,
   },
-  lessonCard: {
+  sectionHeader: {
+    marginBottom: 12,
+    fontSize: 18,
+  },
+  description: {
+    fontSize: 15,
+    lineHeight: 24,
+    color: "#ccc",
+  },
+  lessonsHeaderRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: Palette.darkGray,
-    padding: 14,
-    borderRadius: 12,
-    marginBottom: 10,
-    borderWidth: 2,
-    borderColor: "#2a2a2a",
+    marginBottom: 16,
   },
-  lessonCardActive: {
-    borderColor: "#00bfff",
-    backgroundColor: "#00bfff10",
+  lessonsCount: {
+    fontSize: 13,
+    color: Palette.gray,
+  },
+  lessonsList: {
+    gap: 12,
+  },
+  lessonItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: "#1E1E1E",
+  },
+  lessonItemActive: {
+    backgroundColor: "#2C2C2E", // Slightly lighter active state
+    borderLeftWidth: 3,
+    borderLeftColor: Palette.primary,
   },
   lessonLeft: {
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
+    marginRight: 12,
   },
-  lessonNumber: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#2a2a2a",
+  indexCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#333",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
   },
-  lessonNumberCompleted: {
-    backgroundColor: "#22c55e",
+  indexCircleCompleted: {
+    backgroundColor: Palette.green,
   },
-  lessonNumberActive: {
-    backgroundColor: "#00bfff",
+  indexCircleActive: {
+    backgroundColor: Palette.primary,
   },
-  lessonNumberText: {
-    fontSize: 14,
+  indexText: {
+    fontSize: 10,
     fontWeight: "600",
-    color: "#888",
+    color: Palette.gray,
+  },
+  indexTextActive: {
+    color: Palette.white,
   },
   lessonInfo: {
     flex: 1,
   },
   lessonTitle: {
     fontSize: 15,
-    fontWeight: "600",
+    fontWeight: "500",
     color: Palette.white,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   lessonTitleActive: {
-    color: "#00bfff",
-  },
-  lessonMeta: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
+    fontWeight: "600",
+    color: Palette.primary,
   },
   lessonDuration: {
     fontSize: 12,
-    color: "#666",
+    color: Palette.gray,
   },
 });

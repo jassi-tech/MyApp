@@ -2,21 +2,43 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
+import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { Palette } from "@/constants/theme";
 
 const LEAVE_HISTORY = [
-  { id: "1", reason: "Medical Emergency", from: "5 Feb", to: "7 Feb", status: "approved", days: 3 },
-  { id: "2", reason: "Family Function", from: "20 Jan", to: "21 Jan", status: "approved", days: 2 },
-  { id: "3", reason: "Sick Leave", from: "10 Jan", to: "10 Jan", status: "rejected", days: 1 },
+  {
+    id: "1",
+    reason: "Medical Emergency",
+    from: "5 Feb",
+    to: "7 Feb",
+    status: "approved",
+    days: 3,
+  },
+  {
+    id: "2",
+    reason: "Family Function",
+    from: "20 Jan",
+    to: "21 Jan",
+    status: "approved",
+    days: 2,
+  },
+  {
+    id: "3",
+    reason: "Sick Leave",
+    from: "10 Jan",
+    to: "10 Jan",
+    status: "rejected",
+    days: 1,
+  },
 ];
 
 export default function LeaveRequestScreen() {
@@ -25,40 +47,47 @@ export default function LeaveRequestScreen() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "approved": return "#22c55e";
-      case "pending": return "#f59e0b";
-      case "rejected": return "#ef4444";
-      default: return "#666";
+      case "approved":
+        return "#22c55e";
+      case "pending":
+        return "#f59e0b";
+      case "rejected":
+        return "#ef4444";
+      default:
+        return "#666";
     }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={Palette.white} />
-        </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Leave Request</ThemedText>
-        <View style={{ width: 40 }} />
-      </View>
+      <ScreenHeader title="Leave Request" />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.balanceCard}>
-          <ThemedText style={styles.balanceLabel}>Available Leave Balance</ThemedText>
+          <ThemedText style={styles.balanceLabel}>
+            Available Leave Balance
+          </ThemedText>
           <ThemedText style={styles.balanceValue}>12 Days</ThemedText>
         </View>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.applyButton}
           onPress={() => setShowForm(!showForm)}
         >
           <Ionicons name="add-circle-outline" size={20} color={Palette.white} />
-          <ThemedText style={styles.applyButtonText}>Apply for Leave</ThemedText>
+          <ThemedText style={styles.applyButtonText}>
+            Apply for Leave
+          </ThemedText>
         </TouchableOpacity>
 
         {showForm && (
           <View style={styles.formCard}>
-            <ThemedText style={styles.formTitle}>New Leave Application</ThemedText>
+            <ThemedText style={styles.formTitle}>
+              New Leave Application
+            </ThemedText>
             <TextInput
               style={styles.input}
               placeholder="Reason for leave"
@@ -77,7 +106,9 @@ export default function LeaveRequestScreen() {
               />
             </View>
             <TouchableOpacity style={styles.submitButton}>
-              <ThemedText style={styles.submitButtonText}>Submit Request</ThemedText>
+              <ThemedText style={styles.submitButtonText}>
+                Submit Request
+              </ThemedText>
             </TouchableOpacity>
           </View>
         )}
@@ -87,8 +118,18 @@ export default function LeaveRequestScreen() {
           <View key={leave.id} style={styles.leaveCard}>
             <View style={styles.leaveHeader}>
               <ThemedText style={styles.reasonText}>{leave.reason}</ThemedText>
-              <View style={[styles.statusBadge, { backgroundColor: getStatusColor(leave.status) + "20" }]}>
-                <ThemedText style={[styles.statusText, { color: getStatusColor(leave.status) }]}>
+              <View
+                style={[
+                  styles.statusBadge,
+                  { backgroundColor: getStatusColor(leave.status) + "20" },
+                ]}
+              >
+                <ThemedText
+                  style={[
+                    styles.statusText,
+                    { color: getStatusColor(leave.status) },
+                  ]}
+                >
                   {leave.status.toUpperCase()}
                 </ThemedText>
               </View>
@@ -97,7 +138,8 @@ export default function LeaveRequestScreen() {
               <View style={styles.detailRow}>
                 <Ionicons name="calendar-outline" size={14} color="#666" />
                 <ThemedText style={styles.detailText}>
-                  {leave.from} to {leave.to} ({leave.days} {leave.days === 1 ? 'day' : 'days'})
+                  {leave.from} to {leave.to} ({leave.days}{" "}
+                  {leave.days === 1 ? "day" : "days"})
                 </ThemedText>
               </View>
             </View>
@@ -114,26 +156,7 @@ const styles = StyleSheet.create({
     backgroundColor: Palette.black,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#1a1a1a",
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Palette.darkGray,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: Palette.white,
+    // moved to common component
   },
   scrollContent: {
     padding: 16,

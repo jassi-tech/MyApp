@@ -13,8 +13,12 @@ interface StoreItem {
   subtitle: string;
   image: string;
   price: string;
+  originalPrice: string;
   rating: number;
   students: string;
+  author: string;
+  updatedAt: string;
+  isTopAuthor?: boolean;
 }
 
 const CATEGORIES = ["All", "Development", "Design", "Business", "Marketing", "Health"];
@@ -22,21 +26,29 @@ const CATEGORIES = ["All", "Development", "Design", "Business", "Marketing", "He
 const FEATURED_COURSES: StoreItem[] = [
   {
     id: "1",
-    title: "Complete React Native Masterclass 2026",
-    subtitle: "Build professional iOS and Android apps with Expo and TypeScript.",
-    image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2670&auto=format&fit=crop",
-    price: "$89.99",
-    rating: 4.9,
-    students: "12.5k",
+    title: "JavaScript for Modern Web Development",
+    subtitle: "Build professional websites with JS.",
+    author: "Robert Fox",
+    updatedAt: "3 hr",
+    image: "https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2?q=80&w=2670&auto=format&fit=crop",
+    price: "$10.99",
+    originalPrice: "$32",
+    rating: 4.5,
+    students: "2,980",
+    isTopAuthor: true,
   },
   {
     id: "2",
-    title: "Advanced UI/UX Design Principles",
-    subtitle: "Master Figma and create stunning user interfaces for mobile.",
-    image: "https://images.unsplash.com/photo-1586717791821-3f44a563de4c?q=80&w=2670&auto=format&fit=crop",
-    price: "$74.99",
-    rating: 4.8,
-    students: "8.2k",
+    title: "Python Programming for Data Analysis",
+    subtitle: "Master Python and Data Science.",
+    author: "Eleanor Pena",
+    updatedAt: "3 hr",
+    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2670&auto=format&fit=crop",
+    price: "$10.99",
+    originalPrice: "$32",
+    rating: 4.5,
+    students: "2,980",
+    isTopAuthor: true,
   },
 ];
 
@@ -44,20 +56,28 @@ const RECENTLY_ADDED: StoreItem[] = [
   {
     id: "3",
     title: "Next.js 15 & Tailwind CSS",
-    subtitle: "Build high-performance web applications with ease.",
+    subtitle: "Build high-performance web applications.",
+    author: "Arlene McCoy",
+    updatedAt: "5 hr",
     image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2672&auto=format&fit=crop",
     price: "$59.99",
+    originalPrice: "$89",
     rating: 4.7,
     students: "3.1k",
+    isTopAuthor: false,
   },
   {
     id: "4",
     title: "Professional Backend with Node.js",
-    subtitle: "Scalable APIs with Express and PostgreSQL.",
+    subtitle: "Scalable APIs with Express.",
+    author: "Guy Hawkins",
+    updatedAt: "1 day",
     image: "https://images.unsplash.com/photo-1516116216624-53e697fedbea?q=80&w=2728&auto=format&fit=crop",
     price: "$69.99",
+    originalPrice: "$99",
     rating: 4.9,
     students: "5.4k",
+    isTopAuthor: true,
   },
 ];
 
@@ -125,21 +145,33 @@ export default function StoreScreen() {
 
 const CourseCard = ({ item }: { item: StoreItem }) => (
   <Card
+    variant="horizontal"
     title={item.title}
-    subtitle={item.subtitle}
+    subtitle={`${item.author} · ${item.updatedAt}`}
     image={item.image}
     onPress={() => {}}
     style={styles.card}
+    imageStyle={styles.cardImage}
   >
+    <View style={styles.divider} />
+
     <View style={styles.cardFooter}>
-      <View style={styles.statsRow}>
-        <Ionicons name="star" size={14} color="#FFD700" />
-        <ThemedText style={styles.statsText}>{item.rating}</ThemedText>
-        <Ionicons name="people" size={14} color={Palette.gray} style={{ marginLeft: 8 }} />
-        <ThemedText style={styles.statsText}>{item.students}</ThemedText>
+      <View style={styles.priceRow}>
+        <ThemedText style={styles.price}>{item.price}</ThemedText>
+        <ThemedText style={styles.originalPrice}>{item.originalPrice}</ThemedText>
       </View>
-      <ThemedText style={styles.price}>{item.price}</ThemedText>
+      
+      <View style={styles.ratingRow}>
+        <Ionicons name="star" size={14} color="#f59e0b" />
+        <ThemedText style={styles.ratingText}>{item.rating} ({item.students})</ThemedText>
+      </View>
     </View>
+
+    {item.isTopAuthor && (
+      <View style={styles.topAuthorBadge}>
+        <ThemedText style={styles.topAuthorText}>Top Author</ThemedText>
+      </View>
+    )}
   </Card>
 );
 
@@ -219,26 +251,60 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   card: {
-    marginBottom: 15,
+    marginBottom: 16,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+  },
+  cardImage: {
+    width: 130, // Slightly wider to match image proportion
+    height: 130,
+    borderRadius: 12,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#333",
+    marginVertical: 8,
   },
   cardFooter: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 8,
+    justifyContent: "space-between",
+    marginBottom: 8,
   },
-  statsRow: {
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+  },
+  price: {
+    color: Palette.white,
+    fontWeight: "bold",
+    fontSize: 16,
+    marginRight: 8,
+  },
+  originalPrice: {
+    color: Palette.gray,
+    fontSize: 14,
+    textDecorationLine: "line-through",
+  },
+  ratingRow: {
     flexDirection: "row",
     alignItems: "center",
   },
-  statsText: {
-    fontSize: 12,
-    color: Palette.gray,
+  ratingText: {
+    fontSize: 13,
+    color: Palette.gray, // Or white if preferred
     marginLeft: 4,
   },
-  price: {
-    color: Palette.green,
-    fontWeight: "bold",
-    fontSize: 18,
+  topAuthorBadge: {
+    backgroundColor: "#e8def8", // Light purple background
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    alignSelf: "flex-start",
+  },
+  topAuthorText: {
+    fontSize: 11,
+    color: "#6b21a8", // Dark purple text
+    fontWeight: "600",
   },
 });

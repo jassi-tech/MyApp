@@ -1,22 +1,46 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
+import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { Palette } from "@/constants/theme";
 
 const FEE_HISTORY = [
-  { id: "1", month: "January 2026", amount: "₹5,000", status: "paid", date: "5 Jan 2026" },
-  { id: "2", month: "February 2026", amount: "₹5,000", status: "pending", dueDate: "10 Feb 2026" },
-  { id: "3", month: "December 2025", amount: "₹5,000", status: "paid", date: "3 Dec 2025" },
-  { id: "4", month: "November 2025", amount: "₹5,000", status: "paid", date: "5 Nov 2025" },
+  {
+    id: "1",
+    month: "January 2026",
+    amount: "₹5,000",
+    status: "paid",
+    date: "5 Jan 2026",
+  },
+  {
+    id: "2",
+    month: "February 2026",
+    amount: "₹5,000",
+    status: "pending",
+    dueDate: "10 Feb 2026",
+  },
+  {
+    id: "3",
+    month: "December 2025",
+    amount: "₹5,000",
+    status: "paid",
+    date: "3 Dec 2025",
+  },
+  {
+    id: "4",
+    month: "November 2025",
+    amount: "₹5,000",
+    status: "paid",
+    date: "5 Nov 2025",
+  },
 ];
 
 const FEE_BREAKDOWN = [
@@ -31,24 +55,25 @@ export default function FeesScreen() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "paid": return "#22c55e";
-      case "pending": return "#f59e0b";
-      case "overdue": return "#ef4444";
-      default: return "#666";
+      case "paid":
+        return "#22c55e";
+      case "pending":
+        return "#f59e0b";
+      case "overdue":
+        return "#ef4444";
+      default:
+        return "#666";
     }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={Palette.white} />
-        </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Fee Details</ThemedText>
-        <View style={{ width: 40 }} />
-      </View>
+      <ScreenHeader title="Fee Details" />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.summaryCard}>
           <ThemedText style={styles.summaryLabel}>Total Pending</ThemedText>
           <ThemedText style={styles.summaryAmount}>₹5,000</ThemedText>
@@ -61,8 +86,12 @@ export default function FeesScreen() {
         <View style={styles.breakdownCard}>
           {FEE_BREAKDOWN.map((item, index) => (
             <View key={index} style={styles.breakdownRow}>
-              <ThemedText style={styles.breakdownLabel}>{item.label}</ThemedText>
-              <ThemedText style={styles.breakdownAmount}>{item.amount}</ThemedText>
+              <ThemedText style={styles.breakdownLabel}>
+                {item.label}
+              </ThemedText>
+              <ThemedText style={styles.breakdownAmount}>
+                {item.amount}
+              </ThemedText>
             </View>
           ))}
           <View style={[styles.breakdownRow, styles.totalRow]}>
@@ -76,8 +105,18 @@ export default function FeesScreen() {
           <View key={fee.id} style={styles.historyCard}>
             <View style={styles.historyHeader}>
               <ThemedText style={styles.monthText}>{fee.month}</ThemedText>
-              <View style={[styles.statusBadge, { backgroundColor: getStatusColor(fee.status) + "20" }]}>
-                <ThemedText style={[styles.statusText, { color: getStatusColor(fee.status) }]}>
+              <View
+                style={[
+                  styles.statusBadge,
+                  { backgroundColor: getStatusColor(fee.status) + "20" },
+                ]}
+              >
+                <ThemedText
+                  style={[
+                    styles.statusText,
+                    { color: getStatusColor(fee.status) },
+                  ]}
+                >
                   {fee.status.toUpperCase()}
                 </ThemedText>
               </View>
@@ -85,7 +124,9 @@ export default function FeesScreen() {
             <View style={styles.historyDetails}>
               <ThemedText style={styles.amountText}>{fee.amount}</ThemedText>
               <ThemedText style={styles.dateText}>
-                {fee.status === "paid" ? `Paid on ${fee.date}` : `Due: ${fee.dueDate}`}
+                {fee.status === "paid"
+                  ? `Paid on ${fee.date}`
+                  : `Due: ${fee.dueDate}`}
               </ThemedText>
             </View>
           </View>
@@ -101,26 +142,7 @@ const styles = StyleSheet.create({
     backgroundColor: Palette.black,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#1a1a1a",
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Palette.darkGray,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: Palette.white,
+    // moved to common component
   },
   scrollContent: {
     padding: 16,

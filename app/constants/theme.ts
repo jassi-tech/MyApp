@@ -11,7 +11,9 @@ export const Palette = {
   gray: '#8E8E93',
   green: '#34C759',
   red: '#FF3B30',
-  lightGray: '#2c2c2e', // Added for separators or minor backgrounds
+  lightGray: '#2c2c2e', 
+  background: '#050505',
+  primary: '#0a7ea4',
 };
 
 export const Colors = {

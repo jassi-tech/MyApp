@@ -8,11 +8,17 @@ import { Palette } from "@/constants/theme";
 
 interface ScreenHeaderProps {
   title: string;
+  subtitle?: string;
   onBack?: () => void;
   rightElement?: React.ReactNode;
 }
 
-export function ScreenHeader({ title, onBack, rightElement }: ScreenHeaderProps) {
+export function ScreenHeader({
+  title,
+  subtitle,
+  onBack,
+  rightElement,
+}: ScreenHeaderProps) {
   const router = useRouter();
 
   const handleBack = () => {
@@ -25,13 +31,17 @@ export function ScreenHeader({ title, onBack, rightElement }: ScreenHeaderProps)
 
   return (
     <View style={styles.header}>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={handleBack}
-      >
+      <TouchableOpacity style={styles.backButton} onPress={handleBack}>
         <Ionicons name="arrow-back" size={24} color={Palette.white} />
       </TouchableOpacity>
-      <ThemedText type="subtitle" style={styles.headerTitle}>{title}</ThemedText>
+      <View style={styles.centerContainer}>
+        <ThemedText type="subtitle" style={styles.headerTitle}>
+          {title}
+        </ThemedText>
+        {subtitle && (
+          <ThemedText style={styles.headerSubtitle}>{subtitle}</ThemedText>
+        )}
+      </View>
       <View style={styles.rightContainer}>
         {rightElement || <View style={styles.placeholder} />}
       </View>
@@ -57,14 +67,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  centerContainer: {
+    alignItems: "center",
+  },
   headerTitle: {
     color: Palette.white,
   },
+  headerSubtitle: {
+    fontSize: 12,
+    color: "#00bfff",
+    marginTop: 2,
+  },
   rightContainer: {
     width: 40,
-    alignItems: 'center',
+    alignItems: "center",
   },
   placeholder: {
     width: 40,
-  }
+  },
 });

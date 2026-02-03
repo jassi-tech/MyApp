@@ -2,21 +2,46 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
+import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { Palette } from "@/constants/theme";
 
 const EXAM_SCHEDULE = [
-  { id: "1", subject: "Mathematics", date: "15 Feb 2026", time: "9:00 AM - 12:00 PM", room: "Hall A" },
-  { id: "2", subject: "Science", date: "17 Feb 2026", time: "9:00 AM - 12:00 PM", room: "Hall B" },
-  { id: "3", subject: "English", date: "19 Feb 2026", time: "9:00 AM - 12:00 PM", room: "Hall A" },
-  { id: "4", subject: "History", date: "21 Feb 2026", time: "9:00 AM - 12:00 PM", room: "Hall C" },
+  {
+    id: "1",
+    subject: "Mathematics",
+    date: "15 Feb 2026",
+    time: "9:00 AM - 12:00 PM",
+    room: "Hall A",
+  },
+  {
+    id: "2",
+    subject: "Science",
+    date: "17 Feb 2026",
+    time: "9:00 AM - 12:00 PM",
+    room: "Hall B",
+  },
+  {
+    id: "3",
+    subject: "English",
+    date: "19 Feb 2026",
+    time: "9:00 AM - 12:00 PM",
+    room: "Hall A",
+  },
+  {
+    id: "4",
+    subject: "History",
+    date: "21 Feb 2026",
+    time: "9:00 AM - 12:00 PM",
+    room: "Hall C",
+  },
 ];
 
 const RESULTS = [
@@ -28,7 +53,9 @@ const RESULTS = [
 
 export default function ExaminationScreen() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"schedule" | "results">("schedule");
+  const [activeTab, setActiveTab] = useState<"schedule" | "results">(
+    "schedule",
+  );
 
   const getGradeColor = (grade: string) => {
     if (grade.startsWith("A")) return "#22c55e";
@@ -38,20 +65,19 @@ export default function ExaminationScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={Palette.white} />
-        </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Examination</ThemedText>
-        <View style={{ width: 40 }} />
-      </View>
+      <ScreenHeader title="Examination" />
 
       <View style={styles.tabContainer}>
         <TouchableOpacity
           style={[styles.tab, activeTab === "schedule" && styles.activeTab]}
           onPress={() => setActiveTab("schedule")}
         >
-          <ThemedText style={[styles.tabText, activeTab === "schedule" && styles.activeTabText]}>
+          <ThemedText
+            style={[
+              styles.tabText,
+              activeTab === "schedule" && styles.activeTabText,
+            ]}
+          >
             Schedule
           </ThemedText>
         </TouchableOpacity>
@@ -59,32 +85,50 @@ export default function ExaminationScreen() {
           style={[styles.tab, activeTab === "results" && styles.activeTab]}
           onPress={() => setActiveTab("results")}
         >
-          <ThemedText style={[styles.tabText, activeTab === "results" && styles.activeTabText]}>
+          <ThemedText
+            style={[
+              styles.tabText,
+              activeTab === "results" && styles.activeTabText,
+            ]}
+          >
             Results
           </ThemedText>
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {activeTab === "schedule" ? (
           <>
             {EXAM_SCHEDULE.map((exam) => (
               <View key={exam.id} style={styles.examCard}>
                 <View style={styles.examHeader}>
-                  <ThemedText style={styles.subjectText}>{exam.subject}</ThemedText>
+                  <ThemedText style={styles.subjectText}>
+                    {exam.subject}
+                  </ThemedText>
                   <View style={styles.roomBadge}>
-                    <Ionicons name="location-outline" size={12} color="#00bfff" />
+                    <Ionicons
+                      name="location-outline"
+                      size={12}
+                      color="#00bfff"
+                    />
                     <ThemedText style={styles.roomText}>{exam.room}</ThemedText>
                   </View>
                 </View>
                 <View style={styles.examDetails}>
                   <View style={styles.detailRow}>
                     <Ionicons name="calendar-outline" size={16} color="#666" />
-                    <ThemedText style={styles.detailText}>{exam.date}</ThemedText>
+                    <ThemedText style={styles.detailText}>
+                      {exam.date}
+                    </ThemedText>
                   </View>
                   <View style={styles.detailRow}>
                     <Ionicons name="time-outline" size={16} color="#666" />
-                    <ThemedText style={styles.detailText}>{exam.time}</ThemedText>
+                    <ThemedText style={styles.detailText}>
+                      {exam.time}
+                    </ThemedText>
                   </View>
                 </View>
               </View>
@@ -93,7 +137,9 @@ export default function ExaminationScreen() {
         ) : (
           <>
             <View style={styles.performanceCard}>
-              <ThemedText style={styles.performanceLabel}>Overall Performance</ThemedText>
+              <ThemedText style={styles.performanceLabel}>
+                Overall Performance
+              </ThemedText>
               <ThemedText style={styles.performanceValue}>85.75%</ThemedText>
               <ThemedText style={styles.performanceGrade}>Grade: A</ThemedText>
             </View>
@@ -101,9 +147,21 @@ export default function ExaminationScreen() {
             {RESULTS.map((result, index) => (
               <View key={index} style={styles.resultCard}>
                 <View style={styles.resultHeader}>
-                  <ThemedText style={styles.subjectText}>{result.subject}</ThemedText>
-                  <View style={[styles.gradeBadge, { backgroundColor: getGradeColor(result.grade) + "20" }]}>
-                    <ThemedText style={[styles.gradeText, { color: getGradeColor(result.grade) }]}>
+                  <ThemedText style={styles.subjectText}>
+                    {result.subject}
+                  </ThemedText>
+                  <View
+                    style={[
+                      styles.gradeBadge,
+                      { backgroundColor: getGradeColor(result.grade) + "20" },
+                    ]}
+                  >
+                    <ThemedText
+                      style={[
+                        styles.gradeText,
+                        { color: getGradeColor(result.grade) },
+                      ]}
+                    >
                       {result.grade}
                     </ThemedText>
                   </View>
@@ -117,7 +175,12 @@ export default function ExaminationScreen() {
                   </ThemedText>
                 </View>
                 <View style={styles.progressBar}>
-                  <View style={[styles.progressFill, { width: `${(result.marks / result.total) * 100}%` }]} />
+                  <View
+                    style={[
+                      styles.progressFill,
+                      { width: `${(result.marks / result.total) * 100}%` },
+                    ]}
+                  />
                 </View>
               </View>
             ))}
@@ -134,26 +197,7 @@ const styles = StyleSheet.create({
     backgroundColor: Palette.black,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#1a1a1a",
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Palette.darkGray,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: Palette.white,
+    // moved to common component
   },
   tabContainer: {
     flexDirection: "row",

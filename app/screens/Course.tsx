@@ -56,10 +56,12 @@ export default function CoursesScreen() {
         {ACTIVE_COURSES.map((course) => (
           <Card
             key={course.id}
+            variant="horizontal"
             title={course.title}
             subtitle={`Instructor: ${course.instructor}`}
             image={course.image}
             onPress={() => router.push(`/screens/course-details?id=${course.id}`)}
+            style={styles.card}
           >
             <View style={styles.progressRow}>
               <View style={styles.progressBarContainer}>
@@ -77,10 +79,12 @@ export default function CoursesScreen() {
         {COMPLETED_COURSES.map((course) => (
           <Card
             key={course.id}
+            variant="horizontal"
             title={course.title}
             subtitle={`Instructor: ${course.instructor}`}
             image={course.image}
             onPress={() => router.push(`/screens/course-details?id=${course.id}`)}
+            style={styles.card}
           >
             <ThemedText style={styles.statusLabelCompleted}>{course.status}</ThemedText>
           </Card>
@@ -100,6 +104,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+  card: {
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    marginBottom: 8,
+  },
   progressRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -108,9 +117,9 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     flex: 1,
-    height: 8,
+    height: 6,
     backgroundColor: Palette.lightGray,
-    borderRadius: 4,
+    borderRadius: 3,
     overflow: "hidden",
     marginRight: 10,
   },
