@@ -3,7 +3,7 @@
 import { AttendanceCalendar } from "@/components/attendance-calendar";
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
@@ -14,8 +14,10 @@ import {
 } from "react-native";
 
 export default function AttendanceScreen() {
+  const { colors, fontScale, isDark } = useTheme();
+
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScreenHeader title="My Attendance" />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -25,7 +27,7 @@ export default function AttendanceScreen() {
         <AttendanceCalendar />
 
         {/* Month Attendance Summary */}
-        <ThemedText style={styles.sectionTitle}>
+        <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>
           Month Attendance Summary
         </ThemedText>
         <View style={styles.summaryGrid}>
@@ -33,34 +35,38 @@ export default function AttendanceScreen() {
             label="Present"
             value="1 Days"
             icon="person"
-            color="#ecfdf5" 
+            color={isDark ? "#064e3b" : "#ecfdf5"} 
             iconColor="#10b981"
+            textColor={colors.text}
           />
           <SummaryCard
             label="Absent"
             value="1 Days"
             icon="calendar"
-            color="#fff1f2" 
+            color={isDark ? "#450a0a" : "#fff1f2"} 
             iconColor="#f43f5e" 
+            textColor={colors.text}
           />
           <SummaryCard
             label="Leave"
             value="1 Days"
             icon="calendar"
-            color="#fff7ed" // Light orange
+            color={isDark ? "#451a03" : "#fff7ed"} 
             iconColor="#f59e0b" // Orange
+            textColor={colors.text}
           />
           <SummaryCard
             label="Holiday"
             value="1 Days"
             icon="calendar"
-            color="#faf5ff" // Light purple
+            color={isDark ? "#3b0764" : "#faf5ff"} 
             iconColor="#a855f7" // Purple
+            textColor={colors.text}
           />
         </View>
 
         {/* Academic Attendance Summary */}
-        <ThemedText style={styles.sectionTitle}>
+        <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>
           Academic Attendance Summary
         </ThemedText>
         <View style={styles.academicList}>
@@ -100,15 +106,15 @@ export default function AttendanceScreen() {
   );
 }
 
-const SummaryCard = ({ label, value, icon, color, iconColor }: any) => (
+const SummaryCard = ({ label, value, icon, color, iconColor, textColor }: any) => (
   <View style={[styles.summaryCard, { backgroundColor: color }]}>
     <View style={styles.summaryCardHeader}>
       <Ionicons name={icon} size={24} color={iconColor} />
       <View style={styles.summaryCardText}>
-        <ThemedText style={[styles.summaryCardLabel, { color: "#333" }]}>
+        <ThemedText style={[styles.summaryCardLabel, { color: textColor ?? "#333" }]}>
           {label}
         </ThemedText>
-        <ThemedText style={[styles.summaryCardValue, { color: "#666" }]}>
+        <ThemedText style={[styles.summaryCardValue, { color: textColor ? textColor + '99' : "#666" }]}>
           {value}
         </ThemedText>
       </View>
@@ -116,24 +122,26 @@ const SummaryCard = ({ label, value, icon, color, iconColor }: any) => (
   </View>
 );
 
-const AcademicItem = ({ label, value, icon, badgeColor }: any) => (
-  <View style={styles.academicItem}>
-    <View style={styles.academicItemLeft}>
-      <View style={styles.academicIconWrapper}>
-        <Ionicons name={icon} size={20} color={Palette.gray} />
-      </View>
-      <ThemedText style={styles.academicLabel}>{label}</ThemedText>
-    </View>
-    <View style={[styles.academicBadge, { backgroundColor: badgeColor }]}>
-      <ThemedText style={styles.academicBadgeText}>{value}</ThemedText>
-    </View>
-  </View>
-);
+const AcademicItem = ({ label, value, icon, badgeColor }: any) => {
+    const { colors } = useTheme();
+    return (
+        <View style={[styles.academicItem, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <View style={styles.academicItemLeft}>
+            <View style={[styles.academicIconWrapper, { backgroundColor: colors.backgroundSecondary }]}>
+                <Ionicons name={icon} size={20} color={colors.textSecondary} />
+            </View>
+            <ThemedText style={[styles.academicLabel, { color: colors.textSecondary }]}>{label}</ThemedText>
+            </View>
+            <View style={[styles.academicBadge, { backgroundColor: badgeColor }]}>
+            <ThemedText style={styles.academicBadgeText}>{value}</ThemedText>
+            </View>
+        </View>
+    );
+};
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
   },
 
   scrollContent: {
@@ -142,7 +150,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#c3c6ca",
     marginBottom: 16,
     marginTop: 8,
   },
@@ -179,12 +186,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: Palette.darkGray,
     padding: 14,
     borderRadius: 12,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: "#333",
   },
   academicItemLeft: {
     flexDirection: "row",
@@ -194,7 +199,6 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: "#f5f5f5",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
@@ -202,7 +206,6 @@ const styles = StyleSheet.create({
   academicLabel: {
     fontSize: 13,
     fontWeight: "500",
-    color: "#afa7a7",
   },
   academicBadge: {
     minWidth: 32,

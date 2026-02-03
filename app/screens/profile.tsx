@@ -7,10 +7,11 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { ScreenContainer } from "@/components/common/screen-container";
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function Profile() {
   const router = useRouter();
+  const { colors, fontScale } = useTheme();
 
   return (
     <ScreenContainer header={<ScreenHeader title="Profile" />}>
@@ -18,15 +19,15 @@ export default function Profile() {
           <View style={styles.avatarContainer}>
             <Image
               source="https://i.pravatar.cc/300?img=11"
-              style={styles.avatar}
+              style={[styles.avatar, { borderColor: colors.border }]}
               contentFit="cover"
             />
-            <View style={styles.onlineStatus} />
+            <View style={[styles.onlineStatus, { borderColor: colors.background }]} />
           </View>
-          <ThemedText type="subtitle" style={styles.userName}>
+          <ThemedText type="subtitle" style={[styles.userName, { color: colors.text }]}>
             Name
           </ThemedText>
-          <ThemedText style={styles.userEmail}>Email@gmail.com</ThemedText>
+          <ThemedText style={[styles.userEmail, { color: colors.textSecondary }]}>Email@gmail.com</ThemedText>
         </View>
 
         <View style={styles.menuContainer}>
@@ -45,18 +46,18 @@ export default function Profile() {
                 <Ionicons
                   name="lock-closed-outline"
                   size={24}
-                  color={Palette.white}
+                  color={colors.text}
                   style={styles.menuIcon}
                 />
-                <ThemedText style={styles.menuText}>
+                <ThemedText style={[styles.menuText, { color: colors.text }]}>
                   Account Security
                 </ThemedText>
               </View>
-              <Ionicons name="chevron-forward" size={20} color={Palette.gray} />
+              <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
             </View>
-            <ThemedText style={styles.progressText}>Excellent</ThemedText>
-            <View style={styles.progressContainer}>
-              <View style={[styles.progressBar, { width: "90%", backgroundColor: Palette.green }]} />
+            <ThemedText style={[styles.progressText, { color: colors.primary }]}>Excellent</ThemedText>
+            <View style={[styles.progressContainer, { backgroundColor: colors.border }]}>
+              <View style={[styles.progressBar, { width: "90%", backgroundColor: colors.primary }]} />
             </View>
           </TouchableOpacity>
 
@@ -90,23 +91,26 @@ const MenuItem = ({
   title: string;
   noBorder?: boolean;
   onPress?: () => void;
-}) => (
-  <TouchableOpacity
-    style={[styles.menuItem, noBorder && styles.noBorder]}
-    onPress={onPress}
-  >
-    <View style={styles.row}>
-      <Ionicons
-        name={icon}
-        size={24}
-        color={Palette.white}
-        style={styles.menuIcon}
-      />
-      <ThemedText style={styles.menuText}>{title}</ThemedText>
-    </View>
-    <Ionicons name="chevron-forward" size={20} color={Palette.gray} />
-  </TouchableOpacity>
-);
+}) => {
+  const { colors, fontScale } = useTheme();
+  return (
+    <TouchableOpacity
+      style={[styles.menuItem, noBorder && styles.noBorder, { borderBottomColor: colors.border }]}
+      onPress={onPress}
+    >
+      <View style={styles.row}>
+        <Ionicons
+          name={icon}
+          size={24}
+          color={colors.text}
+          style={styles.menuIcon}
+        />
+        <ThemedText style={[styles.menuText, { color: colors.text }]}>{title}</ThemedText>
+      </View>
+      <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   profileSection: {
@@ -123,7 +127,6 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 2,
-    borderColor: "#333",
   },
   onlineStatus: {
     position: "absolute",
@@ -132,17 +135,14 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: Palette.green,
+    backgroundColor: "#34C759", // Keep green for success/online
     borderWidth: 3,
-    borderColor: Palette.black,
   },
   userName: {
-    color: Palette.white,
     fontSize: 22,
     marginBottom: 4,
   },
   userEmail: {
-    color: Palette.gray,
     fontSize: 14,
   },
   menuContainer: {
@@ -166,7 +166,6 @@ const styles = StyleSheet.create({
   },
   menuText: {
     fontSize: 16,
-    color: Palette.white,
   },
   securitySection: {
     marginVertical: 10,
@@ -179,7 +178,6 @@ const styles = StyleSheet.create({
   },
   progressContainer: {
     height: 8,
-    backgroundColor: Palette.darkGray,
     borderRadius: 4,
     marginTop: 8,
     marginBottom: 12,
@@ -189,7 +187,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   progressText: {
-    color: Palette.green,
     fontSize: 12,
     fontWeight: "700",
     textTransform: "uppercase",

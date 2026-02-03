@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 const FREQUENCIES = ["Instant", "Daily Digest", "Weekly Summary", "Never"];
 
@@ -23,27 +23,28 @@ export default function EmailNotificationsScreen() {
   const [assignments, setAssignments] = useState(true);
   const [grades, setGrades] = useState(true);
   const [events, setEvents] = useState(false);
+  const { colors, fontScale } = useTheme();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={Palette.white} />
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.card }]} onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Email Notifications</ThemedText>
+        <ThemedText style={[styles.headerTitle, { color: colors.text, fontSize: 20 * fontScale }]}>Email Notifications</ThemedText>
         <View style={{ width: 40 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>GENERAL</ThemedText>
-          <View style={styles.card}>
+          <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>GENERAL</ThemedText>
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <View style={styles.toggleItem}>
               <View style={styles.toggleLeft}>
-                <Ionicons name="mail" size={20} color="#888" style={{ marginRight: 12 }} />
+                <Ionicons name="mail" size={20} color={colors.textSecondary} style={{ marginRight: 12 }} />
                 <View>
-                  <ThemedText style={styles.toggleLabel}>Email Notifications</ThemedText>
-                  <ThemedText style={styles.toggleDescription}>
+                  <ThemedText style={[styles.toggleLabel, { color: colors.text, fontSize: 16 * fontScale }]}>Email Notifications</ThemedText>
+                  <ThemedText style={[styles.toggleDescription, { color: colors.textSecondary }]}>
                     Receive updates via email
                   </ThemedText>
                 </View>
@@ -51,22 +52,22 @@ export default function EmailNotificationsScreen() {
               <Switch
                 value={emailEnabled}
                 onValueChange={setEmailEnabled}
-                trackColor={{ false: "#2a2a2a", true: "#00bfff" }}
-                thumbColor={Palette.white}
+                trackColor={{ false: colors.border, true: colors.primary }}
+                thumbColor={"#fff"}
               />
             </View>
           </View>
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>FREQUENCY</ThemedText>
-          <View style={styles.card}>
+          <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>FREQUENCY</ThemedText>
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             {FREQUENCIES.map((freq, index) => (
               <TouchableOpacity
                 key={freq}
                 style={[
                   styles.frequencyItem,
-                  index < FREQUENCIES.length - 1 && styles.frequencyItemBorder,
+                  index < FREQUENCIES.length - 1 && { borderBottomWidth: 1, borderBottomColor: colors.border },
                 ]}
                 onPress={() => setFrequency(freq)}
                 disabled={!emailEnabled}
@@ -83,17 +84,17 @@ export default function EmailNotificationsScreen() {
                         : "close-circle-outline"
                     }
                     size={18}
-                    color={emailEnabled ? "#888" : "#444"}
+                    color={emailEnabled ? colors.textSecondary : colors.border}
                     style={{ marginRight: 10 }}
                   />
                   <ThemedText
-                    style={[styles.frequencyLabel, !emailEnabled && styles.disabledText]}
+                    style={[styles.frequencyLabel, { color: colors.text, fontSize: 16 * fontScale }, !emailEnabled && { color: colors.border }]}
                   >
                     {freq}
                   </ThemedText>
                 </View>
                 {frequency === freq && emailEnabled && (
-                  <Ionicons name="checkmark" size={20} color="#00bfff" />
+                  <Ionicons name="checkmark" size={20} color={colors.primary} />
                 )}
               </TouchableOpacity>
             ))}
@@ -101,8 +102,8 @@ export default function EmailNotificationsScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>CATEGORIES</ThemedText>
-          <View style={styles.card}>
+          <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>CATEGORIES</ThemedText>
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <EmailToggle
               icon="chatbubbles-outline"
               label="Messages"
@@ -153,33 +154,35 @@ const EmailToggle = ({
   onValueChange: (value: boolean) => void;
   disabled: boolean;
   isLast?: boolean;
-}) => (
-  <View style={[styles.emailToggleItem, !isLast && styles.emailToggleItemBorder]}>
-    <View style={styles.emailToggleLeft}>
-      <Ionicons
-        name={icon}
-        size={18}
-        color={disabled ? "#444" : "#888"}
-        style={{ marginRight: 10 }}
+}) => {
+  const { colors, fontScale } = useTheme();
+  return (
+    <View style={[styles.emailToggleItem, !isLast && { borderBottomWidth: 1, borderBottomColor: colors.border }]}>
+      <View style={styles.emailToggleLeft}>
+        <Ionicons
+          name={icon}
+          size={18}
+          color={disabled ? colors.border : colors.textSecondary}
+          style={{ marginRight: 10 }}
+        />
+        <ThemedText style={[styles.emailToggleLabel, { color: colors.text, fontSize: 16 * fontScale }, disabled && { color: colors.border }]}>
+          {label}
+        </ThemedText>
+      </View>
+      <Switch
+        value={value}
+        onValueChange={onValueChange}
+        disabled={disabled}
+        trackColor={{ false: colors.border, true: colors.primary }}
+        thumbColor={"#fff"}
       />
-      <ThemedText style={[styles.emailToggleLabel, disabled && styles.disabledText]}>
-        {label}
-      </ThemedText>
     </View>
-    <Switch
-      value={value}
-      onValueChange={onValueChange}
-      disabled={disabled}
-      trackColor={{ false: "#2a2a2a", true: "#00bfff" }}
-      thumbColor={Palette.white}
-    />
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
   },
   header: {
     flexDirection: "row",
@@ -188,20 +191,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#1a1a1a",
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Palette.darkGray,
     justifyContent: "center",
     alignItems: "center",
   },
   headerTitle: {
-    fontSize: 20,
     fontWeight: "bold",
-    color: Palette.white,
   },
   scrollContent: {
     padding: 16,
@@ -213,16 +212,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#666",
     marginBottom: 12,
     letterSpacing: 1,
   },
   card: {
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   toggleItem: {
     flexDirection: "row",
@@ -235,13 +231,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   toggleLabel: {
-    fontSize: 16,
-    color: Palette.white,
     marginBottom: 4,
   },
   toggleDescription: {
     fontSize: 12,
-    color: "#666",
   },
   frequencyItem: {
     flexDirection: "row",
@@ -249,20 +242,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 14,
   },
-  frequencyItemBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#2a2a2a",
-  },
   frequencyLeft: {
     flexDirection: "row",
     alignItems: "center",
   },
   frequencyLabel: {
-    fontSize: 16,
-    color: Palette.white,
   },
   disabledText: {
-    color: "#444",
   },
   emailToggleItem: {
     flexDirection: "row",
@@ -271,8 +257,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   emailToggleItemBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#2a2a2a",
     marginBottom: 12,
     paddingBottom: 12,
   },
@@ -282,7 +266,5 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   emailToggleLabel: {
-    fontSize: 16,
-    color: Palette.white,
   },
 });

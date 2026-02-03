@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 const FAQ_CATEGORIES = [
   {
@@ -50,29 +50,30 @@ const FAQ_CATEGORIES = [
       { q: "How do I download a receipt?", a: "To download a receipt..." },
     ],
   },
-];
+  ];
 
 export default function HelpCenterScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  const { colors, fontScale } = useTheme();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={Palette.white} />
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.card }]} onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Help Center</ThemedText>
+        <ThemedText style={[styles.headerTitle, { color: colors.text, fontSize: 20 * fontScale }]}>Help Center</ThemedText>
         <View style={{ width: 40 }} />
       </View>
 
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+      <View style={[styles.searchContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Ionicons name="search" size={20} color={colors.textSecondary} style={styles.searchIcon} />
         <TextInput
-          style={styles.searchInput}
+          style={[styles.searchInput, { color: colors.text, fontSize: 16 * fontScale }]}
           placeholder="Search for help..."
-          placeholderTextColor="#666"
+          placeholderTextColor={colors.textSecondary}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -80,24 +81,24 @@ export default function HelpCenterScreen() {
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.quickActions}>
-          <TouchableOpacity style={styles.quickActionCard}>
+          <TouchableOpacity style={[styles.quickActionCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Ionicons name="chatbubbles-outline" size={28} color="#00bfff" />
-            <ThemedText style={styles.quickActionText}>Live Chat</ThemedText>
+            <ThemedText style={[styles.quickActionText, { color: colors.text, fontSize: 12 * fontScale }]}>Live Chat</ThemedText>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.quickActionCard}>
+          <TouchableOpacity style={[styles.quickActionCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Ionicons name="mail-outline" size={28} color="#8b5cf6" />
-            <ThemedText style={styles.quickActionText}>Email Us</ThemedText>
+            <ThemedText style={[styles.quickActionText, { color: colors.text, fontSize: 12 * fontScale }]}>Email Us</ThemedText>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.quickActionCard}>
+          <TouchableOpacity style={[styles.quickActionCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Ionicons name="call-outline" size={28} color="#f59e0b" />
-            <ThemedText style={styles.quickActionText}>Call Support</ThemedText>
+            <ThemedText style={[styles.quickActionText, { color: colors.text, fontSize: 12 * fontScale }]}>Call Support</ThemedText>
           </TouchableOpacity>
         </View>
 
-        <ThemedText style={styles.sectionTitle}>FREQUENTLY ASKED QUESTIONS</ThemedText>
+        <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>FREQUENTLY ASKED QUESTIONS</ThemedText>
 
         {FAQ_CATEGORIES.map((category) => (
-          <View key={category.id} style={styles.categoryCard}>
+          <View key={category.id} style={[styles.categoryCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <TouchableOpacity
               style={styles.categoryHeader}
               onPress={() =>
@@ -105,24 +106,24 @@ export default function HelpCenterScreen() {
               }
             >
               <View style={styles.categoryLeft}>
-                <View style={styles.categoryIconContainer}>
-                  <Ionicons name={category.icon as any} size={22} color="#00bfff" />
+                <View style={[styles.categoryIconContainer, { backgroundColor: colors.background }]}>
+                  <Ionicons name={category.icon as any} size={22} color={colors.primary} />
                 </View>
-                <ThemedText style={styles.categoryTitle}>{category.title}</ThemedText>
+                <ThemedText style={[styles.categoryTitle, { color: colors.text, fontSize: 16 * fontScale }]}>{category.title}</ThemedText>
               </View>
               <Ionicons
                 name={expandedCategory === category.id ? "chevron-up" : "chevron-down"}
                 size={20}
-                color="#666"
+                color={colors.textSecondary}
               />
             </TouchableOpacity>
 
             {expandedCategory === category.id && (
-              <View style={styles.questionsContainer}>
+              <View style={[styles.questionsContainer, { borderTopColor: colors.border }]}>
                 {category.questions.map((item, index) => (
                   <View key={index} style={styles.questionItem}>
-                    <ThemedText style={styles.question}>{item.q}</ThemedText>
-                    <ThemedText style={styles.answer}>{item.a}</ThemedText>
+                    <ThemedText style={[styles.question, { color: colors.text, fontSize: 14 * fontScale }]}>{item.q}</ThemedText>
+                    <ThemedText style={[styles.answer, { color: colors.textSecondary, fontSize: 13 * fontScale }]}>{item.a}</ThemedText>
                   </View>
                 ))}
               </View>
@@ -137,7 +138,6 @@ export default function HelpCenterScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
   },
   header: {
     flexDirection: "row",
@@ -146,30 +146,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#1a1a1a",
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Palette.darkGray,
     justifyContent: "center",
     alignItems: "center",
   },
   headerTitle: {
-    fontSize: 20,
     fontWeight: "bold",
-    color: Palette.white,
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: Palette.darkGray,
     margin: 16,
     paddingHorizontal: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   searchIcon: {
     marginRight: 8,
@@ -177,8 +171,6 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     paddingVertical: 12,
-    fontSize: 16,
-    color: Palette.white,
   },
   scrollContent: {
     padding: 16,
@@ -192,32 +184,25 @@ const styles = StyleSheet.create({
   },
   quickActionCard: {
     flex: 1,
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     padding: 16,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   quickActionText: {
-    fontSize: 12,
-    color: Palette.white,
     marginTop: 8,
     textAlign: "center",
   },
   sectionTitle: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#666",
     marginBottom: 12,
     letterSpacing: 1,
   },
   categoryCard: {
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
     overflow: "hidden",
   },
   categoryHeader: {
@@ -235,19 +220,15 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 10,
-    backgroundColor: "#2a2a2a",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
   },
   categoryTitle: {
-    fontSize: 16,
     fontWeight: "600",
-    color: Palette.white,
   },
   questionsContainer: {
     borderTopWidth: 1,
-    borderTopColor: "#2a2a2a",
     padding: 16,
     paddingTop: 12,
   },
@@ -255,14 +236,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   question: {
-    fontSize: 14,
     fontWeight: "600",
-    color: Palette.white,
     marginBottom: 6,
   },
   answer: {
-    fontSize: 13,
-    color: "#888",
     lineHeight: 18,
   },
 });

@@ -11,7 +11,7 @@ import {
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 const SUBJECTS = [
   { id: "1", label: "Mathematics", icon: "calculator-outline", color: "#e0f2fe", iconColor: "#0ea5e9" },
@@ -24,6 +24,7 @@ const SUBJECTS = [
 
 export default function QuizScreen() {
   const router = useRouter();
+  const { colors, fontScale } = useTheme();
 
   const handleSubjectPress = (subject: typeof SUBJECTS[0]) => {
     router.push({
@@ -33,24 +34,24 @@ export default function QuizScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScreenHeader title="Select Subject" />
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <ThemedText style={styles.subtitle}>Choose a subject to start your quiz</ThemedText>
+        <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>Choose a subject to start your quiz</ThemedText>
         
         <View style={styles.grid}>
           {SUBJECTS.map((subject) => (
             <TouchableOpacity
               key={subject.id}
-              style={styles.subjectCard}
+              style={[styles.subjectCard, { backgroundColor: colors.card, borderColor: colors.border }]}
               onPress={() => handleSubjectPress(subject)}
             >
               <View style={[styles.iconWrapper, { backgroundColor: subject.color }]}>
                 <Ionicons name={subject.icon as any} size={32} color={subject.iconColor} />
               </View>
-              <ThemedText style={styles.subjectLabel}>{subject.label}</ThemedText>
-              <ThemedText style={styles.quizInfo}>10 Questions</ThemedText>
+              <ThemedText style={[styles.subjectLabel, { color: colors.text }]}>{subject.label}</ThemedText>
+              <ThemedText style={[styles.quizInfo, { color: colors.textSecondary }]}>10 Questions</ThemedText>
             </TouchableOpacity>
           ))}
         </View>
@@ -62,14 +63,12 @@ export default function QuizScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
   },
   scrollContent: {
     padding: 16,
   },
   subtitle: {
     fontSize: 14,
-    color: "#ccc",
     marginBottom: 24,
     textAlign: "center",
   },
@@ -80,13 +79,11 @@ const styles = StyleSheet.create({
   },
   subjectCard: {
     width: "48%",
-    backgroundColor: Palette.darkGray,
     borderRadius: 20,
     padding: 20,
     alignItems: "center",
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#333",
     elevation: 4,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -104,11 +101,9 @@ const styles = StyleSheet.create({
   subjectLabel: {
     fontSize: 16,
     fontWeight: "bold",
-    color: Palette.white,
     marginBottom: 4,
   },
   quizInfo: {
     fontSize: 12,
-    color: "#888",
   },
 });

@@ -2,17 +2,17 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 const LEAVE_HISTORY = [
   {
@@ -44,6 +44,7 @@ const LEAVE_HISTORY = [
 export default function LeaveRequestScreen() {
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
+  const { colors, fontScale, isDark } = useTheme();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -59,7 +60,7 @@ export default function LeaveRequestScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScreenHeader title="Leave Request" />
 
       <ScrollView
@@ -77,32 +78,55 @@ export default function LeaveRequestScreen() {
           style={styles.applyButton}
           onPress={() => setShowForm(!showForm)}
         >
-          <Ionicons name="add-circle-outline" size={20} color={Palette.white} />
+          <Ionicons name="add-circle-outline" size={20} color="#fff" />
           <ThemedText style={styles.applyButtonText}>
             Apply for Leave
           </ThemedText>
         </TouchableOpacity>
 
         {showForm && (
-          <View style={styles.formCard}>
-            <ThemedText style={styles.formTitle}>
+          <View style={[styles.formCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <ThemedText style={[styles.formTitle, { color: colors.text }]}>
               New Leave Application
             </ThemedText>
             <TextInput
-              style={styles.input}
+              style={[
+                  styles.input, 
+                  { 
+                      backgroundColor: colors.background, 
+                      borderColor: colors.border,
+                      color: colors.text
+                  }
+              ]}
               placeholder="Reason for leave"
-              placeholderTextColor="#666"
+              placeholderTextColor={colors.textSecondary}
             />
             <View style={styles.dateRow}>
               <TextInput
-                style={[styles.input, styles.halfInput]}
+                style={[
+                    styles.input, 
+                    styles.halfInput,
+                    { 
+                        backgroundColor: colors.background, 
+                        borderColor: colors.border,
+                        color: colors.text
+                    }
+                ]}
                 placeholder="From Date"
-                placeholderTextColor="#666"
+                placeholderTextColor={colors.textSecondary}
               />
               <TextInput
-                style={[styles.input, styles.halfInput]}
+                style={[
+                    styles.input, 
+                    styles.halfInput,
+                    { 
+                        backgroundColor: colors.background, 
+                        borderColor: colors.border,
+                        color: colors.text
+                    }
+                ]}
                 placeholder="To Date"
-                placeholderTextColor="#666"
+                placeholderTextColor={colors.textSecondary}
               />
             </View>
             <TouchableOpacity style={styles.submitButton}>
@@ -113,11 +137,11 @@ export default function LeaveRequestScreen() {
           </View>
         )}
 
-        <ThemedText style={styles.sectionTitle}>Leave History</ThemedText>
+        <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>Leave History</ThemedText>
         {LEAVE_HISTORY.map((leave) => (
-          <View key={leave.id} style={styles.leaveCard}>
+          <View key={leave.id} style={[styles.leaveCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <View style={styles.leaveHeader}>
-              <ThemedText style={styles.reasonText}>{leave.reason}</ThemedText>
+              <ThemedText style={[styles.reasonText, { color: colors.text }]}>{leave.reason}</ThemedText>
               <View
                 style={[
                   styles.statusBadge,
@@ -136,8 +160,8 @@ export default function LeaveRequestScreen() {
             </View>
             <View style={styles.leaveDetails}>
               <View style={styles.detailRow}>
-                <Ionicons name="calendar-outline" size={14} color="#666" />
-                <ThemedText style={styles.detailText}>
+                <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
+                <ThemedText style={[styles.detailText, { color: colors.textSecondary }]}>
                   {leave.from} to {leave.to} ({leave.days}{" "}
                   {leave.days === 1 ? "day" : "days"})
                 </ThemedText>
@@ -153,7 +177,6 @@ export default function LeaveRequestScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
   },
   header: {
     // moved to common component
@@ -177,7 +200,7 @@ const styles = StyleSheet.create({
   balanceValue: {
     fontSize: 32,
     fontWeight: "bold",
-    color: Palette.white,
+    color: "#fff",
   },
   applyButton: {
     flexDirection: "row",
@@ -192,31 +215,25 @@ const styles = StyleSheet.create({
   applyButtonText: {
     fontSize: 16,
     fontWeight: "700",
-    color: Palette.white,
+    color: "#fff",
   },
   formCard: {
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     padding: 16,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   formTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: Palette.white,
     marginBottom: 16,
   },
   input: {
-    backgroundColor: "#1a1a1a",
     borderRadius: 12,
     padding: 14,
-    color: Palette.white,
     fontSize: 14,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   dateRow: {
     flexDirection: "row",
@@ -235,21 +252,18 @@ const styles = StyleSheet.create({
   submitButtonText: {
     fontSize: 15,
     fontWeight: "700",
-    color: Palette.white,
+    color: "#fff",
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: Palette.white,
     marginBottom: 16,
   },
   leaveCard: {
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   leaveHeader: {
     flexDirection: "row",
@@ -260,7 +274,6 @@ const styles = StyleSheet.create({
   reasonText: {
     fontSize: 16,
     fontWeight: "700",
-    color: Palette.white,
     flex: 1,
   },
   statusBadge: {
@@ -282,6 +295,5 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 13,
-    color: "#888",
   },
 });

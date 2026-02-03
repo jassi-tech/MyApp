@@ -1,16 +1,16 @@
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 const FEE_HISTORY = [
   {
@@ -52,6 +52,7 @@ const FEE_BREAKDOWN = [
 
 export default function FeesScreen() {
   const router = useRouter();
+  const { colors, fontScale } = useTheme();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -67,7 +68,7 @@ export default function FeesScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScreenHeader title="Fee Details" />
 
       <ScrollView
@@ -76,35 +77,35 @@ export default function FeesScreen() {
       >
         <View style={styles.summaryCard}>
           <ThemedText style={styles.summaryLabel}>Total Pending</ThemedText>
-          <ThemedText style={styles.summaryAmount}>₹5,000</ThemedText>
+          <ThemedText style={[styles.summaryAmount, { fontSize: 36 * fontScale }]}>₹5,000</ThemedText>
           <TouchableOpacity style={styles.payButton}>
             <ThemedText style={styles.payButtonText}>Pay Now</ThemedText>
           </TouchableOpacity>
         </View>
 
-        <ThemedText style={styles.sectionTitle}>Fee Breakdown</ThemedText>
-        <View style={styles.breakdownCard}>
+        <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>Fee Breakdown</ThemedText>
+        <View style={[styles.breakdownCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
           {FEE_BREAKDOWN.map((item, index) => (
-            <View key={index} style={styles.breakdownRow}>
-              <ThemedText style={styles.breakdownLabel}>
+            <View key={index} style={[styles.breakdownRow, { borderBottomColor: colors.border }]}>
+              <ThemedText style={[styles.breakdownLabel, { color: colors.textSecondary }]}>
                 {item.label}
               </ThemedText>
-              <ThemedText style={styles.breakdownAmount}>
+              <ThemedText style={[styles.breakdownAmount, { color: colors.text }]}>
                 {item.amount}
               </ThemedText>
             </View>
           ))}
           <View style={[styles.breakdownRow, styles.totalRow]}>
-            <ThemedText style={styles.totalLabel}>Total</ThemedText>
+            <ThemedText style={[styles.totalLabel, { color: colors.text }]}>Total</ThemedText>
             <ThemedText style={styles.totalAmount}>₹5,000</ThemedText>
           </View>
         </View>
 
-        <ThemedText style={styles.sectionTitle}>Payment History</ThemedText>
+        <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>Payment History</ThemedText>
         {FEE_HISTORY.map((fee) => (
-          <View key={fee.id} style={styles.historyCard}>
+          <View key={fee.id} style={[styles.historyCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <View style={styles.historyHeader}>
-              <ThemedText style={styles.monthText}>{fee.month}</ThemedText>
+              <ThemedText style={[styles.monthText, { color: colors.text }]}>{fee.month}</ThemedText>
               <View
                 style={[
                   styles.statusBadge,
@@ -123,7 +124,7 @@ export default function FeesScreen() {
             </View>
             <View style={styles.historyDetails}>
               <ThemedText style={styles.amountText}>{fee.amount}</ThemedText>
-              <ThemedText style={styles.dateText}>
+              <ThemedText style={[styles.dateText, { color: colors.textSecondary }]}>
                 {fee.status === "paid"
                   ? `Paid on ${fee.date}`
                   : `Due: ${fee.dueDate}`}
@@ -139,7 +140,6 @@ export default function FeesScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
   },
   header: {
     // moved to common component
@@ -161,13 +161,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   summaryAmount: {
-    fontSize: 36,
     fontWeight: "bold",
-    color: Palette.white,
-    marginBottom: 16,
+    color: "#fff",
+    marginBottom: 26,
   },
   payButton: {
-    backgroundColor: Palette.white,
+    backgroundColor: "#fff",
     paddingHorizontal: 32,
     paddingVertical: 12,
     borderRadius: 25,
@@ -180,33 +179,27 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: Palette.white,
     marginBottom: 16,
     marginTop: 8,
   },
   breakdownCard: {
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     padding: 16,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   breakdownRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#2a2a2a",
   },
   breakdownLabel: {
     fontSize: 14,
-    color: "#ccc",
   },
   breakdownAmount: {
     fontSize: 14,
     fontWeight: "600",
-    color: Palette.white,
   },
   totalRow: {
     borderBottomWidth: 0,
@@ -215,7 +208,6 @@ const styles = StyleSheet.create({
   totalLabel: {
     fontSize: 16,
     fontWeight: "700",
-    color: Palette.white,
   },
   totalAmount: {
     fontSize: 16,
@@ -223,12 +215,10 @@ const styles = StyleSheet.create({
     color: "#00bfff",
   },
   historyCard: {
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   historyHeader: {
     flexDirection: "row",
@@ -239,7 +229,6 @@ const styles = StyleSheet.create({
   monthText: {
     fontSize: 16,
     fontWeight: "600",
-    color: Palette.white,
   },
   statusBadge: {
     paddingHorizontal: 12,
@@ -262,6 +251,5 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 12,
-    color: "#888",
   },
 });

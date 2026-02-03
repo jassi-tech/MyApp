@@ -2,16 +2,18 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
+
+const TABS = ["Schedule", "Results"];
 
 const EXAM_SCHEDULE = [
   {
@@ -20,6 +22,8 @@ const EXAM_SCHEDULE = [
     date: "15 Feb 2026",
     time: "9:00 AM - 12:00 PM",
     room: "Hall A",
+    icon: "calculator-outline",
+    color: "#e0f2fe",
   },
   {
     id: "2",
@@ -27,6 +31,8 @@ const EXAM_SCHEDULE = [
     date: "17 Feb 2026",
     time: "9:00 AM - 12:00 PM",
     room: "Hall B",
+    icon: "flask-outline",
+    color: "#f0fdf4",
   },
   {
     id: "3",
@@ -34,6 +40,8 @@ const EXAM_SCHEDULE = [
     date: "19 Feb 2026",
     time: "9:00 AM - 12:00 PM",
     room: "Hall A",
+    icon: "book-outline",
+    color: "#fff7ed",
   },
   {
     id: "4",
@@ -41,6 +49,8 @@ const EXAM_SCHEDULE = [
     date: "21 Feb 2026",
     time: "9:00 AM - 12:00 PM",
     room: "Hall C",
+    icon: "earth-outline",
+    color: "#faf5ff",
   },
 ];
 
@@ -56,6 +66,7 @@ export default function ExaminationScreen() {
   const [activeTab, setActiveTab] = useState<"schedule" | "results">(
     "schedule",
   );
+  const { colors, fontScale, isDark } = useTheme();
 
   const getGradeColor = (grade: string) => {
     if (grade.startsWith("A")) return "#22c55e";
@@ -64,31 +75,41 @@ export default function ExaminationScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScreenHeader title="Examination" />
 
-      <View style={styles.tabContainer}>
+      <View style={[styles.tabContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === "schedule" && styles.activeTab]}
+          style={[
+            styles.tab, 
+            activeTab === "schedule" && { backgroundColor: keyToColor(activeTab, colors) },
+            activeTab !== "schedule" && { backgroundColor: "transparent" }
+          ]} // Simplified logic, let's fix this properly
           onPress={() => setActiveTab("schedule")}
         >
           <ThemedText
             style={[
               styles.tabText,
               activeTab === "schedule" && styles.activeTabText,
+              activeTab !== "schedule" && { color: colors.textSecondary }
             ]}
           >
             Schedule
           </ThemedText>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.tab, activeTab === "results" && styles.activeTab]}
+          style={[
+            styles.tab, 
+            activeTab === "results" && { backgroundColor: keyToColor(activeTab, colors) },
+            activeTab !== "results" && { backgroundColor: "transparent" }
+          ]}
           onPress={() => setActiveTab("results")}
         >
           <ThemedText
             style={[
               styles.tabText,
               activeTab === "results" && styles.activeTabText,
+              activeTab !== "results" && { color: colors.textSecondary }
             ]}
           >
             Results
@@ -103,9 +124,9 @@ export default function ExaminationScreen() {
         {activeTab === "schedule" ? (
           <>
             {EXAM_SCHEDULE.map((exam) => (
-              <View key={exam.id} style={styles.examCard}>
+              <View key={exam.id} style={[styles.examCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
                 <View style={styles.examHeader}>
-                  <ThemedText style={styles.subjectText}>
+                  <ThemedText style={[styles.subjectText, { color: colors.text }]}>
                     {exam.subject}
                   </ThemedText>
                   <View style={styles.roomBadge}>
@@ -119,14 +140,14 @@ export default function ExaminationScreen() {
                 </View>
                 <View style={styles.examDetails}>
                   <View style={styles.detailRow}>
-                    <Ionicons name="calendar-outline" size={16} color="#666" />
-                    <ThemedText style={styles.detailText}>
+                    <Ionicons name="calendar-outline" size={16} color={colors.textSecondary} />
+                    <ThemedText style={[styles.detailText, { color: colors.textSecondary }]}>
                       {exam.date}
                     </ThemedText>
                   </View>
                   <View style={styles.detailRow}>
-                    <Ionicons name="time-outline" size={16} color="#666" />
-                    <ThemedText style={styles.detailText}>
+                    <Ionicons name="time-outline" size={16} color={colors.textSecondary} />
+                    <ThemedText style={[styles.detailText, { color: colors.textSecondary }]}>
                       {exam.time}
                     </ThemedText>
                   </View>
@@ -145,9 +166,9 @@ export default function ExaminationScreen() {
             </View>
 
             {RESULTS.map((result, index) => (
-              <View key={index} style={styles.resultCard}>
+              <View key={index} style={[styles.resultCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
                 <View style={styles.resultHeader}>
-                  <ThemedText style={styles.subjectText}>
+                  <ThemedText style={[styles.subjectText, { color: colors.text }]}>
                     {result.subject}
                   </ThemedText>
                   <View
@@ -167,14 +188,14 @@ export default function ExaminationScreen() {
                   </View>
                 </View>
                 <View style={styles.marksRow}>
-                  <ThemedText style={styles.marksText}>
+                  <ThemedText style={[styles.marksText, { color: colors.textSecondary }]}>
                     {result.marks} / {result.total}
                   </ThemedText>
-                  <ThemedText style={styles.percentageText}>
+                  <ThemedText style={[styles.percentageText, { fontSize: 20 * fontScale }]}>
                     {((result.marks / result.total) * 100).toFixed(1)}%
                   </ThemedText>
                 </View>
-                <View style={styles.progressBar}>
+                <View style={[styles.progressBar, { backgroundColor: colors.border }]}>
                   <View
                     style={[
                       styles.progressFill,
@@ -191,10 +212,14 @@ export default function ExaminationScreen() {
   );
 }
 
+// Helper to avoid inline complex logic in return
+function keyToColor(key: string, colors: any) {
+    return colors.primary;
+}
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
   },
   header: {
     // moved to common component
@@ -208,31 +233,27 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     borderRadius: 12,
-    backgroundColor: Palette.darkGray,
     alignItems: "center",
   },
   activeTab: {
-    backgroundColor: "#00bfff",
+      // handled inline
   },
   tabText: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#666",
   },
   activeTabText: {
-    color: Palette.white,
+    color: "#fff",
   },
   scrollContent: {
     padding: 16,
     paddingBottom: 40,
   },
   examCard: {
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   examHeader: {
     flexDirection: "row",
@@ -243,7 +264,6 @@ const styles = StyleSheet.create({
   subjectText: {
     fontSize: 18,
     fontWeight: "700",
-    color: Palette.white,
   },
   roomBadge: {
     flexDirection: "row",
@@ -269,7 +289,6 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 14,
-    color: "#888",
   },
   performanceCard: {
     backgroundColor: "#8b5cf6",
@@ -286,7 +305,7 @@ const styles = StyleSheet.create({
   performanceValue: {
     fontSize: 36,
     fontWeight: "bold",
-    color: Palette.white,
+    color: "#fff",
     marginBottom: 4,
   },
   performanceGrade: {
@@ -295,12 +314,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   resultCard: {
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   resultHeader: {
     flexDirection: "row",
@@ -326,16 +343,13 @@ const styles = StyleSheet.create({
   marksText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#ccc",
   },
   percentageText: {
-    fontSize: 20,
     fontWeight: "700",
     color: "#00bfff",
   },
   progressBar: {
     height: 8,
-    backgroundColor: "#2a2a2a",
     borderRadius: 4,
   },
   progressFill: {

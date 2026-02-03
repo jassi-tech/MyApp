@@ -2,16 +2,16 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 const SUBJECTS = [
   {
@@ -58,9 +58,10 @@ const SUBJECTS = [
 
 export default function SyllabusScreen() {
   const router = useRouter();
+  const { colors, fontScale, isDark } = useTheme();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScreenHeader title="Syllabus" />
 
       <ScrollView
@@ -70,20 +71,23 @@ export default function SyllabusScreen() {
         {SUBJECTS.map((subject) => {
           const progress = (subject.completed / subject.chapters) * 100;
           return (
-            <TouchableOpacity key={subject.id} style={styles.subjectCard}>
+            <TouchableOpacity 
+              key={subject.id} 
+              style={[styles.subjectCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+            >
               <View
-                style={[styles.iconBox, { backgroundColor: subject.color }]}
+                style={[styles.iconBox, { backgroundColor: isDark ? "rgba(255,255,255,0.05)" : subject.color }]}
               >
-                <Ionicons name={subject.icon as any} size={28} color="#333" />
+                <Ionicons name={subject.icon as any} size={28} color={isDark ? colors.text : "#333"} />
               </View>
               <View style={styles.subjectContent}>
-                <ThemedText style={styles.subjectName}>
+                <ThemedText style={[styles.subjectName, { color: colors.text }]}>
                   {subject.name}
                 </ThemedText>
-                <ThemedText style={styles.chaptersText}>
+                <ThemedText style={[styles.chaptersText, { color: colors.textSecondary }]}>
                   {subject.completed} of {subject.chapters} chapters completed
                 </ThemedText>
-                <View style={styles.progressBarBg}>
+                <View style={[styles.progressBarBg, { backgroundColor: colors.border }]}>
                   <View
                     style={[styles.progressBarFill, { width: `${progress}%` }]}
                   />
@@ -92,7 +96,7 @@ export default function SyllabusScreen() {
                   {Math.round(progress)}% Complete
                 </ThemedText>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#666" />
+              <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
             </TouchableOpacity>
           );
         })}
@@ -104,7 +108,6 @@ export default function SyllabusScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
   },
   header: {
     // moved to common component
@@ -115,13 +118,11 @@ const styles = StyleSheet.create({
   },
   subjectCard: {
     flexDirection: "row",
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   iconBox: {
     width: 56,
@@ -137,17 +138,14 @@ const styles = StyleSheet.create({
   subjectName: {
     fontSize: 18,
     fontWeight: "700",
-    color: Palette.white,
     marginBottom: 6,
   },
   chaptersText: {
     fontSize: 13,
-    color: "#888",
     marginBottom: 10,
   },
   progressBarBg: {
     height: 6,
-    backgroundColor: "#2a2a2a",
     borderRadius: 3,
     marginBottom: 6,
   },

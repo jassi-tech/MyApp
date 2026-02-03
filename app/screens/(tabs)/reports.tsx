@@ -1,16 +1,17 @@
+// ...existing code...
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { ScreenContainer } from "@/components/common/screen-container";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 interface ReportItem {
   id: string;
@@ -32,6 +33,7 @@ const PENDING_DOCUMENTS: ReportItem[] = [
 export default function ReportsScreen() {
   const [submittedData] = useState<ReportItem[]>(SUBMITTED_REPORTS);
   const [pendingData] = useState<ReportItem[]>(PENDING_DOCUMENTS);
+  const { colors, fontScale, isDark } = useTheme();
 
   const handleUpload = (docName: string) => {
     Alert.alert("Professional Upload", `Ready to upload: ${docName}`, [
@@ -51,24 +53,30 @@ export default function ReportsScreen() {
           <View
             style={[
               styles.summaryCard,
-              { backgroundColor: "rgba(52, 199, 89, 0.1)" },
+              { 
+                backgroundColor: isDark ? "rgba(52, 199, 89, 0.1)" : colors.backgroundSecondary,
+                borderColor: colors.border
+              },
             ]}
           >
-            <ThemedText style={styles.summaryValue}>
+            <ThemedText style={[styles.summaryValue, { color: colors.text }]}>
               {pendingData.length}
             </ThemedText>
-            <ThemedText style={styles.summaryLabel}>Pending</ThemedText>
+            <ThemedText style={[styles.summaryLabel, { color: colors.textSecondary }]}>Pending</ThemedText>
           </View>
           <View
             style={[
               styles.summaryCard,
-              { backgroundColor: "rgba(255, 255, 255, 0.05)" },
+              { 
+                  backgroundColor: isDark ? "rgba(255, 255, 255, 0.05)" : colors.card,
+                  borderColor: colors.border
+              },
             ]}
           >
-            <ThemedText style={styles.summaryValue}>
+            <ThemedText style={[styles.summaryValue, { color: colors.text }]}>
               {submittedData.length}
             </ThemedText>
-            <ThemedText style={styles.summaryLabel}>Submitted</ThemedText>
+            <ThemedText style={[styles.summaryLabel, { color: colors.textSecondary }]}>Submitted</ThemedText>
           </View>
         </View>
 
@@ -78,46 +86,47 @@ export default function ReportsScreen() {
             <Ionicons
               name="time-outline"
               size={20}
-              color={Palette.green}
+              color={colors.primary}
               style={{ marginRight: 8 }}
             />
-            <ThemedText type="subtitle" style={styles.sectionTitle}>
+            <ThemedText type="subtitle" style={[styles.sectionTitle, { color: colors.text, fontSize: 16 * fontScale }]}>
               Action Required
             </ThemedText>
           </View>
         </View>
 
-        <View style={styles.listCard}>
+        <View style={[styles.listCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
           {pendingData.map((item, index) => (
             <TouchableOpacity
               key={item.id}
               activeOpacity={0.7}
               style={[
                 styles.itemRow,
+                { borderBottomColor: colors.border },
                 index === pendingData.length - 1 && { borderBottomWidth: 0 },
               ]}
               onPress={() => handleUpload(item.name)}
             >
               <View style={styles.itemNameContainer}>
-                <View style={styles.iconCirclePending}>
+                <View style={[styles.iconCirclePending, { backgroundColor: colors.backgroundSecondary }]}>
                   <Ionicons
                     name="document-outline"
                     size={20}
-                    color={Palette.white}
+                    color={colors.text}
                   />
                 </View>
                 <View style={styles.textStack}>
-                  <ThemedText style={styles.itemName} numberOfLines={1}>
+                  <ThemedText style={[styles.itemName, { color: colors.text, fontSize: 14 * fontScale }]} numberOfLines={1}>
                     {item.name}
                   </ThemedText>
-                  <ThemedText style={styles.itemSubText}>
+                  <ThemedText style={[styles.itemSubText, { color: colors.textSecondary }]}>
                     Click to upload document
                   </ThemedText>
                 </View>
               </View>
 
-              <View style={styles.actionButton}>
-                <Ionicons name="add" size={18} color={Palette.green} />
+              <View style={[styles.actionButton, { backgroundColor: isDark ? "rgba(52, 199, 89, 0.1)" : "#dcfce7" }]}>
+                <Ionicons name="add" size={18} color={isDark ? "#34C759" : "#10b981"} />
               </View>
             </TouchableOpacity>
           ))}
@@ -129,37 +138,38 @@ export default function ReportsScreen() {
             <Ionicons
               name="checkmark-done-circle-outline"
               size={20}
-              color={Palette.gray}
+              color={colors.icon}
               style={{ marginRight: 8 }}
             />
-            <ThemedText type="subtitle" style={styles.sectionTitle}>
+            <ThemedText type="subtitle" style={[styles.sectionTitle, { color: colors.text, fontSize: 16 * fontScale }]}>
               Submission History
             </ThemedText>
           </View>
         </View>
 
-        <View style={styles.listCard}>
+        <View style={[styles.listCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
           {submittedData.map((item, index) => (
             <View
               key={item.id}
               style={[
                 styles.itemRow,
+                { borderBottomColor: colors.border },
                 index === submittedData.length - 1 && { borderBottomWidth: 0 },
               ]}
             >
               <View style={styles.itemNameContainer}>
-                <View style={styles.iconCircleSubmitted}>
+                <View style={[styles.iconCircleSubmitted, { backgroundColor: colors.backgroundSecondary }]}>
                   <Ionicons
                     name="document-text-outline"
                     size={20}
-                    color={Palette.gray}
+                    color={colors.textSecondary}
                   />
                 </View>
                 <View style={styles.textStack}>
-                  <ThemedText style={styles.itemName} numberOfLines={1}>
+                  <ThemedText style={[styles.itemName, { color: colors.text, fontSize: 14 * fontScale }]} numberOfLines={1}>
                     {item.name}
                   </ThemedText>
-                  <ThemedText style={styles.itemSubText}>
+                  <ThemedText style={[styles.itemSubText, { color: colors.textSecondary }]}>
                     Verified and Stored
                   </ThemedText>
                 </View>
@@ -169,11 +179,11 @@ export default function ReportsScreen() {
                 style={[
                   styles.statusBadge,
                   item.status === "Completed"
-                    ? styles.badgeCompleted
-                    : styles.badgeReview,
+                    ? { backgroundColor: isDark ? "rgba(52, 199, 89, 0.12)" : "#dcfce7" }
+                    : { backgroundColor: isDark ? "rgba(10, 132, 255, 0.12)" : "#e0f2fe" },
                 ]}
               >
-                <ThemedText style={styles.statusText}>{item.status}</ThemedText>
+                <ThemedText style={[styles.statusText, { color: colors.text }]}>{item.status}</ThemedText>
               </View>
             </View>
           ))}
@@ -199,17 +209,14 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.05)",
   },
   summaryValue: {
     fontSize: 24,
     fontWeight: "600",
-    color: Palette.white,
     marginBottom: 2,
   },
   summaryLabel: {
     fontSize: 12,
-    color: Palette.gray,
     fontWeight: "600",
     textTransform: "uppercase",
     letterSpacing: 1,
@@ -226,22 +233,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   sectionTitle: {
-    fontSize: 16,
     fontWeight: "600",
-    color: Palette.white,
   },
   listCard: {
-    backgroundColor: Palette.darkGray,
     borderRadius: 28,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.05)",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.1,
     shadowRadius: 20,
-    elevation: 5,
+    elevation: 2,
   },
   itemRow: {
     flexDirection: "row",
@@ -249,7 +252,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(255, 255, 255, 0.03)",
   },
   itemNameContainer: {
     flexDirection: "row",
@@ -260,7 +262,6 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 14,
-    backgroundColor: Palette.lightGray,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
@@ -269,7 +270,6 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 14,
-    backgroundColor: "rgba(255, 255, 255, 0.03)",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
@@ -278,20 +278,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   itemName: {
-    fontSize: 14,
     fontWeight: "600",
-    color: Palette.white,
     marginBottom: 2,
   },
   itemSubText: {
     fontSize: 10,
-    color: Palette.gray,
   },
   actionButton: {
     width: 32,
     height: 32,
     borderRadius: 10,
-    backgroundColor: "rgba(52, 199, 89, 0.1)",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -302,15 +298,8 @@ const styles = StyleSheet.create({
     minWidth: 84,
     alignItems: "center",
   },
-  badgeCompleted: {
-    backgroundColor: "rgba(52, 199, 89, 0.12)",
-  },
-  badgeReview: {
-    backgroundColor: "rgba(10, 132, 255, 0.12)",
-  },
   statusText: {
     fontSize: 10,
     fontWeight: "600",
-    color: Palette.white,
   },
 });

@@ -13,7 +13,7 @@ import {
     type ViewStyle,
 } from "react-native";
 
-import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTheme } from "@/context/ThemeContext";
 import { ThemedText } from "../themed-text";
 
 export type CardProps = {
@@ -51,8 +51,10 @@ export default function Card({
   disabled = false,
   variant = "vertical",
 }: CardProps) {
-  const backgroundColor = useThemeColor({}, "background") as string | undefined;
-  const borderColor = "transparent"; // Removed border color for cleaner look, or use standard if preferred
+  const { colors, fontScale } = useTheme();
+
+  const backgroundColor = colors.card;
+  const borderColor = colors.border;
 
   const Wrapper: any = onPress ? TouchableOpacity : View;
 
@@ -70,10 +72,10 @@ export default function Card({
       style={[
         isHorizontal ? styles.containerHorizontal : styles.container,
         {
-          backgroundColor: isHorizontal ? "transparent" : backgroundColor, // Horizontal cards might look better without background or transparent
+          backgroundColor: isHorizontal ? "transparent" : backgroundColor,
           borderColor,
           borderRadius: rounded ? 12 : 6,
-          elevation: isHorizontal ? 0 : elevation, // Remove elevation for horizontal list items usually
+          elevation: isHorizontal ? 0 : elevation,
         },
         style,
       ]}
@@ -91,19 +93,28 @@ export default function Card({
               resizeMode={imageResizeMode}
               style={[
                 isHorizontal ? styles.imageHorizontal : styles.image,
-                rounded ? (isHorizontal ? styles.imageRoundedHorizontal : styles.imageRounded) : undefined,
+                rounded
+                  ? isHorizontal
+                    ? styles.imageRoundedHorizontal
+                    : styles.imageRounded
+                  : undefined,
                 imageStyle,
               ]}
             />
           ) : null}
 
-          <View style={isHorizontal ? styles.contentHorizontal : styles.content}>
+          <View
+            style={isHorizontal ? styles.contentHorizontal : styles.content}
+          >
             {(title || headerRight) && (
               <View style={styles.headerRow}>
                 {title ? (
                   <ThemedText
                     type="subtitle"
-                    style={[styles.title, isHorizontal && styles.titleHorizontal]}
+                    style={[
+                      styles.title,
+                      isHorizontal && styles.titleHorizontal,
+                    ]}
                     numberOfLines={2}
                   >
                     {title}
@@ -131,7 +142,9 @@ export default function Card({
             {children ? <View style={styles.children}>{children}</View> : null}
           </View>
 
-          {!isHorizontal && footer ? <View style={styles.footer}>{footer}</View> : null}
+          {!isHorizontal && footer ? (
+            <View style={styles.footer}>{footer}</View>
+          ) : null}
         </>
       )}
     </Wrapper>
@@ -158,34 +171,34 @@ const styles = StyleSheet.create({
   center: { alignItems: "center", justifyContent: "center" },
   image: {
     width: "100%",
-    height: 140,
+    height: 100,
   },
   imageHorizontal: {
     width: 100,
     height: 100,
-    borderRadius: 8,
+    borderRadius: 10,
   },
   imageRounded: {
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
   imageRoundedHorizontal: {
-    borderRadius: 12, // Rounded corners for horizontal image
+    borderRadius: 10, // Rounded corners for horizontal image
   },
   content: {
     padding: 12,
   },
   contentHorizontal: {
     flex: 1,
-    paddingLeft: 12,
-    paddingVertical: 4,
+    paddingLeft: 10,
+    paddingVertical: 2,
     justifyContent: "center",
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "flex-start", // Align top for text wrapping
     justifyContent: "space-between",
-    marginBottom: 4,
+    marginBottom: 2,
   },
   headerRight: {
     marginLeft: 8,
@@ -194,21 +207,20 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     lineHeight: 22,
-  },
-  titleHorizontal: {
-    fontSize: 15, // Slightly smaller for horizontal list maybe
     fontWeight: "bold",
   },
+  titleHorizontal: {
+    fontSize: 12,
+  },
   subtitle: {
-    marginBottom: 4,
-    color: "#666",
-    fontSize: 13,
+    marginBottom: 2,
+    fontSize: 12,
   },
   children: {
-    marginTop: 4,
+    marginTop: 2,
   },
   footer: {
-    padding: 12,
+    padding: 10,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: "rgba(0,0,0,0.06)",
   },

@@ -7,10 +7,11 @@ import Button from "@/components/common/button";
 import { ScreenContainer } from "@/components/common/screen-container";
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function Settings() {
   const router = useRouter();
+  const { colors, fontScale } = useTheme();
 
   return (
     <ScreenContainer header={<ScreenHeader title="Settings" />}>
@@ -66,12 +67,15 @@ const SettingsSection = ({
 }: {
   title: string;
   children: React.ReactNode;
-}) => (
-  <View style={styles.section}>
-    <ThemedText style={styles.sectionTitle}>{title}</ThemedText>
-    <View style={styles.sectionContent}>{children}</View>
-  </View>
-);
+}) => {
+  const { colors, fontScale } = useTheme();
+  return (
+    <View style={styles.section}>
+      <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: 13 * fontScale }]}>{title}</ThemedText>
+      <View style={[styles.sectionContent, { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: 16 }]}>{children}</View>
+    </View>
+  );
+};
 
 const MenuItem = ({
   icon,
@@ -81,31 +85,33 @@ const MenuItem = ({
   icon: any;
   title: string;
   onPress: () => void;
-}) => (
-  <TouchableOpacity style={styles.menuItem} onPress={onPress}>
-    <View style={styles.row}>
-      <Ionicons
-        name={icon}
-        size={22}
-        color={Palette.white}
-        style={styles.menuIcon}
-      />
-      <ThemedText style={styles.menuText}>{title}</ThemedText>
-    </View>
-    <Ionicons name="chevron-forward" size={20} color={Palette.gray} />
-  </TouchableOpacity>
-);
+}) => {
+  const { colors, fontScale } = useTheme();
+  return (
+    <TouchableOpacity style={[styles.menuItem, { borderBottomColor: colors.border }]} onPress={onPress}>
+      <View style={styles.row}>
+        <Ionicons
+          name={icon}
+          size={22}
+          color={colors.text}
+          style={styles.menuIcon}
+        />
+        <ThemedText style={[styles.menuText, { color: colors.text, fontSize: 16 * fontScale }]}>{title}</ThemedText>
+      </View>
+      <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   section: {
     marginBottom: 24,
   },
   sectionTitle: {
-    color: Palette.gray,
-    fontSize: 14,
     marginBottom: 8,
     marginLeft: 4,
     textTransform: "uppercase",
+    fontWeight: "600",
   },
   sectionContent: {
     overflow: "hidden",
@@ -126,8 +132,6 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   menuText: {
-    fontSize: 16,
-    color: Palette.white,
   },
   logoutButton: {
     paddingVertical: 10,

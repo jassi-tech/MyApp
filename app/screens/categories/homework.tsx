@@ -2,16 +2,16 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 const HOMEWORK = [
   {
@@ -54,6 +54,7 @@ const HOMEWORK = [
 
 export default function HomeworkScreen() {
   const router = useRouter();
+  const { colors, fontScale, isDark } = useTheme();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -69,7 +70,7 @@ export default function HomeworkScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScreenHeader title="Homework" />
 
       <ScrollView
@@ -77,25 +78,28 @@ export default function HomeworkScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.statsRow}>
-          <View style={styles.statCard}>
-            <ThemedText style={styles.statValue}>2</ThemedText>
-            <ThemedText style={styles.statLabel}>Pending</ThemedText>
+          <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <ThemedText style={[styles.statValue, { fontSize: 24 * fontScale }]}>2</ThemedText>
+            <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>Pending</ThemedText>
           </View>
-          <View style={styles.statCard}>
-            <ThemedText style={styles.statValue}>1</ThemedText>
-            <ThemedText style={styles.statLabel}>Submitted</ThemedText>
+          <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <ThemedText style={[styles.statValue, { fontSize: 24 * fontScale }]}>1</ThemedText>
+            <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>Submitted</ThemedText>
           </View>
-          <View style={styles.statCard}>
-            <ThemedText style={styles.statValue}>1</ThemedText>
-            <ThemedText style={styles.statLabel}>Upcoming</ThemedText>
+          <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <ThemedText style={[styles.statValue, { fontSize: 24 * fontScale }]}>1</ThemedText>
+            <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>Upcoming</ThemedText>
           </View>
         </View>
 
-        <ThemedText style={styles.sectionTitle}>All Assignments</ThemedText>
+        <ThemedText style={[styles.sectionTitle, { color: colors.text, fontSize: 18 * fontScale }]}>All Assignments</ThemedText>
         {HOMEWORK.map((hw) => (
-          <TouchableOpacity key={hw.id} style={styles.homeworkCard}>
-            <View style={[styles.iconBox, { backgroundColor: hw.color }]}>
-              <Ionicons name={hw.icon as any} size={24} color="#333" />
+          <TouchableOpacity 
+            key={hw.id} 
+            style={[styles.homeworkCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+          >
+            <View style={[styles.iconBox, { backgroundColor: isDark ? "rgba(255,255,255,0.05)" : hw.color }]}>
+              <Ionicons name={hw.icon as any} size={24} color={isDark ? colors.text : "#333"} />
             </View>
             <View style={styles.homeworkContent}>
               <View style={styles.homeworkHeader}>
@@ -116,10 +120,10 @@ export default function HomeworkScreen() {
                   </ThemedText>
                 </View>
               </View>
-              <ThemedText style={styles.titleText}>{hw.title}</ThemedText>
+              <ThemedText style={[styles.titleText, { color: colors.text, fontSize: 15 * fontScale }]}>{hw.title}</ThemedText>
               <View style={styles.dueRow}>
-                <Ionicons name="time-outline" size={14} color="#666" />
-                <ThemedText style={styles.dueText}>
+                <Ionicons name="time-outline" size={14} color={colors.textSecondary} />
+                <ThemedText style={[styles.dueText, { color: colors.textSecondary }]}>
                   Due: {hw.dueDate}
                 </ThemedText>
               </View>
@@ -134,7 +138,6 @@ export default function HomeworkScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
   },
   header: {
     // moved to common component
@@ -150,37 +153,29 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     padding: 16,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   statValue: {
-    fontSize: 24,
     fontWeight: "bold",
     color: "#00bfff",
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: "#888",
   },
   sectionTitle: {
-    fontSize: 18,
     fontWeight: "700",
-    color: Palette.white,
     marginBottom: 16,
   },
   homeworkCard: {
     flexDirection: "row",
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   iconBox: {
     width: 48,
@@ -214,8 +209,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   titleText: {
-    fontSize: 15,
-    color: Palette.white,
     marginBottom: 8,
   },
   dueRow: {
@@ -225,6 +218,5 @@ const styles = StyleSheet.create({
   },
   dueText: {
     fontSize: 12,
-    color: "#666",
   },
 });

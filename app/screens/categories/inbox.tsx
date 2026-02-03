@@ -11,7 +11,7 @@ import {
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 const MESSAGES = [
   {
@@ -59,40 +59,50 @@ const MESSAGES = [
 export default function InboxScreen() {
   const router = useRouter();
   const [filter, setFilter] = useState<"all" | "unread">("all");
+  const { colors, fontScale } = useTheme();
 
   const filteredMessages =
     filter === "unread" ? MESSAGES.filter((m) => !m.isRead) : MESSAGES;
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScreenHeader
         title="Inbox"
         rightElement={
-          <TouchableOpacity style={styles.filterButton}>
-            <Ionicons name="filter-outline" size={22} color={Palette.white} />
+          <TouchableOpacity style={[styles.filterButton, { backgroundColor: colors.backgroundSecondary }]}>
+            <Ionicons name="filter-outline" size={22} color={colors.text} />
           </TouchableOpacity>
         }
       />
 
       <View style={styles.filterTabs}>
         <TouchableOpacity
-          style={[styles.tab, filter === "all" && styles.activeTab]}
+          style={[
+            styles.tab, 
+            { backgroundColor: filter === "all" ? colors.primary : colors.backgroundSecondary }
+          ]}
           onPress={() => setFilter("all")}
         >
           <ThemedText
-            style={[styles.tabText, filter === "all" && styles.activeTabText]}
+            style={[
+              styles.tabText, 
+              { color: filter === "all" ? '#fff' : colors.textSecondary }
+            ]}
           >
             All ({MESSAGES.length})
           </ThemedText>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.tab, filter === "unread" && styles.activeTab]}
+          style={[
+            styles.tab, 
+            { backgroundColor: filter === "unread" ? colors.primary : colors.backgroundSecondary }
+          ]}
           onPress={() => setFilter("unread")}
         >
           <ThemedText
             style={[
               styles.tabText,
-              filter === "unread" && styles.activeTabText,
+              { color: filter === "unread" ? '#fff' : colors.textSecondary }
             ]}
           >
             Unread ({MESSAGES.filter((m) => !m.isRead).length})
@@ -105,14 +115,26 @@ export default function InboxScreen() {
         showsVerticalScrollIndicator={false}
       >
         {filteredMessages.map((message) => (
-          <TouchableOpacity key={message.id} style={styles.messageCard}>
+          <TouchableOpacity 
+            key={message.id} 
+            style={[
+              styles.messageCard, 
+              { 
+                backgroundColor: colors.card,
+                borderColor: colors.border
+              }
+            ]}
+          >
             <View style={styles.messageHeader}>
               <View style={styles.senderRow}>
-                {!message.isRead && <View style={styles.unreadDot} />}
+                {!message.isRead && <View style={[styles.unreadDot, { backgroundColor: colors.primary }]} />}
                 <ThemedText
                   style={[
                     styles.senderText,
-                    !message.isRead && styles.unreadText,
+                    { 
+                        color: !message.isRead ? colors.text : colors.textSecondary,
+                        fontSize: 14 * fontScale
+                    }
                   ]}
                 >
                   {message.sender}
@@ -126,16 +148,22 @@ export default function InboxScreen() {
                   />
                 )}
               </View>
-              <ThemedText style={styles.dateText}>{message.date}</ThemedText>
+              <ThemedText style={[styles.dateText, { color: colors.textSecondary }]}>{message.date}</ThemedText>
             </View>
             <ThemedText
-              style={[styles.subjectText, !message.isRead && styles.unreadText]}
+              style={[
+                  styles.subjectText, 
+                  { 
+                      color: !message.isRead ? colors.text : colors.textSecondary,
+                      fontSize: 15 * fontScale 
+                  }
+              ]}
             >
               {message.subject}
             </ThemedText>
             <View style={styles.messageFooter}>
-              <Ionicons name="mail-outline" size={14} color="#666" />
-              <ThemedText style={styles.footerText}>Tap to read</ThemedText>
+              <Ionicons name="mail-outline" size={14} color={colors.textSecondary} />
+              <ThemedText style={[styles.footerText, { color: colors.textSecondary }]}>Tap to read</ThemedText>
             </View>
           </TouchableOpacity>
         ))}
@@ -147,16 +175,11 @@ export default function InboxScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
-  },
-  header: {
-    // moved to common component
   },
   filterButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Palette.darkGray,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -169,31 +192,21 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
     borderRadius: 12,
-    backgroundColor: Palette.darkGray,
     alignItems: "center",
-  },
-  activeTab: {
-    backgroundColor: "#00bfff",
   },
   tabText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#666",
-  },
-  activeTabText: {
-    color: Palette.white,
   },
   scrollContent: {
     padding: 16,
     paddingBottom: 40,
   },
   messageCard: {
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   messageHeader: {
     flexDirection: "row",
@@ -210,25 +223,15 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#00bfff",
     marginRight: 8,
   },
   senderText: {
-    fontSize: 14,
     fontWeight: "600",
-    color: "#999",
-  },
-  unreadText: {
-    color: Palette.white,
-    fontWeight: "700",
   },
   dateText: {
     fontSize: 12,
-    color: "#666",
   },
   subjectText: {
-    fontSize: 15,
-    color: "#ccc",
     marginBottom: 12,
   },
   messageFooter: {
@@ -238,6 +241,5 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 12,
-    color: "#666",
   },
 });

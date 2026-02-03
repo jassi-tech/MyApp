@@ -2,7 +2,7 @@ import React from "react";
 import { ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 interface ScreenContainerProps {
   children: React.ReactNode;
@@ -19,8 +19,10 @@ export function ScreenContainer({
   style,
   contentContainerStyle,
 }: ScreenContainerProps) {
+  const { colors } = useTheme();
+
   return (
-    <SafeAreaView style={[styles.container, style]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }, style]}>
       {header}
       {scrollable ? (
         <ScrollView 
@@ -41,7 +43,6 @@ export function ScreenContainer({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Palette.black,
   },
   contentContainer: {
     padding: 12,

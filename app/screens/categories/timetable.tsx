@@ -12,10 +12,11 @@ import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+// ... keep data as is ...
 const TIMETABLE_DATA: Record<string, any[]> = {
   Mon: [
     {
@@ -232,17 +233,18 @@ const TIMETABLE_DATA: Record<string, any[]> = {
 export default function TimetableScreen() {
   const router = useRouter();
   const [selectedDay, setSelectedDay] = useState("Mon");
+  const { colors, fontScale, isDark } = useTheme();
 
   const schedule = TIMETABLE_DATA[selectedDay] || TIMETABLE_DATA["Mon"];
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScreenHeader
         title="Class Timetable"
         subtitle={`${selectedDay}day's Schedule`}
       />
 
-      <View style={styles.daySelectorContainer}>
+      <View style={[styles.daySelectorContainer, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -254,13 +256,18 @@ export default function TimetableScreen() {
               onPress={() => setSelectedDay(day)}
               style={[
                 styles.dayTab,
+                { 
+                    backgroundColor: colors.card,
+                    borderColor: colors.border
+                },
                 selectedDay === day && styles.activeDayTab,
               ]}
             >
               <ThemedText
                 style={[
                   styles.dayTabText,
-                  selectedDay === day && styles.activeDayTabText,
+                  { color: colors.textSecondary },
+                  selectedDay === day && { color: "#fff" },
                 ]}
               >
                 {day}
@@ -282,26 +289,29 @@ export default function TimetableScreen() {
           {schedule.map((item, index) => (
             <View key={index} style={styles.periodWrapper}>
               <View style={styles.timelineSection}>
-                <View style={styles.timelineDot} />
+                <View style={[styles.timelineDot, { borderColor: colors.background }]} />
                 {index < schedule.length - 1 && (
-                  <View style={styles.timelineLine} />
+                  <View style={[styles.timelineLine, { backgroundColor: colors.border }]} />
                 )}
               </View>
 
-              <View style={styles.periodCard}>
-                <View style={styles.timeSection}>
-                  <ThemedText style={styles.timeText}>
+              <View style={[styles.periodCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                <View style={[styles.timeSection, { borderBottomColor: colors.border }]}>
+                  <ThemedText style={[styles.timeText, { color: colors.textSecondary }]}>
                     {item.time.split(" - ")[0]}
                   </ThemedText>
-                  <View style={styles.timeDivider} />
-                  <ThemedText style={styles.timeText}>
+                  <View style={[styles.timeDivider, { backgroundColor: colors.border }]} />
+                  <ThemedText style={[styles.timeText, { color: colors.textSecondary }]}>
                     {item.time.split(" - ")[1]}
                   </ThemedText>
                 </View>
 
                 <View style={styles.contentSection}>
                   <View
-                    style={[styles.iconBox, { backgroundColor: item.color }]}
+                    style={[
+                        styles.iconBox, 
+                        { backgroundColor: isDark ? "rgba(255,255,255,0.05)" : item.color }
+                    ]}
                   >
                     <Ionicons
                       name={item.icon}
@@ -310,17 +320,17 @@ export default function TimetableScreen() {
                     />
                   </View>
                   <View style={styles.infoBox}>
-                    <ThemedText style={styles.subjectText}>
+                    <ThemedText style={[styles.subjectText, { color: colors.text, fontSize: 18 * fontScale }]}>
                       {item.subject}
                     </ThemedText>
                     <View style={styles.detailsRow}>
                       <Ionicons
                         name="person-outline"
                         size={12}
-                        color="#666"
+                        color={colors.textSecondary}
                         style={{ marginRight: 4 }}
                       />
-                      <ThemedText style={styles.detailsText}>
+                      <ThemedText style={[styles.detailsText, { color: colors.textSecondary }]}>
                         {item.teacher}
                       </ThemedText>
                     </View>
@@ -328,7 +338,7 @@ export default function TimetableScreen() {
                       <Ionicons
                         name="location-outline"
                         size={12}
-                        color="#666"
+                        color={colors.textSecondary}
                         style={{ marginRight: 4 }}
                       />
                       <ThemedText style={styles.roomText}>
@@ -349,13 +359,10 @@ export default function TimetableScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
   },
   daySelectorContainer: {
     paddingVertical: 20,
-    backgroundColor: "#0a0a0a",
     borderBottomWidth: 1,
-    borderBottomColor: "#1a1a1a",
   },
   daySelectorScroll: {
     paddingHorizontal: 16,
@@ -365,33 +372,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 30,
-    backgroundColor: Palette.darkGray,
     marginRight: 8,
-    borderWidth: 2,
-    borderColor: "#2a2a2a",
-    elevation: 3,
+    borderWidth: 1,
+    elevation: 2,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
     shadowRadius: 3,
   },
   activeDayTab: {
     backgroundColor: "#00bfff",
     borderColor: "#00bfff",
-    elevation: 6,
+    elevation: 4,
     shadowColor: "#00bfff",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.3,
     shadowRadius: 6,
   },
   dayTabText: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#666",
     letterSpacing: 0.5,
-  },
-  activeDayTabText: {
-    color: Palette.white,
   },
   scrollContent: {
     padding: 20,
@@ -412,27 +413,23 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: "#00bfff",
     borderWidth: 3,
-    borderColor: "#1a1a1a",
     zIndex: 2,
   },
   timelineLine: {
     flex: 1,
     width: 2,
-    backgroundColor: "#2a2a2a",
     marginTop: 4,
   },
   periodCard: {
     flex: 1,
-    backgroundColor: Palette.darkGray,
     borderRadius: 20,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
-    elevation: 4,
+    elevation: 2,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   timeSection: {
     flexDirection: "row",
@@ -440,18 +437,15 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#2a2a2a",
   },
   timeText: {
     fontSize: 11,
-    color: "#888",
     fontWeight: "600",
     letterSpacing: 0.5,
   },
   timeDivider: {
     width: 20,
     height: 1,
-    backgroundColor: "#444",
     marginHorizontal: 8,
   },
   contentSection: {
@@ -465,19 +459,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 16,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
   },
   infoBox: {
     flex: 1,
   },
   subjectText: {
-    fontSize: 18,
     fontWeight: "700",
-    color: Palette.white,
     marginBottom: 8,
     letterSpacing: 0.3,
   },
@@ -488,7 +475,6 @@ const styles = StyleSheet.create({
   },
   detailsText: {
     fontSize: 13,
-    color: "#999",
     fontWeight: "500",
   },
   roomText: {

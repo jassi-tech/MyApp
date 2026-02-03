@@ -11,7 +11,7 @@ import {
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 const { width } = Dimensions.get("window");
 
@@ -65,6 +65,7 @@ export default function QuizDetailsScreen() {
   const router = useRouter();
   const { id, title } = useLocalSearchParams();
   const questions = MOCK_QUESTIONS[id as string] || MOCK_QUESTIONS.default;
+  const { colors, fontScale } = useTheme();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -106,21 +107,21 @@ export default function QuizDetailsScreen() {
 
   if (showResult) {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
         <View style={styles.resultContainer}>
-          <Ionicons name="checkmark-circle" size={80} color="#22c55e" />
-          <ThemedText style={styles.resultTitle}>Quiz Completed!</ThemedText>
-          <ThemedText style={styles.resultSubtitle}>
+          <Ionicons name="checkmark-circle" size={80} color={colors.success} />
+          <ThemedText style={[styles.resultTitle, { color: colors.text, fontSize: 28 * fontScale }]}>Quiz Completed!</ThemedText>
+          <ThemedText style={[styles.resultSubtitle, { color: colors.textSecondary, fontSize: 18 * fontScale }]}>
             You scored {score} out of {questions.length}
           </ThemedText>
           
-          <View style={styles.autoSaveNotice}>
-            <Ionicons name="cloud-done-outline" size={20} color="#ccc" />
-            <ThemedText style={styles.autoSaveText}>Results auto-saved successfully</ThemedText>
+          <View style={[styles.autoSaveNotice, { backgroundColor: colors.card }]}>
+            <Ionicons name="cloud-done-outline" size={20} color={colors.textSecondary} />
+            <ThemedText style={[styles.autoSaveText, { color: colors.textSecondary }]}>Results auto-saved successfully</ThemedText>
           </View>
 
-          <TouchableOpacity style={styles.restartButton} onPress={handleRestart}>
-            <ThemedText style={styles.restartButtonText}>Restart Quiz</ThemedText>
+          <TouchableOpacity style={[styles.restartButton, { backgroundColor: colors.card }]} onPress={handleRestart}>
+            <ThemedText style={[styles.restartButtonText, { color: colors.text }]}>Restart Quiz</ThemedText>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.homeButton} onPress={() => router.back()}>
@@ -134,13 +135,13 @@ export default function QuizDetailsScreen() {
   const currentQuestion = questions[currentIndex];
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="close" size={24} color={Palette.white} />
+        <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.card }]} onPress={() => router.back()}>
+          <Ionicons name="close" size={24} color={colors.text} />
         </TouchableOpacity>
         <View style={styles.headerInfo}>
-          <ThemedText style={styles.headerTitle}>{title}</ThemedText>
+          <ThemedText style={[styles.headerTitle, { color: colors.text, fontSize: 16 * fontScale }]}>{title}</ThemedText>
           <ThemedText style={styles.timerText}>
             <Ionicons name="time-outline" size={14} /> {timeLeft}s
           </ThemedText>
@@ -149,15 +150,15 @@ export default function QuizDetailsScreen() {
       </View>
 
       <View style={styles.progressContainer}>
-        <View style={styles.progressBarBackground}>
+        <View style={[styles.progressBarBackground, { backgroundColor: colors.border }]}>
           <View 
             style={[
               styles.progressBarFill, 
-              { width: `${((currentIndex + 1) / questions.length) * 100}%` }
+              { width: `${((currentIndex + 1) / questions.length) * 100}%`, backgroundColor: colors.primary }
             ]} 
           />
         </View>
-        <ThemedText style={styles.progressText}>
+        <ThemedText style={[styles.progressText, { color: colors.textSecondary }]}>
           Question {currentIndex + 1} of {questions.length}
         </ThemedText>
       </View>
@@ -168,7 +169,7 @@ export default function QuizDetailsScreen() {
         exiting={FadeOutLeft}
         style={styles.questionCard}
       >
-        <ThemedText style={styles.questionText}>
+        <ThemedText style={[styles.questionText, { color: colors.text, fontSize: 22 * fontScale }]}>
           {currentQuestion.question}
         </ThemedText>
 
@@ -178,24 +179,28 @@ export default function QuizDetailsScreen() {
               key={index}
               style={[
                 styles.optionCard,
-                selectedOption === index && styles.selectedOptionCard,
+                { backgroundColor: colors.card, borderColor: colors.border },
+                selectedOption === index && { borderColor: colors.primary, backgroundColor: colors.primary + '20' },
               ]}
               onPress={() => setSelectedOption(index)}
             >
               <View style={[
                 styles.optionIndex,
-                selectedOption === index && styles.selectedOptionIndex
+                { backgroundColor: colors.border },
+                selectedOption === index && { backgroundColor: colors.primary }
               ]}>
                 <ThemedText style={[
                   styles.optionIndexText,
-                  selectedOption === index && styles.selectedOptionIndexText
+                  { color: colors.textSecondary },
+                  selectedOption === index && { color: "#fff" }
                 ]}>
                   {String.fromCharCode(65 + index)}
                 </ThemedText>
               </View>
               <ThemedText style={[
                 styles.optionText,
-                selectedOption === index && styles.selectedOptionText
+                { color: colors.textSecondary, fontSize: 16 * fontScale },
+                selectedOption === index && { color: colors.text, fontWeight: "600" }
               ]}>
                 {option}
               </ThemedText>
@@ -204,13 +209,13 @@ export default function QuizDetailsScreen() {
         </View>
       </Animated.View>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { backgroundColor: colors.background }]}>
         <TouchableOpacity
-          style={[styles.nextButton, selectedOption === null && styles.disabledButton]}
+          style={[styles.nextButton, { backgroundColor: colors.primary }, selectedOption === null && { backgroundColor: colors.border, opacity: 0.6 }]}
           onPress={handleNext}
           disabled={selectedOption === null}
         >
-          <ThemedText style={styles.nextButtonText}>
+          <ThemedText style={[styles.nextButtonText, { color: "#fff" }]}>
             {currentIndex === questions.length - 1 ? "Submit Quiz" : "Next Question"}
           </ThemedText>
         </TouchableOpacity>
@@ -222,7 +227,6 @@ export default function QuizDetailsScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
   },
   header: {
     flexDirection: "row",
@@ -235,7 +239,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Palette.darkGray,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -243,9 +246,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerTitle: {
-    fontSize: 16,
     fontWeight: "bold",
-    color: Palette.white,
   },
   timerText: {
     fontSize: 12,
@@ -258,18 +259,15 @@ const styles = StyleSheet.create({
   },
   progressBarBackground: {
     height: 8,
-    backgroundColor: "#333",
     borderRadius: 4,
     marginBottom: 8,
   },
   progressBarFill: {
     height: "100%",
-    backgroundColor: "#0ea5e9",
     borderRadius: 4,
   },
   progressText: {
     fontSize: 12,
-    color: "#888",
     textAlign: "right",
   },
   questionCard: {
@@ -278,9 +276,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   questionText: {
-    fontSize: 22,
     fontWeight: "700",
-    color: Palette.white,
     lineHeight: 32,
     marginBottom: 30,
   },
@@ -290,62 +286,35 @@ const styles = StyleSheet.create({
   optionCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: Palette.darkGray,
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#333",
-  },
-  selectedOptionCard: {
-    borderColor: "#0ea5e9",
-    backgroundColor: "#0c4a6e",
   },
   optionIndex: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#444",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 16,
   },
-  selectedOptionIndex: {
-    backgroundColor: "#0ea5e9",
-  },
   optionIndexText: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "#ccc",
-  },
-  selectedOptionIndexText: {
-    color: Palette.white,
   },
   optionText: {
-    fontSize: 16,
-    color: "#ccc",
     flex: 1,
-  },
-  selectedOptionText: {
-    color: Palette.white,
-    fontWeight: "600",
   },
   footer: {
     padding: 20,
-    backgroundColor: Palette.black,
   },
   nextButton: {
-    backgroundColor: "#0ea5e9",
     height: 56,
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
   },
-  disabledButton: {
-    backgroundColor: "#1e293b",
-    opacity: 0.6,
-  },
   nextButtonText: {
-    color: Palette.white,
     fontSize: 16,
     fontWeight: "bold",
   },
@@ -356,21 +325,16 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   resultTitle: {
-    fontSize: 28,
     fontWeight: "bold",
-    color: Palette.white,
     marginTop: 24,
   },
   resultSubtitle: {
-    fontSize: 18,
-    color: "#ccc",
     marginTop: 8,
     marginBottom: 32,
   },
   autoSaveNotice: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: "#1f2937",
       paddingHorizontal: 16,
       paddingVertical: 10,
       borderRadius: 12,
@@ -378,11 +342,9 @@ const styles = StyleSheet.create({
   },
   autoSaveText: {
       fontSize: 13,
-      color: "#ccc",
       marginLeft: 8,
   },
   restartButton: {
-    backgroundColor: "#333",
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 12,
@@ -391,8 +353,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   restartButtonText: {
-    color: Palette.white,
-    fontSize: 16,
     fontWeight: "600",
   },
   homeButton: {

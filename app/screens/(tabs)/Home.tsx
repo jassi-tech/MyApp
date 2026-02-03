@@ -5,12 +5,14 @@ import React from "react";
 import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 
 import { ScreenContainer } from "@/components/common/screen-container";
+import { LifetimeDealBanner } from "@/components/marketing/LifetimeDealBanner";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 import CoursesScreen from "@/screens/Course";
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { colors, fontScale } = useTheme();
 
   return (
     <ScreenContainer scrollable>
@@ -24,35 +26,35 @@ export default function HomeScreen() {
             />
           </TouchableOpacity>
           <View style={styles.titleContainer}>
-            <ThemedText style={styles.userName}>Rumi Aktar</ThemedText>
-            <ThemedText style={styles.welcomeText}>
+            <ThemedText style={[styles.userName, { color: colors.text }]}>Rumi Aktar</ThemedText>
+            <ThemedText style={[styles.welcomeText, { color: colors.textSecondary }]}>
               Let&apos;s learn something new
             </ThemedText>
           </View>
         </View>
         <TouchableOpacity
-          style={styles.notificationButton}
+          style={[styles.notificationButton, { backgroundColor: colors.backgroundSecondary }]}
           onPress={() => router.push("/screens/notification")}
         >
           <Ionicons
             name="notifications-outline"
             size={20}
-            color={Palette.white}
+            color={colors.icon}
           />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.searchContainer}>
+      <View style={[styles.searchContainer, { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}>
         <Ionicons
           name="search-outline"
           size={16}
-          color={Palette.gray}
+          color={colors.icon}
           style={styles.searchIcon}
         />
         <TextInput
-          style={styles.searchInput}
+          style={[styles.searchInput, { color: colors.text }]}
           placeholder="Search Courses"
-          placeholderTextColor={Palette.gray}
+          placeholderTextColor={colors.textSecondary}
         />
       </View>
 
@@ -74,6 +76,10 @@ export default function HomeScreen() {
         />
       </View>
 
+      <LifetimeDealBanner 
+        onRedeem={() => router.push("/screens/marketing/lifetime-deal")} 
+      />
+
       <CoursesScreen />
     </ScreenContainer>
   );
@@ -87,14 +93,17 @@ const CategoryItem = ({
   icon: any;
   label: string;
   onPress?: () => void;
-}) => (
-  <TouchableOpacity style={styles.categoryItem} onPress={onPress}>
-    <View style={styles.iconContainer}>
-      <Ionicons name={icon} size={20} color={Palette.white} />
-    </View>
-    <ThemedText style={styles.categoryLabel}>{label}</ThemedText>
-  </TouchableOpacity>
-);
+}) => {
+  const { colors, fontScale } = useTheme();
+  return (
+    <TouchableOpacity style={styles.categoryItem} onPress={onPress}>
+      <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecondary }]}>
+        <Ionicons name={icon} size={20} color={colors.text} />
+      </View>
+      <ThemedText style={[styles.categoryLabel, { color: colors.text, fontSize: 10 * fontScale }]}>{label}</ThemedText>
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   header: {
@@ -120,37 +129,31 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 12,
     fontWeight: "bold",
-    color: Palette.white,
   },
   welcomeText: {
     fontSize: 10,
-    color: Palette.gray,
   },
   notificationButton: {
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: Palette.darkGray,
     justifyContent: "center",
     alignItems: "center",
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     paddingHorizontal: 14,
     paddingVertical: 10,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: "#333",
   },
   searchIcon: {
     marginRight: 15,
   },
   searchInput: {
     flex: 1,
-    color: Palette.white,
     fontSize: 12,
   },
   grid: {
@@ -168,14 +171,11 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: Palette.darkGray,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 5,
   },
   categoryLabel: {
-    fontSize: 10,
-    color: Palette.white,
     textAlign: "center",
     fontWeight: "600",
   },

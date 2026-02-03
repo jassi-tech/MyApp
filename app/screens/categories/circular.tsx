@@ -2,16 +2,16 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 const CIRCULARS = [
   {
@@ -46,9 +46,10 @@ const CIRCULARS = [
 
 export default function CircularScreen() {
   const router = useRouter();
+  const { colors, fontScale } = useTheme();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScreenHeader title="Circulars" />
 
       <ScrollView
@@ -56,21 +57,24 @@ export default function CircularScreen() {
         showsVerticalScrollIndicator={false}
       >
         {CIRCULARS.map((circular) => (
-          <TouchableOpacity key={circular.id} style={styles.circularCard}>
+          <TouchableOpacity 
+            key={circular.id} 
+            style={[styles.circularCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+          >
             <View style={styles.documentIcon}>
               <Ionicons name="document-text" size={32} color="#00bfff" />
             </View>
             <View style={styles.circularContent}>
-              <ThemedText style={styles.titleText}>{circular.title}</ThemedText>
+              <ThemedText style={[styles.titleText, { color: colors.text, fontSize: 16 * fontScale }]}>{circular.title}</ThemedText>
               <View style={styles.metaRow}>
                 <View style={styles.categoryBadge}>
                   <ThemedText style={styles.categoryText}>
                     {circular.category}
                   </ThemedText>
                 </View>
-                <ThemedText style={styles.sizeText}>{circular.size}</ThemedText>
+                <ThemedText style={[styles.sizeText, { color: colors.textSecondary }]}>{circular.size}</ThemedText>
               </View>
-              <ThemedText style={styles.dateText}>{circular.date}</ThemedText>
+              <ThemedText style={[styles.dateText, { color: colors.textSecondary }]}>{circular.date}</ThemedText>
             </View>
             <TouchableOpacity style={styles.downloadButton}>
               <Ionicons name="download-outline" size={22} color="#00bfff" />
@@ -85,7 +89,6 @@ export default function CircularScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
   },
   header: {
     // moved to common component
@@ -96,13 +99,11 @@ const styles = StyleSheet.create({
   },
   circularCard: {
     flexDirection: "row",
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   documentIcon: {
     width: 56,
@@ -117,9 +118,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   titleText: {
-    fontSize: 16,
     fontWeight: "700",
-    color: Palette.white,
     marginBottom: 8,
   },
   metaRow: {
@@ -141,11 +140,9 @@ const styles = StyleSheet.create({
   },
   sizeText: {
     fontSize: 12,
-    color: "#666",
   },
   dateText: {
     fontSize: 12,
-    color: "#888",
   },
   downloadButton: {
     width: 40,

@@ -4,7 +4,7 @@ import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 interface ScreenHeaderProps {
   title: string;
@@ -20,6 +20,7 @@ export function ScreenHeader({
   rightElement,
 }: ScreenHeaderProps) {
   const router = useRouter();
+  const { colors, fontScale } = useTheme();
 
   const handleBack = () => {
     if (onBack) {
@@ -30,16 +31,19 @@ export function ScreenHeader({
   };
 
   return (
-    <View style={styles.header}>
-      <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-        <Ionicons name="arrow-back" size={24} color={Palette.white} />
+    <View style={[styles.header, { borderBottomColor: colors.border }]}>
+      <TouchableOpacity 
+        style={[styles.backButton, { backgroundColor: colors.backgroundSecondary }]} 
+        onPress={handleBack}
+      >
+        <Ionicons name="arrow-back" size={24} color={colors.text} />
       </TouchableOpacity>
       <View style={styles.centerContainer}>
-        <ThemedText type="subtitle" style={styles.headerTitle}>
+        <ThemedText type="subtitle" style={[styles.headerTitle, { color: colors.text, fontSize: 16 * fontScale }]}>
           {title}
         </ThemedText>
         {subtitle && (
-          <ThemedText style={styles.headerSubtitle}>{subtitle}</ThemedText>
+          <ThemedText style={[styles.headerSubtitle, { fontSize: 12 * fontScale }]}>{subtitle}</ThemedText>
         )}
       </View>
       <View style={styles.rightContainer}>
@@ -57,13 +61,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: Palette.darkGray,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Palette.darkGray,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -71,10 +73,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerTitle: {
-    color: Palette.white,
+    // color set dynamically
   },
   headerSubtitle: {
-    fontSize: 12,
     color: "#00bfff",
     marginTop: 2,
   },

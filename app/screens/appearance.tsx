@@ -4,7 +4,6 @@ import React from 'react';
 import { ScrollView, StyleSheet, Switch, TouchableOpacity, View } from 'react-native';
 
 import { ScreenContainer } from '@/components/common/screen-container';
-import { ScreenHeader } from '@/components/common/screen-header';
 import { ThemedText } from '@/components/themed-text';
 import { FontSizes } from '@/constants/theme';
 import { useTheme } from '@/context/ThemeContext';
@@ -31,7 +30,12 @@ export default function AppearanceScreen() {
 
   return (
     <ScreenContainer>
-      <ScreenHeader title="Appearance" />
+        <View style={styles.header}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={24} color={colors.text} />
+            </TouchableOpacity>
+            <ThemedText type="subtitle" style={[styles.headerTitle, { color: colors.text }]}>Appearance</ThemedText>
+        </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         
@@ -145,6 +149,20 @@ export default function AppearanceScreen() {
 }
 
 const styles = StyleSheet.create({
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+        paddingTop: 10,
+    },
+    backButton: {
+        marginRight: 16,
+        padding: 4,
+    },
+    headerTitle: {
+        fontSize: 20, 
+        fontWeight: 'bold',
+    },
     section: {
         marginBottom: 24,
     },

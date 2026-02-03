@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function PushNotificationsScreen() {
   const router = useRouter();
@@ -23,21 +23,22 @@ export default function PushNotificationsScreen() {
   const [events, setEvents] = useState(true);
   const [sound, setSound] = useState(true);
   const [vibration, setVibration] = useState(true);
+  const { colors, fontScale } = useTheme();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={Palette.white} />
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.card }]} onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Push Notifications</ThemedText>
+        <ThemedText style={[styles.headerTitle, { color: colors.text, fontSize: 20 * fontScale }]}>Push Notifications</ThemedText>
         <View style={{ width: 40 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>GENERAL</ThemedText>
-          <View style={styles.card}>
+          <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>GENERAL</ThemedText>
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <NotificationToggle
               icon="notifications"
               label="All Notifications"
@@ -49,8 +50,8 @@ export default function PushNotificationsScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>CATEGORIES</ThemedText>
-          <View style={styles.card}>
+          <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>CATEGORIES</ThemedText>
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <NotificationToggle
               icon="chatbubbles-outline"
               label="Messages"
@@ -91,8 +92,8 @@ export default function PushNotificationsScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>PREFERENCES</ThemedText>
-          <View style={styles.card}>
+          <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>PREFERENCES</ThemedText>
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <NotificationToggle
               icon="volume-high-outline"
               label="Sound"
@@ -129,30 +130,32 @@ const NotificationToggle = ({
   value: boolean;
   onValueChange: (value: boolean) => void;
   isLast?: boolean;
-}) => (
-  <View style={[styles.toggleItem, !isLast && styles.toggleItemBorder]}>
-    <View style={styles.toggleLeft}>
-      <View style={styles.iconContainer}>
-        <Ionicons name={icon} size={20} color={value ? "#00bfff" : "#666"} />
+}) => {
+  const { colors, fontScale } = useTheme();
+  return (
+    <View style={[styles.toggleItem, !isLast && { borderBottomWidth: 1, borderBottomColor: colors.border }]}>
+      <View style={styles.toggleLeft}>
+        <View style={[styles.iconContainer, { backgroundColor: colors.background }]}>
+          <Ionicons name={icon} size={20} color={value ? colors.primary : colors.textSecondary} />
+        </View>
+        <View style={styles.toggleTextContainer}>
+          <ThemedText style={[styles.toggleLabel, { color: colors.text, fontSize: 16 * fontScale }]}>{label}</ThemedText>
+          <ThemedText style={[styles.toggleDescription, { color: colors.textSecondary }]}>{description}</ThemedText>
+        </View>
       </View>
-      <View style={styles.toggleTextContainer}>
-        <ThemedText style={styles.toggleLabel}>{label}</ThemedText>
-        <ThemedText style={styles.toggleDescription}>{description}</ThemedText>
-      </View>
+      <Switch
+        value={value}
+        onValueChange={onValueChange}
+        trackColor={{ false: colors.border, true: colors.primary }}
+        thumbColor={"#fff"}
+      />
     </View>
-    <Switch
-      value={value}
-      onValueChange={onValueChange}
-      trackColor={{ false: "#2a2a2a", true: "#00bfff" }}
-      thumbColor={Palette.white}
-    />
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
   },
   header: {
     flexDirection: "row",
@@ -161,20 +164,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#1a1a1a",
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Palette.darkGray,
     justifyContent: "center",
     alignItems: "center",
   },
   headerTitle: {
-    fontSize: 20,
     fontWeight: "bold",
-    color: Palette.white,
   },
   scrollContent: {
     padding: 16,
@@ -186,26 +185,19 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#666",
     marginBottom: 12,
     letterSpacing: 1,
   },
   card: {
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   toggleItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 12,
-  },
-  toggleItemBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#2a2a2a",
     marginBottom: 12,
     paddingBottom: 12,
   },
@@ -219,7 +211,6 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: "#2a2a2a",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
@@ -228,13 +219,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   toggleLabel: {
-    fontSize: 16,
-    color: Palette.white,
     marginBottom: 4,
     fontWeight: "500",
   },
   toggleDescription: {
     fontSize: 12,
-    color: "#666",
   },
 });

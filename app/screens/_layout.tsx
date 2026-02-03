@@ -37,7 +37,10 @@ export default function ScreensLayout() {
       <Stack.Screen name="settings/email-notifications" options={{ headerShown: false }} />
       <Stack.Screen name="settings/help-center" options={{ headerShown: false }} />
       <Stack.Screen name="settings/report-problem" options={{ headerShown: false }} />
+      <Stack.Screen name="Course" options={{ headerShown: false }} />
       <Stack.Screen name="course-details" options={{ headerShown: false }} />
+      <Stack.Screen name="checkout" options={{ headerShown: false }} />
+      <Stack.Screen name="payment-success" options={{ headerShown: false }} />
     </Stack>
   );
 }

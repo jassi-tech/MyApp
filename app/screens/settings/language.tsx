@@ -1,17 +1,18 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
+import { ScreenContainer } from "@/components/common/screen-container";
+import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { LanguageCode, useLanguage } from "@/context/LanguageContext";
+import { useTheme } from "@/context/ThemeContext";
 
 const LANGUAGES = [
   { code: "en", name: "English", nativeName: "English" },
@@ -25,9 +26,9 @@ const LANGUAGES = [
 ];
 
 export default function LanguageScreen() {
-  const router = useRouter();
-  const [selectedLanguage, setSelectedLanguage] = useState("en");
+  const { language: selectedLanguage, setLanguage } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
+  const { colors, fontScale } = useTheme();
 
   const filteredLanguages = LANGUAGES.filter(
     (lang) =>
@@ -36,21 +37,15 @@ export default function LanguageScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={Palette.white} />
-        </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Language</ThemedText>
-        <View style={{ width: 40 }} />
-      </View>
+    <ScreenContainer>
+      <ScreenHeader title="Language" />
 
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+      <View style={[styles.searchContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Ionicons name="search" size={20} color={colors.textSecondary} style={styles.searchIcon} />
         <TextInput
-          style={styles.searchInput}
+          style={[styles.searchInput, { color: colors.text, fontSize: 16 * fontScale }]}
           placeholder="Search languages..."
-          placeholderTextColor="#666"
+          placeholderTextColor={colors.textSecondary}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -62,60 +57,33 @@ export default function LanguageScreen() {
             key={language.code}
             style={[
               styles.languageItem,
-              selectedLanguage === language.code && styles.languageItemActive,
+              { backgroundColor: colors.card, borderColor: colors.border },
+              selectedLanguage === language.code && { borderColor: colors.primary },
             ]}
-            onPress={() => setSelectedLanguage(language.code)}
+            onPress={() => setLanguage(language.code as LanguageCode)}
           >
             <View style={styles.languageInfo}>
-              <ThemedText style={styles.languageName}>{language.name}</ThemedText>
-              <ThemedText style={styles.languageNative}>{language.nativeName}</ThemedText>
+              <ThemedText style={[styles.languageName, { color: colors.text, fontSize: 16 * fontScale }]}>{language.name}</ThemedText>
+              <ThemedText style={[styles.languageNative, { color: colors.textSecondary }]}>{language.nativeName}</ThemedText>
             </View>
             {selectedLanguage === language.code && (
-              <Ionicons name="checkmark-circle" size={24} color="#00bfff" />
+              <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
             )}
           </TouchableOpacity>
         ))}
       </ScrollView>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Palette.black,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#1a1a1a",
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Palette.darkGray,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: Palette.white,
-  },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: Palette.darkGray,
     margin: 16,
     paddingHorizontal: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   searchIcon: {
     marginRight: 8,
@@ -123,8 +91,6 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     paddingVertical: 12,
-    fontSize: 16,
-    color: Palette.white,
   },
   scrollContent: {
     padding: 16,
@@ -135,27 +101,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: Palette.darkGray,
     padding: 16,
     borderRadius: 12,
     marginBottom: 8,
     borderWidth: 2,
-    borderColor: "#2a2a2a",
   },
   languageItemActive: {
-    borderColor: "#00bfff",
+    // handled dynamically
   },
   languageInfo: {
     flex: 1,
   },
   languageName: {
-    fontSize: 16,
     fontWeight: "600",
-    color: Palette.white,
     marginBottom: 4,
   },
   languageNative: {
     fontSize: 14,
-    color: "#888",
   },
 });

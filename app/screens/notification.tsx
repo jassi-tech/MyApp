@@ -5,7 +5,7 @@ import { FlatList, StyleSheet, View } from "react-native";
 import { ScreenContainer } from "@/components/common/screen-container";
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 const MOCK_NOTIFICATIONS = [
   {
@@ -43,16 +43,22 @@ const MOCK_NOTIFICATIONS = [
 ];
 
 export default function NotificationScreen() {
+  const { colors, fontScale } = useTheme();
+
   const renderItem = ({ item }: { item: typeof MOCK_NOTIFICATIONS[0] }) => (
-    <View style={[styles.notificationItem, !item.read && styles.unreadItem]}>
-      <View style={styles.iconContainer}>
-        <Ionicons name={item.icon as any} size={24} color={Palette.white} />
-        {!item.read && <View style={styles.unreadDot} />}
+    <View style={[
+      styles.notificationItem, 
+      { borderBottomColor: colors.border },
+      !item.read && { backgroundColor: colors.backgroundSecondary }
+    ]}>
+      <View style={[styles.iconContainer, { backgroundColor: colors.card }]}>
+        <Ionicons name={item.icon as any} size={24} color={colors.text} />
+        {!item.read && <View style={[styles.unreadDot, { borderColor: colors.backgroundSecondary }]} />}
       </View>
       <View style={styles.contentContainer}>
-        <ThemedText style={styles.title}>{item.title}</ThemedText>
-        <ThemedText style={styles.description}>{item.description}</ThemedText>
-        <ThemedText style={styles.time}>{item.time}</ThemedText>
+        <ThemedText style={[styles.title, { color: colors.text, fontSize: 14 * fontScale }]}>{item.title}</ThemedText>
+        <ThemedText style={[styles.description, { color: colors.textSecondary }]}>{item.description}</ThemedText>
+        <ThemedText style={[styles.time, { color: colors.textSecondary }]}>{item.time}</ThemedText>
       </View>
     </View>
   );
@@ -78,17 +84,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#333",
     alignItems: "center",
-  },
-  unreadItem: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
   },
   iconContainer: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: Palette.darkGray,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 16,
@@ -101,26 +102,21 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: Palette.red,
+    backgroundColor: "#FF3B30",
     borderWidth: 2,
-    borderColor: Palette.black,
   },
   contentContainer: {
     flex: 1,
   },
   title: {
-    fontSize: 14,
     fontWeight: "bold",
-    color: Palette.white,
     marginBottom: 4,
   },
   description: {
     fontSize: 12,
-    color: Palette.gray,
     marginBottom: 4,
   },
   time: {
     fontSize: 10,
-    color: Palette.gray,
   },
 });

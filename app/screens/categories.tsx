@@ -2,16 +2,16 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 const CATEGORIES = [
   { id: "1", label: "Inbox", icon: "mail-outline" },
@@ -27,9 +27,10 @@ const CATEGORIES = [
 
 export default function CategoriesScreen() {
   const router = useRouter();
+  const { colors, fontScale } = useTheme();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScreenHeader title="All Categories" />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -37,7 +38,10 @@ export default function CategoriesScreen() {
           {CATEGORIES.map((cat) => (
             <TouchableOpacity
               key={cat.id}
-              style={styles.categoryCard}
+              style={[
+                  styles.categoryCard, 
+                  { backgroundColor: colors.card, borderColor: colors.border }
+              ]}
               onPress={() => {
                 const routes: Record<string, string> = {
                   "Attendance": "/screens/attendance",
@@ -56,9 +60,9 @@ export default function CategoriesScreen() {
               }}
             >
               <View style={styles.iconWrapper}>
-                <Ionicons name={cat.icon as any} size={36} color="#cfcaca" />
+                <Ionicons name={cat.icon as any} size={36} color={colors.textSecondary} />
               </View>
-              <ThemedText style={styles.categoryLabel}>{cat.label}</ThemedText>
+              <ThemedText style={[styles.categoryLabel, { color: colors.text, fontSize: 10 * fontScale }]}>{cat.label}</ThemedText>
             </TouchableOpacity>
           ))}
         </View>
@@ -70,7 +74,6 @@ export default function CategoriesScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
   },
   scrollContent: {
     padding: 16,
@@ -84,25 +87,23 @@ const styles = StyleSheet.create({
   categoryCard: {
     width: "28%",
     aspectRatio: 1,
-    backgroundColor: Palette.darkGray,
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 16,
+    borderWidth: 1,
     // Elevation for Android
-    elevation: 3,
+    elevation: 2,
     // Shadow for iOS
-    shadowColor: "#ffff",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 14,
+    shadowRadius: 4,
   },
   iconWrapper: {
     marginBottom: 4,
   },
   categoryLabel: {
-    fontSize: 10,
-    color: Palette.white,
     fontWeight: "600",
     textAlign: "center",
   },

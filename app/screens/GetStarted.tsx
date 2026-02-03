@@ -6,13 +6,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Button from '@/components/common/button';
 import { ThemedText } from '@/components/themed-text';
-import { Palette } from '@/constants/theme';
+import { useTheme } from '@/context/ThemeContext';
 
 export default function GetStarted() {
   const router = useRouter();
+  const { colors, fontScale } = useTheme();
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.contentContainer}>
         <View style={styles.imageContainer}>
           <Image
@@ -24,7 +25,7 @@ export default function GetStarted() {
 
         {/* Text Section */}
         <View style={styles.textContainer}>
-          <ThemedText type="subtitle" style={styles.title}>
+          <ThemedText type="subtitle" style={[styles.title, { color: colors.text }]}>
             Grow Your Soft Skill{'\n'}And{'\n'}Be More Creative
           </ThemedText>
         </View>
@@ -35,8 +36,8 @@ export default function GetStarted() {
           onPress={() => {
             router.push('/screens/Home');
           }}
-          style={styles.button}
-          textStyle={styles.buttonText}
+          style={[styles.button, { backgroundColor: colors.primary }]}
+          textStyle={[styles.buttonText, { color: '#fff' }]}
         />
       </View>
     </SafeAreaView>
@@ -69,18 +70,15 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   title: {
-    color: Palette.white,
     textAlign: 'center',
     lineHeight: 34,
   },
   button: {
-    backgroundColor: Palette.white,
     width: '100%',
     maxWidth: 200,
     borderRadius: 8,
   },
   buttonText: {
-    color: Palette.deepPurple,
     fontSize: 18,
     fontWeight: 'bold',
   },

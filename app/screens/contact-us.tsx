@@ -6,31 +6,32 @@ import Button from "@/components/common/button";
 import { ScreenContainer } from "@/components/common/screen-container";
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function ContactUs() {
+  const { colors, fontScale } = useTheme();
 
   return (
     <ScreenContainer header={<ScreenHeader title="Contact Us" />}>
-        <ThemedText style={styles.description}>
+        <ThemedText style={[styles.description, { color: colors.textSecondary, fontSize: 16 * fontScale }]}>
             Have a question or need help? Send us a message and we&apos;ll get back to you as soon as possible.
         </ThemedText>
 
         <View style={styles.formGroup}>
-            <ThemedText style={styles.label}>Subject</ThemedText>
+            <ThemedText style={[styles.label, { color: colors.text, fontSize: 15 * fontScale }]}>Subject</ThemedText>
             <TextInput 
-                style={styles.input}
+                style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border, borderWidth: 1, fontSize: 16 * fontScale }]}
                 placeholder="How can we help?"
-                placeholderTextColor={Palette.gray}
+                placeholderTextColor={colors.textSecondary}
             />
         </View>
 
         <View style={styles.formGroup}>
-            <ThemedText style={styles.label}>Message</ThemedText>
+            <ThemedText style={[styles.label, { color: colors.text, fontSize: 15 * fontScale }]}>Message</ThemedText>
             <TextInput 
-                style={[styles.input, styles.textArea]}
+                style={[styles.input, styles.textArea, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border, borderWidth: 1, fontSize: 16 * fontScale }]}
                 placeholder="Describe your issue..."
-                placeholderTextColor={Palette.gray}
+                placeholderTextColor={colors.textSecondary}
                 multiline
                 numberOfLines={6}
                 textAlignVertical="top"
@@ -61,39 +62,36 @@ export default function ContactUs() {
   );
 }
 
-const ContactMethod = ({ icon, title, subtitle }: { icon: any, title: string, subtitle: string }) => (
-    <TouchableOpacity style={styles.contactMethod}>
-        <View style={styles.iconContainer}>
-            <Ionicons name={icon} size={24} color={Palette.white} />
+const ContactMethod = ({ icon, title, subtitle }: { icon: any, title: string, subtitle: string }) => {
+  const { colors, fontScale } = useTheme();
+  return (
+    <TouchableOpacity style={[styles.contactMethod, { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1 }]}>
+        <View style={[styles.iconContainer, { backgroundColor: colors.primary + '15' }]}>
+            <Ionicons name={icon} size={24} color={colors.primary} />
         </View>
         <View>
-            <ThemedText style={styles.methodTitle}>{title}</ThemedText>
-            <ThemedText style={styles.methodSubtitle}>{subtitle}</ThemedText>
+            <ThemedText style={[styles.methodTitle, { color: colors.text, fontSize: 16 * fontScale }]}>{title}</ThemedText>
+            <ThemedText style={[styles.methodSubtitle, { color: colors.textSecondary, fontSize: 14 * fontScale }]}>{subtitle}</ThemedText>
         </View>
     </TouchableOpacity>
-)
+  );
+};
 
 const styles = StyleSheet.create({
   description: {
-      color: Palette.gray,
       marginBottom: 30,
-      fontSize: 16,
       lineHeight: 24,
   },
   formGroup: {
       marginBottom: 20,
   },
   label: {
-      color: Palette.white,
       marginBottom: 8,
       fontWeight: 'bold',
   },
   input: {
-      backgroundColor: Palette.darkGray,
       borderRadius: 12,
       padding: 16,
-      color: Palette.white,
-      fontSize: 16,
   },
   textArea: {
       minHeight: 120,
@@ -104,24 +102,25 @@ const styles = StyleSheet.create({
   },
   contactMethods: {
       gap: 16,
+      marginBottom: 20,
   },
   contactMethod: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: Palette.darkGray,
       padding: 16,
       borderRadius: 12,
   },
   iconContainer: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      justifyContent: "center",
+      alignItems: "center",
       marginRight: 16,
   },
   methodTitle: {
       fontWeight: 'bold',
-      color: Palette.white,
-      fontSize: 16,
   },
   methodSubtitle: {
-      color: Palette.gray,
-      fontSize: 14,
   }
 });

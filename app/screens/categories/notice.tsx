@@ -11,7 +11,7 @@ import {
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 const NOTICES = [
   {
@@ -46,6 +46,7 @@ const NOTICES = [
 
 export default function NoticeScreen() {
   const router = useRouter();
+  const { colors, fontScale } = useTheme();
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -61,7 +62,7 @@ export default function NoticeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScreenHeader title="Notice Board" />
 
       <ScrollView
@@ -69,7 +70,10 @@ export default function NoticeScreen() {
         showsVerticalScrollIndicator={false}
       >
         {NOTICES.map((notice) => (
-          <TouchableOpacity key={notice.id} style={styles.noticeCard}>
+          <TouchableOpacity 
+            key={notice.id} 
+            style={[styles.noticeCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+          >
             <View style={styles.noticeHeader}>
               <View
                 style={[
@@ -86,10 +90,10 @@ export default function NoticeScreen() {
                   {notice.category}
                 </ThemedText>
               </View>
-              <ThemedText style={styles.dateText}>{notice.date}</ThemedText>
+              <ThemedText style={[styles.dateText, { color: colors.textSecondary }]}>{notice.date}</ThemedText>
             </View>
-            <ThemedText style={styles.titleText}>{notice.title}</ThemedText>
-            <ThemedText style={styles.contentText} numberOfLines={2}>
+            <ThemedText style={[styles.titleText, { color: colors.text, fontSize: 18 * fontScale }]}>{notice.title}</ThemedText>
+            <ThemedText style={[styles.contentText, { color: colors.textSecondary, fontSize: 14 * fontScale }]} numberOfLines={2}>
               {notice.content}
             </ThemedText>
             <TouchableOpacity style={styles.readMore}>
@@ -106,7 +110,6 @@ export default function NoticeScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
   },
   header: {
     // moved to common component
@@ -116,12 +119,10 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   noticeCard: {
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   noticeHeader: {
     flexDirection: "row",
@@ -140,17 +141,12 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 12,
-    color: "#666",
   },
   titleText: {
-    fontSize: 18,
     fontWeight: "700",
-    color: Palette.white,
     marginBottom: 8,
   },
   contentText: {
-    fontSize: 14,
-    color: "#999",
     lineHeight: 20,
     marginBottom: 12,
   },

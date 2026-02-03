@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { ResizeMode, Video } from "expo-av";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Dimensions,
@@ -13,7 +13,8 @@ import {
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useCourses } from "@/context/CourseContext";
+import { useTheme } from "@/context/ThemeContext";
 
 const { width } = Dimensions.get("window");
 
@@ -50,7 +51,7 @@ const COURSE_DATA: Record<string, any> = {
         id: "3",
         title: "Spring Animations",
         duration: "15:20",
-        completed: false,
+        completed: true,
         videoUrl:
           "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
       },
@@ -151,38 +152,34 @@ const COURSE_DATA: Record<string, any> = {
 };
 
 export default function CourseDetailsScreen() {
+  const router = useRouter();
   const params = useLocalSearchParams();
   const courseId = params.id as string;
   const course = COURSE_DATA[courseId];
+  const { colors, fontScale } = useTheme();
 
+  const { isCoursePurchased } = useCourses();
   const [selectedLesson, setSelectedLesson] = useState(course?.lessons_list[0]);
   const [isPlaying, setIsPlaying] = useState(false);
 
   if (!course) {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
         <ScreenHeader title="Details" />
         <View style={styles.centerContainer}>
-          <ThemedText>Course not found</ThemedText>
+          <ThemedText style={{ color: colors.text }}>Course not found</ThemedText>
         </View>
       </SafeAreaView>
     );
   }
 
-  const completedLessons = course.lessons_list.filter(
-    (l: any) => l.completed,
-  ).length;
-  const progress = Math.round(
-    (completedLessons / course.lessons_list.length) * 100,
-  );
-
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScreenHeader
         title="Details"
         rightElement={
           <TouchableOpacity>
-            <Ionicons name="bookmark-outline" size={24} color={Palette.white} />
+            <Ionicons name="bookmark-outline" size={24} color={colors.text} />
           </TouchableOpacity>
         }
       />
@@ -192,7 +189,7 @@ export default function CourseDetailsScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Video Player */}
-        <View style={styles.videoContainer}>
+        <View style={[styles.videoContainer, { backgroundColor: '#000' }]}>
           <Video
             source={{ uri: selectedLesson.videoUrl }}
             style={styles.video}
@@ -208,11 +205,8 @@ export default function CourseDetailsScreen() {
           {!isPlaying && (
             <View style={styles.videoOverlay}>
               <View style={styles.playButton}>
-                <Ionicons name="play" size={32} color={Palette.white} />
+                <Ionicons name="play" size={32} color="#FFFFFF" />
               </View>
-              {/* <ThemedText style={styles.videoTitle}>
-                {selectedLesson.title}
-              </ThemedText> */}
             </View>
           )}
         </View>
@@ -220,56 +214,56 @@ export default function CourseDetailsScreen() {
         <View style={styles.contentContainer}>
           {/* Main Info */}
           <View style={styles.headerInfo}>
-            <ThemedText type="title" style={styles.courseTitle}>
+            <ThemedText type="title" style={[styles.courseTitle, { color: colors.text, fontSize: 22 * fontScale }]}>
               {course.title}
             </ThemedText>
             <View style={styles.instructorRow}>
-              <ThemedText style={styles.instructorLabel}>Created by</ThemedText>
-              <ThemedText style={styles.instructorName}>
+              <ThemedText style={[styles.instructorLabel, { color: colors.textSecondary, fontSize: 14 * fontScale }]}>Created by</ThemedText>
+              <ThemedText style={[styles.instructorName, { color: colors.primary, fontSize: 14 * fontScale }]}>
                 {course.instructor}
               </ThemedText>
             </View>
           </View>
 
           {/* Stats Grid */}
-          <View style={styles.statsGrid}>
+          <View style={[styles.statsGrid, { backgroundColor: colors.card }]}>
             <View style={styles.statItem}>
               <Ionicons name="star" size={18} color="#f59e0b" />
               <View>
-                <ThemedText style={styles.statValue}>
+                <ThemedText style={[styles.statValue, { color: colors.text, fontSize: 14 * fontScale }]}>
                   {course.rating}
                 </ThemedText>
-                <ThemedText style={styles.statLabel}>Rating</ThemedText>
+                <ThemedText style={[styles.statLabel, { color: colors.textSecondary, fontSize: 12 * fontScale }]}>Rating</ThemedText>
               </View>
             </View>
-            <View style={styles.statDivider} />
+            <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
             <View style={styles.statItem}>
-              <Ionicons name="people" size={18} color={Palette.gray} />
+              <Ionicons name="people" size={18} color={colors.textSecondary} />
               <View>
-                <ThemedText style={styles.statValue}>
+                <ThemedText style={[styles.statValue, { color: colors.text, fontSize: 14 * fontScale }]}>
                   {course.students.toLocaleString()}
                 </ThemedText>
-                <ThemedText style={styles.statLabel}>Students</ThemedText>
+                <ThemedText style={[styles.statLabel, { color: colors.textSecondary, fontSize: 12 * fontScale }]}>Students</ThemedText>
               </View>
             </View>
-            <View style={styles.statDivider} />
+            <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
             <View style={styles.statItem}>
-              <Ionicons name="time" size={18} color={Palette.gray} />
+              <Ionicons name="time" size={18} color={colors.textSecondary} />
               <View>
-                <ThemedText style={styles.statValue}>
+                <ThemedText style={[styles.statValue, { color: colors.text, fontSize: 14 * fontScale }]}>
                   {course.duration}
                 </ThemedText>
-                <ThemedText style={styles.statLabel}>Duration</ThemedText>
+                <ThemedText style={[styles.statLabel, { color: colors.textSecondary, fontSize: 12 * fontScale }]}>Duration</ThemedText>
               </View>
             </View>
           </View>
 
           {/* About */}
           <View style={styles.section}>
-            <ThemedText type="subtitle" style={styles.sectionHeader}>
+            <ThemedText type="subtitle" style={[styles.sectionHeader, { color: colors.text, fontSize: 18 * fontScale }]}>
               About Course
             </ThemedText>
-            <ThemedText style={styles.description}>
+            <ThemedText style={[styles.description, { color: colors.textSecondary, fontSize: 15 * fontScale }]}>
               {course.description}
             </ThemedText>
           </View>
@@ -277,10 +271,10 @@ export default function CourseDetailsScreen() {
           {/* Lessons */}
           <View style={styles.section}>
             <View style={styles.lessonsHeaderRow}>
-              <ThemedText type="subtitle" style={styles.sectionHeader}>
+              <ThemedText type="subtitle" style={[styles.sectionHeader, { color: colors.text, fontSize: 18 * fontScale }]}>
                 Lessons
               </ThemedText>
-              <ThemedText style={styles.lessonsCount}>
+              <ThemedText style={[styles.lessonsCount, { color: colors.textSecondary, fontSize: 13 * fontScale }]}>
                 {course.lessons} videos
               </ThemedText>
             </View>
@@ -293,7 +287,8 @@ export default function CourseDetailsScreen() {
                     key={lesson.id}
                     style={[
                       styles.lessonItem,
-                      isActive && styles.lessonItemActive,
+                      { backgroundColor: colors.card },
+                      isActive && { borderLeftColor: colors.primary, borderLeftWidth: 3, backgroundColor: colors.backgroundSecondary },
                     ]}
                     onPress={() => setSelectedLesson(lesson)}
                   >
@@ -301,21 +296,23 @@ export default function CourseDetailsScreen() {
                       <View
                         style={[
                           styles.indexCircle,
-                          lesson.completed && styles.indexCircleCompleted,
-                          isActive && styles.indexCircleActive,
+                          { backgroundColor: colors.border },
+                          lesson.completed && { backgroundColor: '#10b981' }, // Success green
+                          isActive && { backgroundColor: colors.primary },
                         ]}
                       >
                         {lesson.completed ? (
                           <Ionicons
                             name="checkmark"
                             size={12}
-                            color={Palette.white}
+                            color="#FFFFFF"
                           />
                         ) : (
                           <ThemedText
                             style={[
                               styles.indexText,
-                              isActive && styles.indexTextActive,
+                              { color: colors.textSecondary },
+                              isActive && { color: '#FFFFFF' },
                             ]}
                           >
                             {index + 1}
@@ -326,13 +323,14 @@ export default function CourseDetailsScreen() {
                         <ThemedText
                           style={[
                             styles.lessonTitle,
-                            isActive && styles.lessonTitleActive,
+                            { color: colors.text, fontSize: 15 * fontScale },
+                            isActive && { color: colors.primary, fontWeight: '700' },
                           ]}
                           numberOfLines={1}
                         >
                           {lesson.title}
                         </ThemedText>
-                        <ThemedText style={styles.lessonDuration}>
+                        <ThemedText style={[styles.lessonDuration, { color: colors.textSecondary, fontSize: 12 * fontScale }]}>
                           {lesson.duration}
                         </ThemedText>
                       </View>
@@ -341,13 +339,13 @@ export default function CourseDetailsScreen() {
                       <Ionicons
                         name="pause-circle"
                         size={24}
-                        color={Palette.primary}
+                        color={colors.primary}
                       />
                     ) : (
                       <Ionicons
                         name="play-circle-outline"
                         size={24}
-                        color={Palette.gray}
+                        color={colors.textSecondary}
                       />
                     )}
                   </TouchableOpacity>
@@ -357,6 +355,20 @@ export default function CourseDetailsScreen() {
           </View>
         </View>
       </ScrollView>
+
+      {!isCoursePurchased(course.id) && (
+        <View style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
+          <TouchableOpacity 
+            style={[styles.buyButton, { backgroundColor: colors.primary }]}
+            onPress={() => router.push({
+              pathname: "/screens/checkout" as any,
+              params: { courseId: course.id }
+            })}
+          >
+            <ThemedText style={styles.buyButtonText}>Enroll Now • {course.price || "$49.99"}</ThemedText>
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -364,7 +376,6 @@ export default function CourseDetailsScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.background,
   },
   centerContainer: {
     flex: 1,
@@ -377,7 +388,6 @@ const styles = StyleSheet.create({
   videoContainer: {
     width: width,
     height: width * 0.5625, // 16:9 aspect ratio
-    backgroundColor: "#000",
     position: "relative",
   },
   video: {
@@ -399,18 +409,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-  // videoTitle: {
-  //   position: "absolute",
-  //   bottom: 0,
-  //   left: 0,
-  //   right: 0,
-  //   padding: 16,
-  //   backgroundColor:
-  //     "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%)", // Simple gradient fallback
-  //   color: Palette.white,
-  //   fontSize: 14,
-  //   fontWeight: "600",
-  // },
   contentContainer: {
     padding: 20,
   },
@@ -418,29 +416,24 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   courseTitle: {
-    fontSize: 22,
     lineHeight: 30,
     marginBottom: 8,
+    fontWeight: '700',
   },
   instructorRow: {
     flexDirection: "row",
     alignItems: "center",
   },
   instructorLabel: {
-    color: Palette.gray,
-    fontSize: 14,
     marginRight: 6,
   },
   instructorName: {
-    color: Palette.primary,
-    fontSize: 14,
     fontWeight: "600",
   },
   statsGrid: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#1E1E1E", // Slightly lighter than background
     padding: 16,
     borderRadius: 16,
     marginBottom: 24,
@@ -453,30 +446,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   statValue: {
-    fontSize: 14,
     fontWeight: "700",
-    color: Palette.white,
   },
   statLabel: {
-    fontSize: 12,
-    color: Palette.gray,
   },
   statDivider: {
     width: 1,
     height: 30,
-    backgroundColor: "#333",
   },
   section: {
     marginBottom: 28,
   },
   sectionHeader: {
     marginBottom: 12,
-    fontSize: 18,
+    fontWeight: '700',
   },
   description: {
-    fontSize: 15,
     lineHeight: 24,
-    color: "#ccc",
   },
   lessonsHeaderRow: {
     flexDirection: "row",
@@ -485,8 +471,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   lessonsCount: {
-    fontSize: 13,
-    color: Palette.gray,
   },
   lessonsList: {
     gap: 12,
@@ -497,12 +481,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 12,
     borderRadius: 12,
-    backgroundColor: "#1E1E1E",
-  },
-  lessonItemActive: {
-    backgroundColor: "#2C2C2E", // Slightly lighter active state
-    borderLeftWidth: 3,
-    borderLeftColor: Palette.primary,
   },
   lessonLeft: {
     flexDirection: "row",
@@ -514,40 +492,37 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: "#333",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
   },
-  indexCircleCompleted: {
-    backgroundColor: Palette.green,
-  },
-  indexCircleActive: {
-    backgroundColor: Palette.primary,
-  },
   indexText: {
     fontSize: 10,
     fontWeight: "600",
-    color: Palette.gray,
-  },
-  indexTextActive: {
-    color: Palette.white,
   },
   lessonInfo: {
     flex: 1,
   },
   lessonTitle: {
-    fontSize: 15,
     fontWeight: "500",
-    color: Palette.white,
     marginBottom: 2,
   },
-  lessonTitleActive: {
-    fontWeight: "600",
-    color: Palette.primary,
-  },
   lessonDuration: {
-    fontSize: 12,
-    color: Palette.gray,
+  },
+  footer: {
+    padding: 20,
+    borderTopWidth: 1,
+    paddingBottom: 34,
+  },
+  buyButton: {
+    height: 56,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buyButtonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });

@@ -2,39 +2,40 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
-import { Palette } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function AccountScreen() {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
+  const { colors, fontScale, isDark } = useTheme();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <TouchableOpacity
-          style={styles.backButton}
+          style={[styles.backButton, { backgroundColor: colors.card }]}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color={Palette.white} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Account</ThemedText>
+        <ThemedText style={[styles.headerTitle, { color: colors.text, fontSize: 20 * fontScale }]}>Account</ThemedText>
         <TouchableOpacity
-          style={styles.editButton}
+          style={[styles.editButton, { backgroundColor: colors.card }]}
           onPress={() => setIsEditing(!isEditing)}
         >
           <Ionicons
             name={isEditing ? "checkmark" : "create-outline"}
             size={22}
-            color="#00bfff"
+            color={colors.primary}
           />
         </TouchableOpacity>
       </View>
@@ -45,24 +46,24 @@ export default function AccountScreen() {
       >
         <View style={styles.profileSection}>
           <View style={styles.avatarContainer}>
-            <View style={styles.avatar}>
-              <Ionicons name="person" size={48} color={Palette.white} />
+            <View style={[styles.avatar, { backgroundColor: colors.card, borderColor: colors.primary }]}>
+              <Ionicons name="person" size={48} color={colors.text} />
             </View>
             {isEditing && (
-              <TouchableOpacity style={styles.editAvatarButton}>
-                <Ionicons name="camera" size={18} color={Palette.white} />
+              <TouchableOpacity style={[styles.editAvatarButton, { backgroundColor: colors.primary }]}>
+                <Ionicons name="camera" size={18} color="#fff" />
               </TouchableOpacity>
             )}
           </View>
-          <ThemedText style={styles.userName}>John Doe</ThemedText>
-          <ThemedText style={styles.userRole}>Student</ThemedText>
+          <ThemedText style={[styles.userName, { color: colors.text, fontSize: 24 * fontScale }]}>John Doe</ThemedText>
+          <ThemedText style={[styles.userRole, { color: colors.textSecondary }]}>Student</ThemedText>
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>
+          <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>
             PERSONAL INFORMATION
           </ThemedText>
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <InfoField
               icon="person-outline"
               label="Full Name"
@@ -91,8 +92,8 @@ export default function AccountScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>ACADEMIC DETAILS</ThemedText>
-          <View style={styles.card}>
+          <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>ACADEMIC DETAILS</ThemedText>
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <InfoField
               icon="school-outline"
               label="Class"
@@ -115,20 +116,20 @@ export default function AccountScreen() {
         </View>
 
         <View style={styles.statsSection}>
-          <View style={styles.statCard}>
+          <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Ionicons name="trophy-outline" size={28} color="#00bfff" />
-            <ThemedText style={styles.statValue}>85%</ThemedText>
-            <ThemedText style={styles.statLabel}>Attendance</ThemedText>
+            <ThemedText style={[styles.statValue, { color: colors.text, fontSize: 20 * fontScale }]}>85%</ThemedText>
+            <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>Attendance</ThemedText>
           </View>
-          <View style={styles.statCard}>
+          <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Ionicons name="star-outline" size={28} color="#f59e0b" />
-            <ThemedText style={styles.statValue}>A+</ThemedText>
-            <ThemedText style={styles.statLabel}>Grade</ThemedText>
+            <ThemedText style={[styles.statValue, { color: colors.text, fontSize: 20 * fontScale }]}>A+</ThemedText>
+            <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>Grade</ThemedText>
           </View>
-          <View style={styles.statCard}>
+          <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Ionicons name="ribbon-outline" size={28} color="#8b5cf6" />
-            <ThemedText style={styles.statValue}>12</ThemedText>
-            <ThemedText style={styles.statLabel}>Achievements</ThemedText>
+            <ThemedText style={[styles.statValue, { color: colors.text, fontSize: 20 * fontScale }]}>12</ThemedText>
+            <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>Achievements</ThemedText>
           </View>
         </View>
       </ScrollView>
@@ -146,24 +147,37 @@ const InfoField = ({
   label: string;
   value: string;
   editable: boolean;
-}) => (
-  <View style={styles.infoField}>
-    <View style={styles.infoHeader}>
-      <Ionicons name={icon} size={18} color="#666" style={{ marginRight: 8 }} />
-      <ThemedText style={styles.infoLabel}>{label}</ThemedText>
+}) => {
+  const { colors, fontScale } = useTheme();
+  return (
+    <View style={styles.infoField}>
+      <View style={styles.infoHeader}>
+        <Ionicons name={icon} size={18} color={colors.textSecondary} style={{ marginRight: 8 }} />
+        <ThemedText style={[styles.infoLabel, { color: colors.textSecondary }]}>{label}</ThemedText>
+      </View>
+      {editable ? (
+        <TextInput 
+          style={[
+            styles.infoInput, 
+            { 
+              backgroundColor: colors.background, 
+              color: colors.text, 
+              borderColor: colors.primary,
+              fontSize: 16 * fontScale
+            }
+          ]} 
+          value={value} 
+        />
+      ) : (
+        <ThemedText style={[styles.infoValue, { color: colors.text, fontSize: 16 * fontScale }]}>{value}</ThemedText>
+      )}
     </View>
-    {editable ? (
-      <TextInput style={styles.infoInput} value={value} />
-    ) : (
-      <ThemedText style={styles.infoValue}>{value}</ThemedText>
-    )}
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Palette.black,
   },
   header: {
     flexDirection: "row",
@@ -172,26 +186,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#1a1a1a",
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Palette.darkGray,
     justifyContent: "center",
     alignItems: "center",
   },
   headerTitle: {
-    fontSize: 20,
     fontWeight: "bold",
-    color: Palette.white,
   },
   editButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Palette.darkGray,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -211,11 +220,9 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: Palette.darkGray,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 3,
-    borderColor: "#00bfff",
   },
   editAvatarButton: {
     position: "absolute",
@@ -224,19 +231,15 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#00bfff",
     justifyContent: "center",
     alignItems: "center",
   },
   userName: {
-    fontSize: 24,
     fontWeight: "bold",
-    color: Palette.white,
     marginBottom: 4,
   },
   userRole: {
     fontSize: 14,
-    color: "#888",
   },
   section: {
     marginBottom: 24,
@@ -244,16 +247,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#666",
     marginBottom: 12,
     letterSpacing: 1,
   },
   card: {
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   infoField: {
     marginBottom: 16,
@@ -265,22 +265,15 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 13,
-    color: "#888",
   },
   infoValue: {
-    fontSize: 16,
-    color: Palette.white,
     fontWeight: "500",
   },
   infoInput: {
-    fontSize: 16,
-    color: Palette.white,
     fontWeight: "500",
-    backgroundColor: "#1a1a1a",
     padding: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#00bfff",
   },
   statsSection: {
     flexDirection: "row",
@@ -289,22 +282,17 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: Palette.darkGray,
     borderRadius: 16,
     padding: 16,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#2a2a2a",
   },
   statValue: {
-    fontSize: 20,
     fontWeight: "bold",
-    color: Palette.white,
     marginTop: 8,
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 11,
-    color: "#888",
   },
 });
