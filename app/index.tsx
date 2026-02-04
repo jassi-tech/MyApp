@@ -6,7 +6,7 @@ export default function Index() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.replace("/screens/GetStarted");
+      router.replace("/screens/onboarding/GetStarted");
     }, 0);
 
     return () => clearTimeout(timer);

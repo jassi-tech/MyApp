@@ -53,7 +53,7 @@ export default function Settings() {
 
         <Button
           label="Log Out"
-          onPress={() => router.replace("/screens/GetStarted")}
+          onPress={() => router.replace("/screens/onboarding/GetStarted")}
           variant="danger"
           style={styles.logoutButton}
         />

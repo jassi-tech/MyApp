@@ -17,7 +17,7 @@ export default function GetStarted() {
       <View style={styles.contentContainer}>
         <View style={styles.imageContainer}>
           <Image
-            source={require('../../assets/svg/SoftSkill.svg')}
+            source={require('../../../assets/svg/SoftSkill.svg')}
             style={styles.image}
             contentFit="contain"
           />
@@ -34,7 +34,7 @@ export default function GetStarted() {
         <Button
           label="Get Started"
           onPress={() => {
-            router.push('/screens/Home');
+            router.push('/screens/onboarding/login');
           }}
           style={[styles.button, { backgroundColor: colors.primary }]}
           textStyle={[styles.buttonText, { color: '#fff' }]}

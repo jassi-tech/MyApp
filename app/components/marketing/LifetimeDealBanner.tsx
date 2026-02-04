@@ -195,6 +195,9 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     fontSize: 24,
     paddingLeft: 4,
+    paddingRight: 4,
+    overflow: "visible",
+    zIndex: 99,
   },
   titleAccentLine: {
     position: "absolute",

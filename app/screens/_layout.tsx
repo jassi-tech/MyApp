@@ -5,9 +5,14 @@ export default function ScreensLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="GetStarted" options={{ headerShown: false }} />
-      <Stack.Screen name="Login" options={{ headerShown: false }} />
-      <Stack.Screen name="register" options={{ headerShown: false }} />
+      <Stack.Screen name="onboarding/GetStarted" options={{ headerShown: false }} />
+      <Stack.Screen name="onboarding/login" options={{ headerShown: false }} />
+      <Stack.Screen name="onboarding/forget" options={{ headerShown: false }} />
+      <Stack.Screen name="onboarding/forgetotp" options={{ headerShown: false }} />
+      <Stack.Screen name="onboarding/new-password" options={{ headerShown: false }} />
+      <Stack.Screen name="onboarding/signup" options={{ headerShown: false }} />
+      <Stack.Screen name="onboarding/signupotp" options={{ headerShown: false }} />
+      {/* <Stack.Screen name="register" options={{ headerShown: false }} /> */}
       <Stack.Screen name="settings" options={{ headerShown: false }} />
       
       <Stack.Screen name="account-security" options={{ headerShown: false }} />
