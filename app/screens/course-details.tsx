@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
-import { ResizeMode, Video } from "expo-av";
+import { ResizeMode, Video, VideoFullscreenUpdate, VideoFullscreenUpdateEvent } from "expo-av";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import * as ScreenOrientation from "expo-screen-orientation";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   ScrollView,
@@ -26,27 +27,32 @@ export default function CourseDetailsScreen() {
   const { colors, fontScale } = useTheme();
 
   const { isCoursePurchased, allCourses } = useCourses();
-  const course = allCourses.find(c => c.id === courseId);
-  const [selectedLesson, setSelectedLesson] = useState(course?.lessons_list?.[0]);
+  const course = allCourses.find((c) => c.id === courseId);
+  const [selectedLesson, setSelectedLesson] = useState(
+    course?.lessons_list?.[0],
+  );
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
   const videoRef = useRef<Video>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Update selected lesson when course changes
     if (course?.lessons_list?.[0]) {
       setSelectedLesson(course.lessons_list[0]);
     }
   }, [course]);
 
-  React.useEffect(() => {
-    setIsMounted(true);
-    return () => {
-      setIsMounted(false);
-    };
-  }, []);
+  /* Logic for handling lesson changes/playback */
+  const purchased = course ? isCoursePurchased(course.id) : false;
+  // STRICT LOCK: If not purchased, EVERYTHING is locked.
+  const isLocked = !purchased;
 
   const handlePlayPress = async () => {
+    // Prevent playback if locked
+    if (isLocked) {
+      // Optional: Show "Purchase to unlock" alert or shake effect
+      return;
+    }
+
     if (videoRef.current) {
       try {
         if (isPlaying) {
@@ -57,7 +63,7 @@ export default function CourseDetailsScreen() {
           setIsPlaying(true);
         }
       } catch (error) {
-        console.log('Video playback error:', error);
+        // Handle error silently
       }
     }
   };
@@ -66,14 +72,25 @@ export default function CourseDetailsScreen() {
     try {
       if (videoRef.current) {
         await videoRef.current.pauseAsync();
-        await videoRef.current.unloadAsync();
+        await videoRef.current.unloadAsync(); // Unload previous video
       }
       setSelectedLesson(lesson);
       setIsPlaying(false);
     } catch (error) {
-      console.log('Lesson change error:', error);
       setSelectedLesson(lesson);
       setIsPlaying(false);
+    }
+  };
+
+  const onFullscreenUpdate = async ({ fullscreenUpdate }: VideoFullscreenUpdateEvent) => {
+    try {
+      if (fullscreenUpdate === VideoFullscreenUpdate.PLAYER_DID_PRESENT) {
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+      } else if (fullscreenUpdate === VideoFullscreenUpdate.PLAYER_WILL_DISMISS) {
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+      }
+    } catch (e) {
+      // Handle error silently
     }
   };
 
@@ -81,14 +98,16 @@ export default function CourseDetailsScreen() {
     return (
       <ScreenContainer header={<ScreenHeader title="Details" />}>
         <View style={styles.centerContainer}>
-          <ThemedText style={{ color: colors.text }}>Course not found</ThemedText>
+          <ThemedText style={{ color: colors.text }}>
+            Course not found
+          </ThemedText>
         </View>
       </ScreenContainer>
     );
   }
 
   return (
-    <ScreenContainer 
+    <ScreenContainer
       scrollable={false}
       header={
         <ScreenHeader
@@ -103,54 +122,97 @@ export default function CourseDetailsScreen() {
     >
       {/* Video Player */}
       {selectedLesson && (
-        <View style={[styles.videoContainer, { backgroundColor: '#000' }]}>
-          <Video
-            key={selectedLesson.id}
-            ref={videoRef}
-            source={{ uri: selectedLesson.videoUrl }}
-            style={styles.video}
-            useNativeControls
-            resizeMode={ResizeMode.CONTAIN}
-            shouldPlay={false}
-            isLooping={false}
-            isMuted={false}
-            onPlaybackStatusUpdate={(status: any) => {
-              if (status.isLoaded) {
-                setIsPlaying(status.isPlaying);
-              }
-            }}
-          />
-          {!isPlaying && (
-            <TouchableOpacity 
-              style={styles.videoOverlay}
-              onPress={handlePlayPress}
-              activeOpacity={0.9}
-            >
-              <View style={styles.playButtonContainer}>
-                <View style={styles.playButton}>
-                  <Ionicons name="play" size={40} color="#FFFFFF" />
+        <View style={[styles.videoContainer, { backgroundColor: "#000" }]}>
+          {isLocked ? (
+            // LOCKED OVERLAY
+            <View style={styles.lockedOverlay}>
+              <View style={styles.lockedContent}>
+                <View
+                  style={[
+                    styles.lockIconCircle,
+                    { backgroundColor: "rgba(255,255,255,0.2)" },
+                  ]}
+                >
+                  <Ionicons name="lock-closed" size={32} color="#FFFFFF" />
                 </View>
-                <ThemedText style={styles.videoLessonTitle}>{selectedLesson.title}</ThemedText>
+                <ThemedText style={styles.lockedTitle}>
+                  Content Locked
+                </ThemedText>
               </View>
-            </TouchableOpacity>
+            </View>
+          ) : (
+            // VIDEO PLAYER (Unlocked or Preview)
+            <>
+              <Video
+                key={selectedLesson.id}
+                ref={videoRef}
+                source={{ uri: selectedLesson.videoUrl }}
+                style={styles.video}
+                useNativeControls
+                resizeMode={ResizeMode.CONTAIN}
+                onFullscreenUpdate={onFullscreenUpdate}
+                shouldPlay={false}
+                isLooping={false}
+                isMuted={false}
+                onPlaybackStatusUpdate={(status: any) => {
+                  if (status.isLoaded) {
+                    setIsPlaying(status.isPlaying);
+                  }
+                }}
+              />
+              {!isPlaying && (
+                <TouchableOpacity
+                  style={styles.videoOverlay}
+                  onPress={handlePlayPress}
+                  activeOpacity={0.9}
+                >
+                  <View style={styles.playButtonContainer}>
+                    <View style={styles.playButton}>
+                      <Ionicons name="play" size={40} color="#FFFFFF" />
+                    </View>
+                    <ThemedText style={styles.videoLessonTitle}>
+                      {selectedLesson.title}
+                    </ThemedText>
+                  </View>
+                </TouchableOpacity>
+              )}
+            </>
           )}
         </View>
       )}
 
       <ScrollView
+        style={{ flex: 1 }}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-
         <View style={styles.contentContainer}>
           {/* Main Info */}
           <View style={styles.headerInfo}>
-            <ThemedText type="title" style={[styles.courseTitle, { color: colors.text, fontSize: 22 * fontScale }]}>
+            <ThemedText
+              type="title"
+              style={[
+                styles.courseTitle,
+                { color: colors.text, fontSize: 22 * fontScale },
+              ]}
+            >
               {course.title}
             </ThemedText>
             <View style={styles.instructorRow}>
-              <ThemedText style={[styles.instructorLabel, { color: colors.textSecondary, fontSize: 14 * fontScale }]}>Created by</ThemedText>
-              <ThemedText style={[styles.instructorName, { color: colors.primary, fontSize: 14 * fontScale }]}>
+              <ThemedText
+                style={[
+                  styles.instructorLabel,
+                  { color: colors.textSecondary, fontSize: 14 * fontScale },
+                ]}
+              >
+                Created by
+              </ThemedText>
+              <ThemedText
+                style={[
+                  styles.instructorName,
+                  { color: colors.primary, fontSize: 14 * fontScale },
+                ]}
+              >
                 {course.instructor}
               </ThemedText>
             </View>
@@ -161,40 +223,93 @@ export default function CourseDetailsScreen() {
             <View style={styles.statItem}>
               <Ionicons name="star" size={18} color="#f59e0b" />
               <View>
-                <ThemedText style={[styles.statValue, { color: colors.text, fontSize: 14 * fontScale }]}>
+                <ThemedText
+                  style={[
+                    styles.statValue,
+                    { color: colors.text, fontSize: 14 * fontScale },
+                  ]}
+                >
                   {course.rating}
                 </ThemedText>
-                <ThemedText style={[styles.statLabel, { color: colors.textSecondary, fontSize: 12 * fontScale }]}>Rating</ThemedText>
+                <ThemedText
+                  style={[
+                    styles.statLabel,
+                    { color: colors.textSecondary, fontSize: 12 * fontScale },
+                  ]}
+                >
+                  Rating
+                </ThemedText>
               </View>
             </View>
-            <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
+            <View
+              style={[styles.statDivider, { backgroundColor: colors.border }]}
+            />
             <View style={styles.statItem}>
               <Ionicons name="people" size={18} color={colors.textSecondary} />
               <View>
-                <ThemedText style={[styles.statValue, { color: colors.text, fontSize: 14 * fontScale }]}>
-                  {typeof course.students === 'string' ? course.students : course.students.toLocaleString()}
+                <ThemedText
+                  style={[
+                    styles.statValue,
+                    { color: colors.text, fontSize: 14 * fontScale },
+                  ]}
+                >
+                  {typeof course.students === "string"
+                    ? course.students
+                    : course.students.toLocaleString()}
                 </ThemedText>
-                <ThemedText style={[styles.statLabel, { color: colors.textSecondary, fontSize: 12 * fontScale }]}>Students</ThemedText>
+                <ThemedText
+                  style={[
+                    styles.statLabel,
+                    { color: colors.textSecondary, fontSize: 12 * fontScale },
+                  ]}
+                >
+                  Students
+                </ThemedText>
               </View>
             </View>
-            <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
+            <View
+              style={[styles.statDivider, { backgroundColor: colors.border }]}
+            />
             <View style={styles.statItem}>
               <Ionicons name="time" size={18} color={colors.textSecondary} />
               <View>
-                <ThemedText style={[styles.statValue, { color: colors.text, fontSize: 14 * fontScale }]}>
+                <ThemedText
+                  style={[
+                    styles.statValue,
+                    { color: colors.text, fontSize: 14 * fontScale },
+                  ]}
+                >
                   {course.duration}
                 </ThemedText>
-                <ThemedText style={[styles.statLabel, { color: colors.textSecondary, fontSize: 12 * fontScale }]}>Duration</ThemedText>
+                <ThemedText
+                  style={[
+                    styles.statLabel,
+                    { color: colors.textSecondary, fontSize: 12 * fontScale },
+                  ]}
+                >
+                  Duration
+                </ThemedText>
               </View>
             </View>
           </View>
 
           {/* About */}
           <View style={styles.section}>
-            <ThemedText type="subtitle" style={[styles.sectionHeader, { color: colors.text, fontSize: 18 * fontScale }]}>
+            <ThemedText
+              type="subtitle"
+              style={[
+                styles.sectionHeader,
+                { color: colors.text, fontSize: 18 * fontScale },
+              ]}
+            >
               About Course
             </ThemedText>
-            <ThemedText style={[styles.description, { color: colors.textSecondary, fontSize: 15 * fontScale }]}>
+            <ThemedText
+              style={[
+                styles.description,
+                { color: colors.textSecondary, fontSize: 15 * fontScale },
+              ]}
+            >
               {course.description}
             </ThemedText>
           </View>
@@ -202,10 +317,21 @@ export default function CourseDetailsScreen() {
           {/* Lessons */}
           <View style={styles.section}>
             <View style={styles.lessonsHeaderRow}>
-              <ThemedText type="subtitle" style={[styles.sectionHeader, { color: colors.text, fontSize: 18 * fontScale }]}>
+              <ThemedText
+                type="subtitle"
+                style={[
+                  styles.sectionHeader,
+                  { color: colors.text, fontSize: 18 * fontScale },
+                ]}
+              >
                 Lessons
               </ThemedText>
-              <ThemedText style={[styles.lessonsCount, { color: colors.textSecondary, fontSize: 13 * fontScale }]}>
+              <ThemedText
+                style={[
+                  styles.lessonsCount,
+                  { color: colors.textSecondary, fontSize: 13 * fontScale },
+                ]}
+              >
                 {course.lessons} videos
               </ThemedText>
             </View>
@@ -219,7 +345,11 @@ export default function CourseDetailsScreen() {
                     style={[
                       styles.lessonItem,
                       { backgroundColor: colors.card },
-                      isActive && { borderLeftColor: colors.primary, borderLeftWidth: 3, backgroundColor: colors.backgroundSecondary },
+                      isActive && {
+                        borderLeftColor: colors.primary,
+                        borderLeftWidth: 3,
+                        backgroundColor: colors.backgroundSecondary,
+                      },
                     ]}
                     onPress={() => handleLessonChange(lesson)}
                   >
@@ -228,7 +358,7 @@ export default function CourseDetailsScreen() {
                         style={[
                           styles.indexCircle,
                           { backgroundColor: colors.border },
-                          lesson.completed && { backgroundColor: '#10b981' }, // Success green
+                          lesson.completed && { backgroundColor: "#10b981" },
                           isActive && { backgroundColor: colors.primary },
                         ]}
                       >
@@ -238,12 +368,19 @@ export default function CourseDetailsScreen() {
                             size={12}
                             color="#FFFFFF"
                           />
+                        ) : // Show Lock if not purchased
+                        !purchased ? (
+                          <Ionicons
+                            name="lock-closed"
+                            size={12}
+                            color={isActive ? "#FFFFFF" : colors.textSecondary}
+                          />
                         ) : (
                           <ThemedText
                             style={[
                               styles.indexText,
                               { color: colors.textSecondary },
-                              isActive && { color: '#FFFFFF' },
+                              isActive && { color: "#FFFFFF" },
                             ]}
                           >
                             {index + 1}
@@ -251,26 +388,64 @@ export default function CourseDetailsScreen() {
                         )}
                       </View>
                       <View style={styles.lessonInfo}>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            gap: 6,
+                          }}
+                        >
+                          <ThemedText
+                            style={[
+                              styles.lessonTitle,
+                              { color: colors.text, fontSize: 15 * fontScale },
+                              isActive && {
+                                color: colors.primary,
+                                fontWeight: "700",
+                              },
+                            ]}
+                            numberOfLines={1}
+                          >
+                            {lesson.title}
+                          </ThemedText>
+                        </View>
                         <ThemedText
                           style={[
-                            styles.lessonTitle,
-                            { color: colors.text, fontSize: 15 * fontScale },
-                            isActive && { color: colors.primary, fontWeight: '700' },
+                            styles.lessonDuration,
+                            {
+                              color: colors.textSecondary,
+                              fontSize: 12 * fontScale,
+                            },
                           ]}
-                          numberOfLines={1}
                         >
-                          {lesson.title}
-                        </ThemedText>
-                        <ThemedText style={[styles.lessonDuration, { color: colors.textSecondary, fontSize: 12 * fontScale }]}>
                           {lesson.duration}
                         </ThemedText>
                       </View>
                     </View>
                     {isActive ? (
+                      // If active & locked -> Show Lock
+                      // If active & unlocked -> Show Pause
+                      isLocked ? (
+                        <Ionicons
+                          name="lock-closed"
+                          size={24}
+                          color={colors.textSecondary}
+                        />
+                      ) : (
+                        <Ionicons
+                          name="pause-circle"
+                          size={24}
+                          color={colors.primary}
+                        />
+                      )
+                    ) : // If not active:
+                    // If locked -> Lock
+                    // If unlocked -> Play circle
+                    !purchased ? (
                       <Ionicons
-                        name="pause-circle"
+                        name="lock-closed-outline"
                         size={24}
-                        color={colors.primary}
+                        color={colors.textSecondary}
                       />
                     ) : (
                       <Ionicons
@@ -288,15 +463,27 @@ export default function CourseDetailsScreen() {
       </ScrollView>
 
       {!isCoursePurchased(course.id) && (
-        <View style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
-          <TouchableOpacity 
+        <View
+          style={[
+            styles.footer,
+            {
+              backgroundColor: colors.background,
+              borderTopColor: colors.border,
+            },
+          ]}
+        >
+          <TouchableOpacity
             style={[styles.buyButton, { backgroundColor: colors.primary }]}
-            onPress={() => router.push({
-              pathname: "/screens/checkout" as any,
-              params: { courseId: course.id }
-            })}
+            onPress={() =>
+              router.push({
+                pathname: "/screens/checkout" as any,
+                params: { courseId: course.id },
+              })
+            }
           >
-            <ThemedText style={styles.buyButtonText}>Enroll Now • {course.price || "$49.99"}</ThemedText>
+            <ThemedText style={styles.buyButtonText}>
+              Enroll Now • {course.price || "$49.99"}
+            </ThemedText>
           </TouchableOpacity>
         </View>
       )}
@@ -364,7 +551,7 @@ const styles = StyleSheet.create({
   courseTitle: {
     lineHeight: 30,
     marginBottom: 8,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   instructorRow: {
     flexDirection: "row",
@@ -394,8 +581,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontWeight: "700",
   },
-  statLabel: {
-  },
+  statLabel: {},
   statDivider: {
     width: 1,
     height: 30,
@@ -405,7 +591,7 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     marginBottom: 12,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   description: {
     lineHeight: 24,
@@ -416,8 +602,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 16,
   },
-  lessonsCount: {
-  },
+  lessonsCount: {},
   lessonsList: {
     gap: 12,
   },
@@ -453,8 +638,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     marginBottom: 2,
   },
-  lessonDuration: {
-  },
+  lessonDuration: {},
   footer: {
     padding: 20,
     borderTopWidth: 1,
@@ -469,6 +653,48 @@ const styles = StyleSheet.create({
   buyButtonText: {
     color: "#FFFFFF",
     fontSize: 18,
+    fontWeight: "bold",
+  },
+  lockedOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.6)",
+    zIndex: 10,
+  },
+  lockedContent: {
+    alignItems: "center",
+    padding: 20,
+    width: "100%",
+  },
+  lockIconCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  lockedTitle: {
+    color: "#FFFFFF",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  lockedSubtitle: {
+    color: "#E5E5E5",
+    fontSize: 14,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  unlockButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 30,
+  },
+  unlockButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
     fontWeight: "bold",
   },
 });

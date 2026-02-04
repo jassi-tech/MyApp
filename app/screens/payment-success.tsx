@@ -55,7 +55,7 @@ export default function PaymentSuccessScreen() {
 
           <TouchableOpacity 
             style={[styles.secondaryButton, { borderColor: colors.primary }]}
-            onPress={() => router.dismissAll()}
+            onPress={() => router.replace({ pathname: "/screens/(tabs)/Home" })}
           >
             <ThemedText style={[styles.secondaryButtonText, { color: colors.primary, fontSize: 16 * fontScale }]}>Go to Home</ThemedText>
           </TouchableOpacity>

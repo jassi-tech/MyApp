@@ -4,6 +4,7 @@ export interface Lesson {
   duration: string;
   completed: boolean;
   videoUrl: string;
+  isPreview?: boolean;
 }
 
 export interface Course {
@@ -43,6 +44,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "Introduction to Animations",
         duration: "12:30",
         completed: false,
@@ -96,6 +98,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "Getting Started with Expo",
         duration: "10:00",
         completed: false,
@@ -135,6 +138,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "TypeScript Basics",
         duration: "14:20",
         completed: false,
@@ -174,6 +178,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "Closures and Scope",
         duration: "20:15",
         completed: false,
@@ -206,6 +211,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "Design Principles",
         duration: "15:00",
         completed: false,
@@ -238,6 +244,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "Setting Up Node.js",
         duration: "10:30",
         completed: false,
@@ -270,6 +277,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "useState and useEffect",
         duration: "16:20",
         completed: false,
@@ -302,6 +310,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "Performance Profiling",
         duration: "14:15",
         completed: false,
@@ -334,6 +343,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "GraphQL Basics",
         duration: "12:00",
         completed: false,
@@ -366,6 +376,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "Jest Fundamentals",
         duration: "15:45",
         completed: false,
@@ -399,6 +410,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "Design Thinking Process",
         duration: "14:20",
         completed: false,
@@ -459,6 +471,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "Typography Fundamentals",
         duration: "16:30",
         completed: false,
@@ -527,6 +540,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "Finding Your Business Idea",
         duration: "18:20",
         completed: false,
@@ -587,6 +601,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "PM Fundamentals",
         duration: "15:30",
         completed: false,
@@ -661,6 +676,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "Financial Statements",
         duration: "17:40",
         completed: false,
@@ -729,6 +745,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "Digital Marketing Overview",
         duration: "14:30",
         completed: false,
@@ -810,6 +827,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "SEO Fundamentals",
         duration: "15:20",
         completed: false,
@@ -877,6 +895,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "Social Media Strategy",
         duration: "16:30",
         completed: false,
@@ -938,6 +957,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "Nutrition Basics",
         duration: "14:20",
         completed: false,
@@ -998,6 +1018,7 @@ export const COURSES: Course[] = [
     lessons_list: [
       {
         id: "1",
+        isPreview: true,
         title: "Fitness Fundamentals",
         duration: "15:30",
         completed: false,
