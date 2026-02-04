@@ -2,12 +2,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
+
+import { ScreenContainer } from "@/components/common/screen-container";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
@@ -34,12 +35,11 @@ export default function CheckoutScreen() {
 
   if (!course) {
     return (
-      <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-        <ScreenHeader title="Checkout" />
+      <ScreenContainer header={<ScreenHeader title="Checkout" />}>
         <View style={styles.centerContainer}>
           <ThemedText style={{ color: colors.text }}>Course not found</ThemedText>
         </View>
-      </SafeAreaView>
+      </ScreenContainer>
     );
   }
 
@@ -57,9 +57,7 @@ export default function CheckoutScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <ScreenHeader title="Checkout" />
-      
+    <ScreenContainer scrollable={false} header={<ScreenHeader title="Checkout" />}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Order Summary */}
         <View style={styles.section}>
@@ -133,14 +131,11 @@ export default function CheckoutScreen() {
           </ThemedText>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
   scrollContent: {
     padding: 20,
     paddingBottom: 120,

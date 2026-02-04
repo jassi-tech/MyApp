@@ -2,6 +2,8 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
+import { ScreenContainer } from "@/components/common/screen-container";
+
 import Card from "@/components/common/cards";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
@@ -22,7 +24,7 @@ export default function CoursesScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <ScreenContainer>
       <View style={styles.section}>
         <ThemedText type="subtitle" style={[styles.sectionTitle, { color: colors.text, fontSize: 18 * fontScale }]}>Active Courses</ThemedText>
         {activeCourses.length > 0 ? (
@@ -73,14 +75,11 @@ export default function CoursesScreen() {
           ))}
         </View>
       )}
-    </View>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   section: {
     marginTop: 15,
   },

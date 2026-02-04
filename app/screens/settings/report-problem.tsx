@@ -1,17 +1,11 @@
+import { ScreenContainer } from "@/components/common/screen-container";
+import { ScreenHeader } from "@/components/common/screen-header";
+import { ThemedText } from "@/components/themed-text";
+import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from "react-native";
-
-import { ThemedText } from "@/components/themed-text";
-import { useTheme } from "@/context/ThemeContext";
+import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 
 const PROBLEM_CATEGORIES = [
   { id: "login", label: "Login Issues", icon: "lock-closed-outline" },
@@ -33,115 +27,141 @@ export default function ReportProblemScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.card }]} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-        <ThemedText style={[styles.headerTitle, { color: colors.text, fontSize: 20 * fontScale }]}>Report a Problem</ThemedText>
-        <View style={{ width: 40 }} />
+    <ScreenContainer header={<ScreenHeader title="Report a Problem" />}>
+      <View
+        style={[
+          styles.infoCard,
+          {
+            backgroundColor: colors.primary + "20",
+            borderColor: colors.primary + "40",
+          },
+        ]}
+      >
+        <Ionicons name="information-circle" size={24} color={colors.primary} />
+        <ThemedText style={[styles.infoText, { color: colors.textSecondary }]}>
+          Help us improve by reporting any issues you encounter. We'll get back
+          to you as soon as possible.
+        </ThemedText>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={[styles.infoCard, { backgroundColor: colors.primary + '20', borderColor: colors.primary + '40' }]}>
-          <Ionicons name="information-circle" size={24} color={colors.primary} />
-          <ThemedText style={[styles.infoText, { color: colors.textSecondary }]}>
-            Help us improve by reporting any issues you encounter. We'll get back to you as soon as possible.
-          </ThemedText>
-        </View>
-
-        <View style={styles.section}>
-          <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>SELECT CATEGORY</ThemedText>
-          <View style={styles.categoriesGrid}>
-            {PROBLEM_CATEGORIES.map((category) => (
-              <TouchableOpacity
-                key={category.id}
+      <View style={styles.section}>
+        <ThemedText
+          style={[styles.sectionTitle, { color: colors.textSecondary }]}
+        >
+          SELECT CATEGORY
+        </ThemedText>
+        <View style={styles.categoriesGrid}>
+          {PROBLEM_CATEGORIES.map((category) => (
+            <TouchableOpacity
+              key={category.id}
+              style={[
+                styles.categoryChip,
+                { backgroundColor: colors.card, borderColor: colors.border },
+                selectedCategory === category.id && {
+                  borderColor: colors.primary,
+                  backgroundColor: colors.primary + "20",
+                },
+              ]}
+              onPress={() => setSelectedCategory(category.id)}
+            >
+              <Ionicons
+                name={category.icon as any}
+                size={20}
+                color={
+                  selectedCategory === category.id
+                    ? colors.primary
+                    : colors.textSecondary
+                }
+              />
+              <ThemedText
                 style={[
-                  styles.categoryChip,
-                  { backgroundColor: colors.card, borderColor: colors.border },
-                  selectedCategory === category.id && { borderColor: colors.primary, backgroundColor: colors.primary + '20' },
+                  styles.categoryChipText,
+                  { color: colors.textSecondary, fontSize: 14 * fontScale },
+                  selectedCategory === category.id && { color: colors.primary },
                 ]}
-                onPress={() => setSelectedCategory(category.id)}
               >
-                <Ionicons
-                  name={category.icon as any}
-                  size={20}
-                  color={selectedCategory === category.id ? colors.primary : colors.textSecondary}
-                />
-                <ThemedText
-                  style={[
-                    styles.categoryChipText,
-                    { color: colors.textSecondary, fontSize: 14 * fontScale },
-                    selectedCategory === category.id && { color: colors.primary },
-                  ]}
-                >
-                  {category.label}
-                </ThemedText>
-              </TouchableOpacity>
-            ))}
-          </View>
+                {category.label}
+              </ThemedText>
+            </TouchableOpacity>
+          ))}
         </View>
+      </View>
 
-        <View style={styles.section}>
-          <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>DESCRIBE THE PROBLEM</ThemedText>
-          <TextInput
-            style={[styles.descriptionInput, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border, fontSize: 15 * fontScale }]}
-            placeholder="Please provide details about the issue..."
-            placeholderTextColor={colors.textSecondary}
-            multiline
-            numberOfLines={8}
-            textAlignVertical="top"
-            value={description}
-            onChangeText={setDescription}
-          />
-        </View>
+      <View style={styles.section}>
+        <ThemedText
+          style={[styles.sectionTitle, { color: colors.textSecondary }]}
+        >
+          DESCRIBE THE PROBLEM
+        </ThemedText>
+        <TextInput
+          style={[
+            styles.descriptionInput,
+            {
+              backgroundColor: colors.card,
+              color: colors.text,
+              borderColor: colors.border,
+              fontSize: 15 * fontScale,
+            },
+          ]}
+          placeholder="Please provide details about the issue..."
+          placeholderTextColor={colors.textSecondary}
+          multiline
+          numberOfLines={8}
+          textAlignVertical="top"
+          value={description}
+          onChangeText={setDescription}
+        />
+      </View>
 
-        <View style={styles.section}>
-          <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>ATTACHMENTS (OPTIONAL)</ThemedText>
-          <TouchableOpacity style={[styles.attachmentButton, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Ionicons name="camera-outline" size={24} color={colors.primary} />
-            <ThemedText style={[styles.attachmentText, { color: colors.primary, fontSize: 15 * fontScale }]}>Add Screenshot</ThemedText>
-          </TouchableOpacity>
-        </View>
-
+      <View style={styles.section}>
+        <ThemedText
+          style={[styles.sectionTitle, { color: colors.textSecondary }]}
+        >
+          ATTACHMENTS (OPTIONAL)
+        </ThemedText>
         <TouchableOpacity
           style={[
-            styles.submitButton,
-            { backgroundColor: colors.primary },
-            (!selectedCategory || !description) && { backgroundColor: colors.border },
+            styles.attachmentButton,
+            { backgroundColor: colors.card, borderColor: colors.border },
           ]}
-          onPress={handleSubmit}
-          disabled={!selectedCategory || !description}
         >
-          <ThemedText style={[styles.submitButtonText, { color: "#fff", fontSize: 16 * fontScale }]}>Submit Report</ThemedText>
+          <Ionicons name="camera-outline" size={24} color={colors.primary} />
+          <ThemedText
+            style={[
+              styles.attachmentText,
+              { color: colors.primary, fontSize: 15 * fontScale },
+            ]}
+          >
+            Add Screenshot
+          </ThemedText>
         </TouchableOpacity>
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+
+      <TouchableOpacity
+        style={[
+          styles.submitButton,
+          { backgroundColor: colors.primary },
+          (!selectedCategory || !description) && {
+            backgroundColor: colors.border,
+          },
+        ]}
+        onPress={handleSubmit}
+        disabled={!selectedCategory || !description}
+      >
+        <ThemedText
+          style={[
+            styles.submitButtonText,
+            { color: "#fff", fontSize: 16 * fontScale },
+          ]}
+        >
+          Submit Report
+        </ThemedText>
+      </TouchableOpacity>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontWeight: "bold",
-  },
   scrollContent: {
     padding: 16,
     paddingBottom: 40,

@@ -4,12 +4,13 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Dimensions,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
+
+import { ScreenContainer } from "@/components/common/screen-container";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
@@ -164,26 +165,28 @@ export default function CourseDetailsScreen() {
 
   if (!course) {
     return (
-      <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-        <ScreenHeader title="Details" />
+      <ScreenContainer header={<ScreenHeader title="Details" />}>
         <View style={styles.centerContainer}>
           <ThemedText style={{ color: colors.text }}>Course not found</ThemedText>
         </View>
-      </SafeAreaView>
+      </ScreenContainer>
     );
   }
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <ScreenHeader
-        title="Details"
-        rightElement={
-          <TouchableOpacity>
-            <Ionicons name="bookmark-outline" size={24} color={colors.text} />
-          </TouchableOpacity>
-        }
-      />
-
+    <ScreenContainer 
+      scrollable={false}
+      header={
+        <ScreenHeader
+          title="Details"
+          rightElement={
+            <TouchableOpacity>
+              <Ionicons name="bookmark-outline" size={24} color={colors.text} />
+            </TouchableOpacity>
+          }
+        />
+      }
+    >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -369,14 +372,11 @@ export default function CourseDetailsScreen() {
           </TouchableOpacity>
         </View>
       )}
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
   centerContainer: {
     flex: 1,
     justifyContent: "center",

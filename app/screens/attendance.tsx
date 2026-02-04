@@ -7,23 +7,18 @@ import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
-  SafeAreaView,
-  ScrollView,
   StyleSheet,
   View,
 } from "react-native";
+
+import { ScreenContainer } from "@/components/common/screen-container";
 
 export default function AttendanceScreen() {
   const { colors, fontScale, isDark } = useTheme();
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <ScreenHeader title="My Attendance" />
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Calendar Section */}
+    <ScreenContainer header={<ScreenHeader title="My Attendance" />}>
+      {/* Calendar Section */}
         <AttendanceCalendar />
 
         {/* Month Attendance Summary */}
@@ -101,8 +96,7 @@ export default function AttendanceScreen() {
             badgeColor="#e0f2fe"
           />
         </View>
-      </ScrollView>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 
@@ -140,9 +134,6 @@ const AcademicItem = ({ label, value, icon, badgeColor }: any) => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
 
   scrollContent: {
     padding: 16,

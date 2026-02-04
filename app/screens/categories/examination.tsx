@@ -2,12 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    SafeAreaView,
-    ScrollView,
     StyleSheet,
     TouchableOpacity,
     View,
 } from "react-native";
+
+import { ScreenContainer } from "@/components/common/screen-container";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
@@ -75,9 +75,7 @@ export default function ExaminationScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <ScreenHeader title="Examination" />
-
+    <ScreenContainer header={<ScreenHeader title="Examination" />}>
       <View style={[styles.tabContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <TouchableOpacity
           style={[
@@ -117,11 +115,7 @@ export default function ExaminationScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {activeTab === "schedule" ? (
+      {activeTab === "schedule" ? (
           <>
             {EXAM_SCHEDULE.map((exam) => (
               <View key={exam.id} style={[styles.examCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -207,8 +201,7 @@ export default function ExaminationScreen() {
             ))}
           </>
         )}
-      </ScrollView>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 
@@ -218,12 +211,6 @@ function keyToColor(key: string, colors: any) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  header: {
-    // moved to common component
-  },
   tabContainer: {
     flexDirection: "row",
     padding: 16,

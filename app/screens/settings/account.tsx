@@ -1,15 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 
+import { ScreenContainer } from "@/components/common/screen-container";
+import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 
@@ -18,122 +13,195 @@ export default function AccountScreen() {
   const [isEditing, setIsEditing] = useState(false);
   const { colors, fontScale, isDark } = useTheme();
 
+  const HeaderRight = () => (
+    <TouchableOpacity
+      style={[styles.editButton, { backgroundColor: colors.card }]}
+      onPress={() => setIsEditing(!isEditing)}
+    >
+      <Ionicons
+        name={isEditing ? "checkmark" : "create-outline"}
+        size={22}
+        color={colors.primary}
+      />
+    </TouchableOpacity>
+  );
+
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity
-          style={[styles.backButton, { backgroundColor: colors.card }]}
-          onPress={() => router.back()}
+    <ScreenContainer
+      header={<ScreenHeader title="Account" rightElement={<HeaderRight />} />}
+    >
+      <View style={styles.profileSection}>
+        <View style={styles.avatarContainer}>
+          <View
+            style={[
+              styles.avatar,
+              { backgroundColor: colors.card, borderColor: colors.primary },
+            ]}
+          >
+            <Ionicons name="person" size={48} color={colors.text} />
+          </View>
+          {isEditing && (
+            <TouchableOpacity
+              style={[
+                styles.editAvatarButton,
+                { backgroundColor: colors.primary },
+              ]}
+            >
+              <Ionicons name="camera" size={18} color="#fff" />
+            </TouchableOpacity>
+          )}
+        </View>
+        <ThemedText
+          style={[
+            styles.userName,
+            { color: colors.text, fontSize: 24 * fontScale },
+          ]}
         >
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-        <ThemedText style={[styles.headerTitle, { color: colors.text, fontSize: 20 * fontScale }]}>Account</ThemedText>
-        <TouchableOpacity
-          style={[styles.editButton, { backgroundColor: colors.card }]}
-          onPress={() => setIsEditing(!isEditing)}
-        >
-          <Ionicons
-            name={isEditing ? "checkmark" : "create-outline"}
-            size={22}
-            color={colors.primary}
-          />
-        </TouchableOpacity>
+          John Doe
+        </ThemedText>
+        <ThemedText style={[styles.userRole, { color: colors.textSecondary }]}>
+          Student
+        </ThemedText>
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.profileSection}>
-          <View style={styles.avatarContainer}>
-            <View style={[styles.avatar, { backgroundColor: colors.card, borderColor: colors.primary }]}>
-              <Ionicons name="person" size={48} color={colors.text} />
-            </View>
-            {isEditing && (
-              <TouchableOpacity style={[styles.editAvatarButton, { backgroundColor: colors.primary }]}>
-                <Ionicons name="camera" size={18} color="#fff" />
-              </TouchableOpacity>
-            )}
-          </View>
-          <ThemedText style={[styles.userName, { color: colors.text, fontSize: 24 * fontScale }]}>John Doe</ThemedText>
-          <ThemedText style={[styles.userRole, { color: colors.textSecondary }]}>Student</ThemedText>
+      <View style={styles.section}>
+        <ThemedText
+          style={[styles.sectionTitle, { color: colors.textSecondary }]}
+        >
+          PERSONAL INFORMATION
+        </ThemedText>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <InfoField
+            icon="person-outline"
+            label="Full Name"
+            value="John Doe"
+            editable={isEditing}
+          />
+          <InfoField
+            icon="mail-outline"
+            label="Email"
+            value="john.doe@example.com"
+            editable={isEditing}
+          />
+          <InfoField
+            icon="call-outline"
+            label="Phone"
+            value="+1 234 567 8900"
+            editable={isEditing}
+          />
+          <InfoField
+            icon="calendar-outline"
+            label="Date of Birth"
+            value="15 Jan 2005"
+            editable={isEditing}
+          />
         </View>
+      </View>
 
-        <View style={styles.section}>
-          <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>
-            PERSONAL INFORMATION
+      <View style={styles.section}>
+        <ThemedText
+          style={[styles.sectionTitle, { color: colors.textSecondary }]}
+        >
+          ACADEMIC DETAILS
+        </ThemedText>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <InfoField
+            icon="school-outline"
+            label="Class"
+            value="10th Grade"
+            editable={false}
+          />
+          <InfoField
+            icon="id-card-outline"
+            label="Roll Number"
+            value="2024-A-101"
+            editable={false}
+          />
+          <InfoField
+            icon="location-outline"
+            label="Section"
+            value="A"
+            editable={false}
+          />
+        </View>
+      </View>
+
+      <View style={styles.statsSection}>
+        <View
+          style={[
+            styles.statCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <Ionicons name="trophy-outline" size={28} color="#00bfff" />
+          <ThemedText
+            style={[
+              styles.statValue,
+              { color: colors.text, fontSize: 20 * fontScale },
+            ]}
+          >
+            85%
           </ThemedText>
-          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <InfoField
-              icon="person-outline"
-              label="Full Name"
-              value="John Doe"
-              editable={isEditing}
-            />
-            <InfoField
-              icon="mail-outline"
-              label="Email"
-              value="john.doe@example.com"
-              editable={isEditing}
-            />
-            <InfoField
-              icon="call-outline"
-              label="Phone"
-              value="+1 234 567 8900"
-              editable={isEditing}
-            />
-            <InfoField
-              icon="calendar-outline"
-              label="Date of Birth"
-              value="15 Jan 2005"
-              editable={isEditing}
-            />
-          </View>
+          <ThemedText
+            style={[styles.statLabel, { color: colors.textSecondary }]}
+          >
+            Attendance
+          </ThemedText>
         </View>
-
-        <View style={styles.section}>
-          <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>ACADEMIC DETAILS</ThemedText>
-          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <InfoField
-              icon="school-outline"
-              label="Class"
-              value="10th Grade"
-              editable={false}
-            />
-            <InfoField
-              icon="id-card-outline"
-              label="Roll Number"
-              value="2024-A-101"
-              editable={false}
-            />
-            <InfoField
-              icon="location-outline"
-              label="Section"
-              value="A"
-              editable={false}
-            />
-          </View>
+        <View
+          style={[
+            styles.statCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <Ionicons name="star-outline" size={28} color="#f59e0b" />
+          <ThemedText
+            style={[
+              styles.statValue,
+              { color: colors.text, fontSize: 20 * fontScale },
+            ]}
+          >
+            A+
+          </ThemedText>
+          <ThemedText
+            style={[styles.statLabel, { color: colors.textSecondary }]}
+          >
+            Grade
+          </ThemedText>
         </View>
-
-        <View style={styles.statsSection}>
-          <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Ionicons name="trophy-outline" size={28} color="#00bfff" />
-            <ThemedText style={[styles.statValue, { color: colors.text, fontSize: 20 * fontScale }]}>85%</ThemedText>
-            <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>Attendance</ThemedText>
-          </View>
-          <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Ionicons name="star-outline" size={28} color="#f59e0b" />
-            <ThemedText style={[styles.statValue, { color: colors.text, fontSize: 20 * fontScale }]}>A+</ThemedText>
-            <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>Grade</ThemedText>
-          </View>
-          <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Ionicons name="ribbon-outline" size={28} color="#8b5cf6" />
-            <ThemedText style={[styles.statValue, { color: colors.text, fontSize: 20 * fontScale }]}>12</ThemedText>
-            <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>Achievements</ThemedText>
-          </View>
+        <View
+          style={[
+            styles.statCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <Ionicons name="ribbon-outline" size={28} color="#8b5cf6" />
+          <ThemedText
+            style={[
+              styles.statValue,
+              { color: colors.text, fontSize: 20 * fontScale },
+            ]}
+          >
+            12
+          </ThemedText>
+          <ThemedText
+            style={[styles.statLabel, { color: colors.textSecondary }]}
+          >
+            Achievements
+          </ThemedText>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+    </ScreenContainer>
   );
 }
 
@@ -152,61 +220,50 @@ const InfoField = ({
   return (
     <View style={styles.infoField}>
       <View style={styles.infoHeader}>
-        <Ionicons name={icon} size={18} color={colors.textSecondary} style={{ marginRight: 8 }} />
-        <ThemedText style={[styles.infoLabel, { color: colors.textSecondary }]}>{label}</ThemedText>
+        <Ionicons
+          name={icon}
+          size={18}
+          color={colors.textSecondary}
+          style={{ marginRight: 8 }}
+        />
+        <ThemedText style={[styles.infoLabel, { color: colors.textSecondary }]}>
+          {label}
+        </ThemedText>
       </View>
       {editable ? (
-        <TextInput 
+        <TextInput
           style={[
-            styles.infoInput, 
-            { 
-              backgroundColor: colors.background, 
-              color: colors.text, 
+            styles.infoInput,
+            {
+              backgroundColor: colors.background,
+              color: colors.text,
               borderColor: colors.primary,
-              fontSize: 16 * fontScale
-            }
-          ]} 
-          value={value} 
+              fontSize: 16 * fontScale,
+            },
+          ]}
+          value={value}
         />
       ) : (
-        <ThemedText style={[styles.infoValue, { color: colors.text, fontSize: 16 * fontScale }]}>{value}</ThemedText>
+        <ThemedText
+          style={[
+            styles.infoValue,
+            { color: colors.text, fontSize: 16 * fontScale },
+          ]}
+        >
+          {value}
+        </ThemedText>
       )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontWeight: "bold",
-  },
   editButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
-  },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 40,
   },
   profileSection: {
     alignItems: "center",

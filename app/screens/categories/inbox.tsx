@@ -2,12 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from "react-native";
+
+import { ScreenContainer } from "@/components/common/screen-container";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
@@ -65,16 +65,18 @@ export default function InboxScreen() {
     filter === "unread" ? MESSAGES.filter((m) => !m.isRead) : MESSAGES;
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <ScreenHeader
-        title="Inbox"
-        rightElement={
-          <TouchableOpacity style={[styles.filterButton, { backgroundColor: colors.backgroundSecondary }]}>
-            <Ionicons name="filter-outline" size={22} color={colors.text} />
-          </TouchableOpacity>
-        }
-      />
-
+    <ScreenContainer 
+      header={
+        <ScreenHeader
+          title="Inbox"
+          rightElement={
+            <TouchableOpacity style={[styles.filterButton, { backgroundColor: colors.backgroundSecondary }]}>
+              <Ionicons name="filter-outline" size={22} color={colors.text} />
+            </TouchableOpacity>
+          }
+        />
+      }
+    >
       <View style={styles.filterTabs}>
         <TouchableOpacity
           style={[
@@ -110,11 +112,7 @@ export default function InboxScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {filteredMessages.map((message) => (
+      {filteredMessages.map((message) => (
           <TouchableOpacity 
             key={message.id} 
             style={[
@@ -167,15 +165,11 @@ export default function InboxScreen() {
             </View>
           </TouchableOpacity>
         ))}
-      </ScrollView>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
   filterButton: {
     width: 40,
     height: 40,

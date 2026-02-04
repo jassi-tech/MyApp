@@ -2,13 +2,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    SafeAreaView,
-    ScrollView,
     StyleSheet,
     TextInput,
     TouchableOpacity,
     View,
 } from "react-native";
+
+import { ScreenContainer } from "@/components/common/screen-container";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
@@ -60,14 +60,8 @@ export default function LeaveRequestScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <ScreenHeader title="Leave Request" />
-
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.balanceCard}>
+    <ScreenContainer header={<ScreenHeader title="Leave Request" />}>
+      <View style={styles.balanceCard}>
           <ThemedText style={styles.balanceLabel}>
             Available Leave Balance
           </ThemedText>
@@ -169,18 +163,11 @@ export default function LeaveRequestScreen() {
             </View>
           </View>
         ))}
-      </ScrollView>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  header: {
-    // moved to common component
-  },
   scrollContent: {
     padding: 16,
     paddingBottom: 40,

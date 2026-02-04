@@ -2,12 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-  SafeAreaView,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
+
+import { ScreenContainer } from "@/components/common/screen-container";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
@@ -30,11 +30,8 @@ export default function CategoriesScreen() {
   const { colors, fontScale } = useTheme();
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <ScreenHeader title="All Categories" />
-
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.grid}>
+    <ScreenContainer header={<ScreenHeader title="All Categories" />}>
+      <View style={styles.grid}>
           {CATEGORIES.map((cat) => (
             <TouchableOpacity
               key={cat.id}
@@ -66,15 +63,11 @@ export default function CategoriesScreen() {
             </TouchableOpacity>
           ))}
         </View>
-      </ScrollView>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
   scrollContent: {
     padding: 16,
     paddingBottom: 40,

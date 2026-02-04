@@ -2,12 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-    SafeAreaView,
-    ScrollView,
     StyleSheet,
     TouchableOpacity,
     View,
 } from "react-native";
+
+import { ScreenContainer } from "@/components/common/screen-container";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
@@ -70,14 +70,8 @@ export default function HomeworkScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <ScreenHeader title="Homework" />
-
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.statsRow}>
+    <ScreenContainer header={<ScreenHeader title="Homework" />}>
+      <View style={styles.statsRow}>
           <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <ThemedText style={[styles.statValue, { fontSize: 24 * fontScale }]}>2</ThemedText>
             <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>Pending</ThemedText>
@@ -130,18 +124,11 @@ export default function HomeworkScreen() {
             </View>
           </TouchableOpacity>
         ))}
-      </ScrollView>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  header: {
-    // moved to common component
-  },
   scrollContent: {
     padding: 16,
     paddingBottom: 40,

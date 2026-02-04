@@ -2,13 +2,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
+
+import { ScreenContainer } from "@/components/common/screen-container";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
@@ -238,12 +239,15 @@ export default function TimetableScreen() {
   const schedule = TIMETABLE_DATA[selectedDay] || TIMETABLE_DATA["Mon"];
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <ScreenHeader
-        title="Class Timetable"
-        subtitle={`${selectedDay}day's Schedule`}
-      />
-
+    <ScreenContainer 
+      scrollable={false}
+      header={
+        <ScreenHeader
+          title="Class Timetable"
+          subtitle={`${selectedDay}day's Schedule`}
+        />
+      }
+    >
       <View style={[styles.daySelectorContainer, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
         <ScrollView
           horizontal
@@ -352,14 +356,11 @@ export default function TimetableScreen() {
           ))}
         </Animated.View>
       </ScrollView>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
   daySelectorContainer: {
     paddingVertical: 20,
     borderBottomWidth: 1,

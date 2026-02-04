@@ -1,12 +1,12 @@
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-    SafeAreaView,
-    ScrollView,
     StyleSheet,
     TouchableOpacity,
     View,
 } from "react-native";
+
+import { ScreenContainer } from "@/components/common/screen-container";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
@@ -68,14 +68,8 @@ export default function FeesScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <ScreenHeader title="Fee Details" />
-
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.summaryCard}>
+    <ScreenContainer header={<ScreenHeader title="Fee Details" />}>
+      <View style={styles.summaryCard}>
           <ThemedText style={styles.summaryLabel}>Total Pending</ThemedText>
           <ThemedText style={[styles.summaryAmount, { fontSize: 36 * fontScale }]}>₹5,000</ThemedText>
           <TouchableOpacity style={styles.payButton}>
@@ -132,18 +126,11 @@ export default function FeesScreen() {
             </View>
           </View>
         ))}
-      </ScrollView>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  header: {
-    // moved to common component
-  },
   scrollContent: {
     padding: 16,
     paddingBottom: 40,

@@ -2,12 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-  SafeAreaView,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
+
+import { ScreenContainer } from "@/components/common/screen-container";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
@@ -62,14 +62,8 @@ export default function NoticeScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <ScreenHeader title="Notice Board" />
-
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {NOTICES.map((notice) => (
+    <ScreenContainer header={<ScreenHeader title="Notice Board" />}>
+      {NOTICES.map((notice) => (
           <TouchableOpacity 
             key={notice.id} 
             style={[styles.noticeCard, { backgroundColor: colors.card, borderColor: colors.border }]}
@@ -102,18 +96,11 @@ export default function NoticeScreen() {
             </TouchableOpacity>
           </TouchableOpacity>
         ))}
-      </ScrollView>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  header: {
-    // moved to common component
-  },
   scrollContent: {
     padding: 16,
     paddingBottom: 40,

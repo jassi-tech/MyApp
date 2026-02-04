@@ -1,17 +1,11 @@
+import { ScreenContainer } from "@/components/common/screen-container";
+import { ScreenHeader } from "@/components/common/screen-header";
+import { ThemedText } from "@/components/themed-text";
+import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    TouchableOpacity,
-    View,
-} from "react-native";
-
-import { ThemedText } from "@/components/themed-text";
-import { useTheme } from "@/context/ThemeContext";
+import { StyleSheet, Switch, View } from "react-native";
 
 export default function PushNotificationsScreen() {
   const router = useRouter();
@@ -26,93 +20,110 @@ export default function PushNotificationsScreen() {
   const { colors, fontScale } = useTheme();
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.card }]} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-        <ThemedText style={[styles.headerTitle, { color: colors.text, fontSize: 20 * fontScale }]}>Push Notifications</ThemedText>
-        <View style={{ width: 40 }} />
+    <ScreenContainer header={<ScreenHeader title="Push Notifications" />}>
+      <View style={styles.section}>
+        <ThemedText
+          style={[styles.sectionTitle, { color: colors.textSecondary }]}
+        >
+          GENERAL
+        </ThemedText>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <NotificationToggle
+            icon="notifications"
+            label="All Notifications"
+            description="Enable or disable all push notifications"
+            value={allNotifications}
+            onValueChange={setAllNotifications}
+          />
+        </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.section}>
-          <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>GENERAL</ThemedText>
-          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <NotificationToggle
-              icon="notifications"
-              label="All Notifications"
-              description="Enable or disable all push notifications"
-              value={allNotifications}
-              onValueChange={setAllNotifications}
-            />
-          </View>
+      <View style={styles.section}>
+        <ThemedText
+          style={[styles.sectionTitle, { color: colors.textSecondary }]}
+        >
+          CATEGORIES
+        </ThemedText>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <NotificationToggle
+            icon="chatbubbles-outline"
+            label="Messages"
+            description="New messages and announcements"
+            value={messages}
+            onValueChange={setMessages}
+          />
+          <NotificationToggle
+            icon="document-text-outline"
+            label="Assignments"
+            description="New homework and deadlines"
+            value={assignments}
+            onValueChange={setAssignments}
+          />
+          <NotificationToggle
+            icon="star-outline"
+            label="Grades"
+            description="Grade updates and results"
+            value={grades}
+            onValueChange={setGrades}
+          />
+          <NotificationToggle
+            icon="calendar-outline"
+            label="Attendance"
+            description="Attendance reminders"
+            value={attendance}
+            onValueChange={setAttendance}
+          />
+          <NotificationToggle
+            icon="megaphone-outline"
+            label="Events"
+            description="School events and activities"
+            value={events}
+            onValueChange={setEvents}
+            isLast
+          />
         </View>
+      </View>
 
-        <View style={styles.section}>
-          <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>CATEGORIES</ThemedText>
-          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <NotificationToggle
-              icon="chatbubbles-outline"
-              label="Messages"
-              description="New messages and announcements"
-              value={messages}
-              onValueChange={setMessages}
-            />
-            <NotificationToggle
-              icon="document-text-outline"
-              label="Assignments"
-              description="New homework and deadlines"
-              value={assignments}
-              onValueChange={setAssignments}
-            />
-            <NotificationToggle
-              icon="star-outline"
-              label="Grades"
-              description="Grade updates and results"
-              value={grades}
-              onValueChange={setGrades}
-            />
-            <NotificationToggle
-              icon="calendar-outline"
-              label="Attendance"
-              description="Attendance reminders"
-              value={attendance}
-              onValueChange={setAttendance}
-            />
-            <NotificationToggle
-              icon="megaphone-outline"
-              label="Events"
-              description="School events and activities"
-              value={events}
-              onValueChange={setEvents}
-              isLast
-            />
-          </View>
+      <View style={styles.section}>
+        <ThemedText
+          style={[styles.sectionTitle, { color: colors.textSecondary }]}
+        >
+          PREFERENCES
+        </ThemedText>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <NotificationToggle
+            icon="volume-high-outline"
+            label="Sound"
+            description="Play sound for notifications"
+            value={sound}
+            onValueChange={setSound}
+          />
+          <NotificationToggle
+            icon="phone-portrait-outline"
+            label="Vibration"
+            description="Vibrate for notifications"
+            value={vibration}
+            onValueChange={setVibration}
+            isLast
+          />
         </View>
-
-        <View style={styles.section}>
-          <ThemedText style={[styles.sectionTitle, { color: colors.textSecondary }]}>PREFERENCES</ThemedText>
-          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <NotificationToggle
-              icon="volume-high-outline"
-              label="Sound"
-              description="Play sound for notifications"
-              value={sound}
-              onValueChange={setSound}
-            />
-            <NotificationToggle
-              icon="phone-portrait-outline"
-              label="Vibration"
-              description="Vibrate for notifications"
-              value={vibration}
-              onValueChange={setVibration}
-              isLast
-            />
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+    </ScreenContainer>
   );
 }
 
@@ -133,14 +144,36 @@ const NotificationToggle = ({
 }) => {
   const { colors, fontScale } = useTheme();
   return (
-    <View style={[styles.toggleItem, !isLast && { borderBottomWidth: 1, borderBottomColor: colors.border }]}>
+    <View
+      style={[
+        styles.toggleItem,
+        !isLast && { borderBottomWidth: 1, borderBottomColor: colors.border },
+      ]}
+    >
       <View style={styles.toggleLeft}>
-        <View style={[styles.iconContainer, { backgroundColor: colors.background }]}>
-          <Ionicons name={icon} size={20} color={value ? colors.primary : colors.textSecondary} />
+        <View
+          style={[styles.iconContainer, { backgroundColor: colors.background }]}
+        >
+          <Ionicons
+            name={icon}
+            size={20}
+            color={value ? colors.primary : colors.textSecondary}
+          />
         </View>
         <View style={styles.toggleTextContainer}>
-          <ThemedText style={[styles.toggleLabel, { color: colors.text, fontSize: 16 * fontScale }]}>{label}</ThemedText>
-          <ThemedText style={[styles.toggleDescription, { color: colors.textSecondary }]}>{description}</ThemedText>
+          <ThemedText
+            style={[
+              styles.toggleLabel,
+              { color: colors.text, fontSize: 16 * fontScale },
+            ]}
+          >
+            {label}
+          </ThemedText>
+          <ThemedText
+            style={[styles.toggleDescription, { color: colors.textSecondary }]}
+          >
+            {description}
+          </ThemedText>
         </View>
       </View>
       <Switch
@@ -154,27 +187,6 @@ const NotificationToggle = ({
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontWeight: "bold",
-  },
   scrollContent: {
     padding: 16,
     paddingBottom: 40,
