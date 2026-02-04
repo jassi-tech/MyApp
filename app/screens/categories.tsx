@@ -20,7 +20,7 @@ const CATEGORIES = [
   { id: "4", label: "Notice", icon: "document-text-outline" },
   { id: "5", label: "Homework", icon: "cloud-upload-outline" },
   { id: "6", label: "Syllabus", icon: "book-outline" },
-  { id: "7", label: "Circular", icon: "list-outline" },
+  { id: "7", label: "Purchased", icon: "school-outline" },
   { id: "8", label: "Leave Request", icon: "document-outline" },
   { id: "9", label: "Examination", icon: "school-outline" },
 ];
@@ -48,7 +48,7 @@ export default function CategoriesScreen() {
                   "Notice": "/screens/categories/notice",
                   "Homework": "/screens/categories/homework",
                   "Syllabus": "/screens/categories/syllabus",
-                  "Circular": "/screens/categories/circular",
+                  "Purchased": "/screens/categories/purchased",
                   "Leave Request": "/screens/categories/leave-request",
                   "Examination": "/screens/categories/examination",
                 };

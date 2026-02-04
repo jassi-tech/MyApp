@@ -12,8 +12,8 @@ interface CourseContextType {
 const CourseContext = createContext<CourseContextType | undefined>(undefined);
 
 export const CourseProvider = ({ children }: { children: ReactNode }) => {
-  // Initializing with "1" and "2" to maintain current app state where some courses are already active
-  const [purchasedCourseIds, setPurchasedCourseIds] = useState<string[]>(['1', '2']);
+  // Start with no purchased courses - users must purchase from Store
+  const [purchasedCourseIds, setPurchasedCourseIds] = useState<string[]>([]);
 
   const purchaseCourse = (id: string) => {
     setPurchasedCourseIds((prev) => {

@@ -14,6 +14,7 @@ export const Palette = {
   lightGray: '#2c2c2e', 
   background: '#050505',
   primary: '#0a7ea4',
+  pinky: '#E35FF2',
   
   // New Semantic Base Colors
   neutral100: '#FFFFFF',
@@ -42,6 +43,8 @@ export interface ThemeColorsType {
   primary: string;
   primaryContrast: string;
   success: string;
+  error: string;
+  pink: string;
 }
 
 // Semantic Colors
@@ -60,6 +63,8 @@ export const ThemeColors: { light: ThemeColorsType; dark: ThemeColorsType } = {
     primary: Palette.primary,
     primaryContrast: Palette.white,
     success: Palette.green,
+    error: Palette.red,
+    pink: Palette.pinky,
   },
   dark: {
     text: Palette.neutral100,
@@ -75,6 +80,8 @@ export const ThemeColors: { light: ThemeColorsType; dark: ThemeColorsType } = {
     primary: Palette.primary,
     primaryContrast: Palette.white,
     success: Palette.green,
+    error: Palette.red,
+    pink: Palette.pinky,
   },
 };
 

@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { ResizeMode, Video } from "expo-av";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Dimensions,
   ScrollView,
@@ -19,149 +19,63 @@ import { useTheme } from "@/context/ThemeContext";
 
 const { width } = Dimensions.get("window");
 
-const COURSE_DATA: Record<string, any> = {
-  "1": {
-    id: "1",
-    title: "Mastering React Native Animation",
-    instructor: "Sarah Johnson",
-    description:
-      "Learn advanced animation techniques in React Native to create stunning user experiences. This course covers everything from simple transitions to complex gesture-based interactions.",
-    duration: "8h 15m",
-    lessons: 5,
-    rating: 4.8,
-    students: 1234,
-    lastUpdated: "Feb 2024",
-    lessons_list: [
-      {
-        id: "1",
-        title: "Introduction to Animations",
-        duration: "12:30",
-        completed: true,
-        videoUrl:
-          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-      },
-      {
-        id: "2",
-        title: "Understanding Animated API",
-        duration: "18:45",
-        completed: true,
-        videoUrl:
-          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-      },
-      {
-        id: "3",
-        title: "Spring Animations",
-        duration: "15:20",
-        completed: true,
-        videoUrl:
-          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-      },
-      {
-        id: "4",
-        title: "Timing Animations",
-        duration: "20:10",
-        completed: false,
-        videoUrl:
-          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-      },
-      {
-        id: "5",
-        title: "Gesture-Based Animations",
-        duration: "25:30",
-        completed: false,
-        videoUrl:
-          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-      },
-    ],
-  },
-  "2": {
-    id: "2",
-    title: "Fullstack Development with Expo",
-    instructor: "Michael Chen",
-    description:
-      "Build complete mobile applications with Expo and modern backend technologies. A comprehensive guide to building scalable apps.",
-    duration: "12h 45m",
-    lessons: 36,
-    rating: 4.9,
-    students: 2156,
-    lastUpdated: "Jan 2024",
-    lessons_list: [
-      {
-        id: "1",
-        title: "Getting Started with Expo",
-        duration: "10:00",
-        completed: true,
-        videoUrl:
-          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-      },
-      {
-        id: "2",
-        title: "Setting Up Backend",
-        duration: "22:15",
-        completed: false,
-        videoUrl:
-          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-      },
-      {
-        id: "3",
-        title: "API Integration",
-        duration: "18:30",
-        completed: false,
-        videoUrl:
-          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-      },
-    ],
-  },
-  "3": {
-    id: "3",
-    title: "TypeScript for Beginners",
-    instructor: "Elena Rodriguez",
-    description:
-      "Master TypeScript fundamentals and advanced concepts for modern development. Essential for any React Native developer.",
-    duration: "6h",
-    lessons: 18,
-    rating: 4.7,
-    students: 3421,
-    lastUpdated: "Mar 2024",
-    lessons_list: [
-      {
-        id: "1",
-        title: "TypeScript Basics",
-        duration: "14:20",
-        completed: true,
-        videoUrl:
-          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-      },
-      {
-        id: "2",
-        title: "Types and Interfaces",
-        duration: "16:45",
-        completed: true,
-        videoUrl:
-          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-      },
-      {
-        id: "3",
-        title: "Generics",
-        duration: "19:30",
-        completed: true,
-        videoUrl:
-          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-      },
-    ],
-  },
-};
-
 export default function CourseDetailsScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const courseId = params.id as string;
-  const course = COURSE_DATA[courseId];
   const { colors, fontScale } = useTheme();
 
-  const { isCoursePurchased } = useCourses();
-  const [selectedLesson, setSelectedLesson] = useState(course?.lessons_list[0]);
+  const { isCoursePurchased, allCourses } = useCourses();
+  const course = allCourses.find(c => c.id === courseId);
+  const [selectedLesson, setSelectedLesson] = useState(course?.lessons_list?.[0]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const videoRef = useRef<Video>(null);
+
+  React.useEffect(() => {
+    // Update selected lesson when course changes
+    if (course?.lessons_list?.[0]) {
+      setSelectedLesson(course.lessons_list[0]);
+    }
+  }, [course]);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+    return () => {
+      setIsMounted(false);
+    };
+  }, []);
+
+  const handlePlayPress = async () => {
+    if (videoRef.current) {
+      try {
+        if (isPlaying) {
+          await videoRef.current.pauseAsync();
+          setIsPlaying(false);
+        } else {
+          await videoRef.current.playAsync();
+          setIsPlaying(true);
+        }
+      } catch (error) {
+        console.log('Video playback error:', error);
+      }
+    }
+  };
+
+  const handleLessonChange = async (lesson: any) => {
+    try {
+      if (videoRef.current) {
+        await videoRef.current.pauseAsync();
+        await videoRef.current.unloadAsync();
+      }
+      setSelectedLesson(lesson);
+      setIsPlaying(false);
+    } catch (error) {
+      console.log('Lesson change error:', error);
+      setSelectedLesson(lesson);
+      setIsPlaying(false);
+    }
+  };
 
   if (!course) {
     return (
@@ -187,18 +101,19 @@ export default function CourseDetailsScreen() {
         />
       }
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Video Player */}
+      {/* Video Player */}
+      {selectedLesson && (
         <View style={[styles.videoContainer, { backgroundColor: '#000' }]}>
           <Video
+            key={selectedLesson.id}
+            ref={videoRef}
             source={{ uri: selectedLesson.videoUrl }}
             style={styles.video}
             useNativeControls
             resizeMode={ResizeMode.CONTAIN}
-            isLooping
+            shouldPlay={false}
+            isLooping={false}
+            isMuted={false}
             onPlaybackStatusUpdate={(status: any) => {
               if (status.isLoaded) {
                 setIsPlaying(status.isPlaying);
@@ -206,13 +121,26 @@ export default function CourseDetailsScreen() {
             }}
           />
           {!isPlaying && (
-            <View style={styles.videoOverlay}>
-              <View style={styles.playButton}>
-                <Ionicons name="play" size={32} color="#FFFFFF" />
+            <TouchableOpacity 
+              style={styles.videoOverlay}
+              onPress={handlePlayPress}
+              activeOpacity={0.9}
+            >
+              <View style={styles.playButtonContainer}>
+                <View style={styles.playButton}>
+                  <Ionicons name="play" size={40} color="#FFFFFF" />
+                </View>
+                <ThemedText style={styles.videoLessonTitle}>{selectedLesson.title}</ThemedText>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
         </View>
+      )}
+
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
 
         <View style={styles.contentContainer}>
           {/* Main Info */}
@@ -244,7 +172,7 @@ export default function CourseDetailsScreen() {
               <Ionicons name="people" size={18} color={colors.textSecondary} />
               <View>
                 <ThemedText style={[styles.statValue, { color: colors.text, fontSize: 14 * fontScale }]}>
-                  {course.students.toLocaleString()}
+                  {typeof course.students === 'string' ? course.students : course.students.toLocaleString()}
                 </ThemedText>
                 <ThemedText style={[styles.statLabel, { color: colors.textSecondary, fontSize: 12 * fontScale }]}>Students</ThemedText>
               </View>
@@ -284,7 +212,7 @@ export default function CourseDetailsScreen() {
 
             <View style={styles.lessonsList}>
               {course.lessons_list.map((lesson: any, index: number) => {
-                const isActive = selectedLesson.id === lesson.id;
+                const isActive = selectedLesson?.id === lesson.id;
                 return (
                   <TouchableOpacity
                     key={lesson.id}
@@ -293,7 +221,7 @@ export default function CourseDetailsScreen() {
                       { backgroundColor: colors.card },
                       isActive && { borderLeftColor: colors.primary, borderLeftWidth: 3, backgroundColor: colors.backgroundSecondary },
                     ]}
-                    onPress={() => setSelectedLesson(lesson)}
+                    onPress={() => handleLessonChange(lesson)}
                   >
                     <View style={styles.lessonLeft}>
                       <View
@@ -400,14 +328,32 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.3)",
   },
+  playButtonContainer: {
+    alignItems: "center",
+  },
   playButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "rgba(0, 191, 255, 0.9)",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  videoLessonTitle: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
+    paddingHorizontal: 20,
+    textShadowColor: "rgba(0, 0, 0, 0.75)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   contentContainer: {
     padding: 20,

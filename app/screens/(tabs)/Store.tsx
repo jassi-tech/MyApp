@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 
 import Card from "@/components/common/cards";
@@ -13,18 +13,40 @@ import { useTheme } from "@/context/ThemeContext";
 const CATEGORIES = ["All", "Development", "Design", "Business", "Marketing", "Health"];
 
 export default function StoreScreen() {
+  const router = useRouter();
   const [activeCategory, setActiveCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const { colors, fontScale } = useTheme();
   const { allCourses, isCoursePurchased } = useCourses();
 
-  const filteredCourses = allCourses.filter(course => 
-    activeCategory === "All" || course.category === activeCategory
-  );
+  // Debounce search input (300ms delay)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
 
-  // For demonstration, let's treat the first 2 as "Featured" if they aren't purchased, 
-  // or just show all available in a nice grid/list
-  const featured = filteredCourses.filter(c => !isCoursePurchased(c.id)).slice(0, 2);
-  const others = filteredCourses.filter(c => !featured.find(f => f.id === c.id));
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Filter courses by category, search, AND exclude purchased courses
+  const filteredCourses = useMemo(() => {
+    return allCourses.filter(course => {
+      const matchesCategory = activeCategory === "All" || course.category === activeCategory;
+      const matchesSearch = debouncedSearch === "" ||
+        course.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        course.instructor.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        course.category.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        course.description.toLowerCase().includes(debouncedSearch.toLowerCase());
+      const notPurchased = !isCoursePurchased(course.id);
+      
+      return matchesCategory && matchesSearch && notPurchased;
+    });
+  }, [allCourses, activeCategory, debouncedSearch, isCoursePurchased]);
+
+  const handleClearSearch = () => {
+    setSearchQuery("");
+  };
 
   return (
     <ScreenContainer scrollable>
@@ -36,7 +58,14 @@ export default function StoreScreen() {
             placeholder="Search for courses, skills..." 
             placeholderTextColor={colors.textSecondary}
             style={[styles.searchInput, { color: colors.text, fontSize: 16 * fontScale }]}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
           />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={handleClearSearch} style={styles.clearButton}>
+              <Ionicons name="close-circle" size={20} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
@@ -68,39 +97,84 @@ export default function StoreScreen() {
         </ScrollView>
       </View>
 
-      {featured.length > 0 && (
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <ThemedText type="subtitle" style={[styles.sectionTitle, { color: colors.text }]}>Featured Courses</ThemedText>
-            <TouchableOpacity><ThemedText style={[styles.seeAll, { color: colors.primary }]}>See All</ThemedText></TouchableOpacity>
-          </View>
-          {featured.map((item) => (
-            <CourseCard key={item.id} item={item} />
-          ))}
-        </View>
-      )}
-
       <View style={[styles.section, { marginBottom: 30 }]}>
-         <View style={styles.sectionHeader}>
-          <ThemedText type="subtitle" style={[styles.sectionTitle, { color: colors.text }]}>
-            {activeCategory === "All" ? "Recently Added" : `${activeCategory} Courses`}
-          </ThemedText>
+        <View style={styles.sectionHeader}>
+          <ThemedText type="subtitle" style={[styles.sectionTitle, { color: colors.text }]}>Featured Courses</ThemedText>
           <TouchableOpacity><ThemedText style={[styles.seeAll, { color: colors.primary }]}>See All</ThemedText></TouchableOpacity>
         </View>
-        {others.length > 0 ? (
-          others.map((item) => (
+        {filteredCourses.length > 0 ? (
+          filteredCourses.map((item) => (
             <CourseCard key={item.id} item={item} />
           ))
         ) : (
-          <View style={styles.emptyContainer}>
-            <ThemedText style={{ color: colors.textSecondary }}>No courses found in this category.</ThemedText>
-          </View>
+          <EmptyState 
+            activeCategory={activeCategory}
+            searchQuery={debouncedSearch}
+            onViewPurchased={() => router.push("/screens/categories/purchased" as any)}
+            onClearSearch={handleClearSearch}
+          />
         )}
       </View>
     </ScreenContainer>
   );
 }
 
+// Empty State Component
+const EmptyState = ({ 
+  activeCategory, 
+  searchQuery,
+  onViewPurchased,
+  onClearSearch 
+}: { 
+  activeCategory: string; 
+  searchQuery: string;
+  onViewPurchased: () => void;
+  onClearSearch: () => void;
+}) => {
+  const { colors } = useTheme();
+  
+  // Different messages based on search vs no search
+  const isSearching = searchQuery.length > 0;
+  
+  return (
+    <View style={styles.emptyContainer}>
+      <Ionicons 
+        name={isSearching ? "search-outline" : "checkmark-circle"} 
+        size={64} 
+        color={isSearching ? colors.textSecondary : (colors.success || "#10b981")} 
+      />
+      <ThemedText style={[styles.emptyTitle, { color: colors.text }]}>
+        {isSearching 
+          ? "No courses found"
+          : (activeCategory === "All" 
+            ? "You've purchased all courses!"
+            : `All ${activeCategory} courses purchased!`)}
+      </ThemedText>
+      <ThemedText style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+        {isSearching 
+          ? `No results for "${searchQuery}". Try different keywords.`
+          : "Visit your purchased courses to continue learning"}
+      </ThemedText>
+      {isSearching ? (
+        <TouchableOpacity 
+          style={[styles.purchasedButton, { backgroundColor: colors.primary }]}
+          onPress={onClearSearch}
+        >
+          <ThemedText style={styles.purchasedButtonText}>Clear Search</ThemedText>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity 
+          style={[styles.purchasedButton, { backgroundColor: colors.primary }]}
+          onPress={onViewPurchased}
+        >
+          <ThemedText style={styles.purchasedButtonText}>View My Courses</ThemedText>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+};
+
+// Course Card Component
 const CourseCard = ({ item }: { item: Course }) => {
   const { colors, fontScale } = useTheme();
   const router = useRouter();
@@ -168,6 +242,9 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
+  },
+  clearButton: {
+    padding: 4,
   },
   categoriesSection: {
     marginBottom: 20,
@@ -259,5 +336,27 @@ const styles = StyleSheet.create({
     padding: 40,
     alignItems: "center",
     justifyContent: "center",
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 16,
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  emptySubtitle: {
+    textAlign: "center",
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
+  purchasedButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  purchasedButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "bold",
   },
 });

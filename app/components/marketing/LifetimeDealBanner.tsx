@@ -2,11 +2,11 @@ import { useTheme } from "@/context/ThemeContext";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
-    Dimensions,
-    Image,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { ThemedText } from "../themed-text";
 
@@ -63,18 +63,20 @@ export function LifetimeDealBanner({ onRedeem }: LifetimeDealBannerProps) {
                   ]}
                 >
                   Get Lifetime
+                  <View style={styles.highlightSection}>
+                    <ThemedText
+                      style={[
+                        styles.emphasizedDeal,
+                        {
+                          fontSize: styles.emphasizedDeal.fontSize * fontScale,
+                        },
+                      ]}
+                    >
+                      Deal
+                    </ThemedText>
+                    <View style={styles.titleAccentLine} />
+                  </View>
                 </ThemedText>
-                <View style={styles.highlightSection}>
-                  <ThemedText
-                    style={[
-                      styles.emphasizedDeal,
-                      { fontSize: styles.emphasizedDeal.fontSize * fontScale },
-                    ]}
-                  >
-                    Deal
-                  </ThemedText>
-                  <View style={styles.titleAccentLine} />
-                </View>
               </View>
 
               <ThemedText
@@ -104,13 +106,13 @@ export function LifetimeDealBanner({ onRedeem }: LifetimeDealBannerProps) {
 
             {/* Right Pane: Reserved for Student Image Overlap */}
             <View style={styles.rightPane} />
-        <View style={styles.studentImgLayer} pointerEvents="none">
-          <Image
-            source={require("../../../assets/images/student.png")}
-            style={styles.actualStudentImg}
-            resizeMode="contain"
-          />
-        </View>
+            <View style={styles.studentImgLayer} pointerEvents="none">
+              <Image
+                source={require("../../../assets/images/student.png")}
+                style={styles.actualStudentImg}
+                resizeMode="contain"
+              />
+            </View>
           </View>
         </LinearGradient>
       </View>
@@ -176,12 +178,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   titleGroupBox: {
-    marginBottom: 4,
+    marginBottom: 2,
   },
   topTitle: {
     color: "#FFFFFF",
-    fontWeight: "800",
-    letterSpacing: -0.5,
+    fontWeight: "600",
     fontSize: 22,
   },
   highlightSection: {
@@ -193,6 +194,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     fontWeight: "900",
     fontSize: 24,
+    paddingLeft: 4,
   },
   titleAccentLine: {
     position: "absolute",
@@ -201,17 +203,17 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 3,
     backgroundColor: "#FFFF00",
-    borderRadius: 2,
+    borderRadius: 4,
     transform: [{ rotate: "-1.5deg" }],
   },
   subPromoText: {
     color: "#F4DEFF",
-    fontWeight: "600",
+    fontWeight: "400",
     marginBottom: 16,
-    fontSize: 13,
+    fontSize: 12,
   },
   redeemNowButton: {
-    width: 125,
+    width: 120,
     height: 38,
     borderRadius: 10,
     overflow: "hidden",
@@ -227,7 +229,6 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "bold",
     fontSize: 14,
-    
   },
   studentImgLayer: {
     position: "absolute",

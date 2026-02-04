@@ -4,8 +4,9 @@ import React, { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
+  TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 import { ScreenContainer } from "@/components/common/screen-container";
@@ -32,6 +33,36 @@ export default function CheckoutScreen() {
   const course = allCourses.find((c) => c.id === courseId);
   const [selectedMethod, setSelectedMethod] = useState('card');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
+  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; amount: number } | null>(null);
+  const [codeError, setCodeError] = useState<string | null>(null);
+
+  const parsePrice = (priceString: string) => {
+    return parseFloat(priceString.replace(/[^0-9.]/g, ''));
+  };
+
+  const originalPrice = course ? parsePrice(course.price) : 0;
+  const discountAmount = appliedDiscount 
+    ? (appliedDiscount.amount < 1 ? originalPrice * appliedDiscount.amount : appliedDiscount.amount)
+    : 0;
+  const finalPrice = Math.max(0, originalPrice - discountAmount);
+  
+  const handleApplyCode = () => {
+    setCodeError(null);
+    const code = referralCode.trim().toUpperCase();
+    
+    if (!code) return;
+
+    // Mock validation logic
+    if (code === "SAVE10") {
+      setAppliedDiscount({ code, amount: 0.1 }); // 10% off
+    } else if (code === "WELCOME20") {
+      setAppliedDiscount({ code, amount: 20 }); // $20 off
+    } else {
+      setCodeError("Invalid referral code");
+      setAppliedDiscount(null);
+    }
+  };
 
   if (!course) {
     return (
@@ -103,19 +134,79 @@ export default function CheckoutScreen() {
           </View>
         </View>
 
+        {/* Referral Code */}
+        <View style={styles.section}>
+          <ThemedText type="subtitle" style={[styles.sectionTitle, { color: colors.text }]}>Referral Code</ThemedText>
+          <View style={styles.codeContainer}>
+             <TextInput
+               style={[
+                 styles.codeInput,
+                 { 
+                   color: colors.text, 
+                   borderColor: codeError ? (colors.error || '#ef4444') : (appliedDiscount ? (colors.success || '#10b981') : colors.border),
+                   backgroundColor: colors.card,
+                   borderWidth: 1
+                 }
+               ]}
+               placeholder="Enter code (e.g. SAVE10)"
+               placeholderTextColor={colors.textSecondary}
+               value={referralCode}
+               onChangeText={setReferralCode}
+               editable={!appliedDiscount}
+             />
+             <TouchableOpacity 
+               style={[
+                 styles.applyButton, 
+                 { 
+                   backgroundColor: appliedDiscount ? colors.backgroundSecondary : colors.primary,
+                   opacity: !referralCode && !appliedDiscount ? 0.6 : 1
+                 }
+               ]}
+               onPress={appliedDiscount ? () => {
+                 setAppliedDiscount(null);
+                 setReferralCode("");
+               } : handleApplyCode}
+               disabled={!referralCode && !appliedDiscount}
+             >
+               <ThemedText style={[
+                 styles.applyButtonText, 
+                 { color: appliedDiscount ? colors.text : (colors.primaryContrast || "#FFFFFF") }
+               ]}>
+                 {appliedDiscount ? "Remove" : "Apply"}
+               </ThemedText>
+             </TouchableOpacity>
+           </View>
+           {codeError && (
+             <ThemedText style={{ color: colors.error || '#ef4444', fontSize: 12, marginTop: 4, marginLeft: 4 }}>
+               {codeError}
+             </ThemedText>
+           )}
+           {appliedDiscount && (
+             <ThemedText style={{ color: colors.success || '#10b981', fontSize: 12, marginTop: 4, marginLeft: 4 }}>
+               Code applied! You saved ${discountAmount.toFixed(2)}
+             </ThemedText>
+           )}
+        </View>
+
         {/* Total details */}
         <View style={[styles.totalSection, { borderTopColor: colors.border }]}>
            <View style={styles.totalRow}>
              <ThemedText style={{ color: colors.textSecondary }}>Subtotal</ThemedText>
-             <ThemedText style={{ color: colors.text }}>{course.price}</ThemedText>
+             <ThemedText style={{ color: colors.text }}>${originalPrice.toFixed(2)}</ThemedText>
            </View>
+           {appliedDiscount && (
+             <View style={styles.totalRow}>
+               <ThemedText style={{ color: colors.success || '#10b981' }}>Discount</ThemedText>
+               <ThemedText style={{ color: colors.success || '#10b981' }}>-${discountAmount.toFixed(2)}</ThemedText>
+             </View>
+           )}
            <View style={styles.totalRow}>
              <ThemedText style={{ color: colors.textSecondary }}>Tax (0%)</ThemedText>
              <ThemedText style={{ color: colors.text }}>$0.00</ThemedText>
            </View>
            <View style={[styles.totalRow, styles.finalTotal]}>
              <ThemedText style={[styles.totalLabel, { color: colors.text }]}>Total Amount</ThemedText>
-             <ThemedText style={[styles.totalValue, { color: colors.primary }]}>{course.price}</ThemedText>
+             <ThemedText style={[styles.totalValue, { color: colors.primary }]}>${finalPrice.toFixed(2)}</ThemedText>
            </View>
         </View>
       </ScrollView>
@@ -127,7 +218,7 @@ export default function CheckoutScreen() {
           disabled={isProcessing}
         >
           <ThemedText style={[styles.payButtonText, { color: colors.primaryContrast || "#FFFFFF" }]}>
-            {isProcessing ? 'Processing...' : `Pay ${course.price}`}
+            {isProcessing ? 'Processing...' : `Pay $${finalPrice.toFixed(2)}`}
           </ThemedText>
         </TouchableOpacity>
       </View>
@@ -137,7 +228,7 @@ export default function CheckoutScreen() {
 
 const styles = StyleSheet.create({
   scrollContent: {
-    padding: 20,
+    padding: 15,
     paddingBottom: 120,
   },
   centerContainer: {
@@ -150,7 +241,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     marginBottom: 16,
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: "bold",
   },
   courseCard: {
@@ -166,12 +257,12 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   courseTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "600",
     marginBottom: 4,
   },
   courseInstructor: {
-    fontSize: 14,
+    fontSize: 12,
   },
   coursePrice: {
     fontSize: 18,
@@ -251,5 +342,28 @@ const styles = StyleSheet.create({
   payButtonText: {
     fontSize: 18,
     fontWeight: "bold",
+  },
+  codeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  codeInput: {
+    flex: 1,
+    height: 50,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    fontSize: 14,
+  },
+  applyButton: {
+    height: 50,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  applyButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
   },
 });

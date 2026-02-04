@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
-const HERO_HEIGHT = 380;
+const HERO_HEIGHT = 280;
 
 export default function LifetimeDealScreen() {
   const { colors, fontScale } = useTheme();
@@ -273,8 +273,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   benefitTitle: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '600',
     marginBottom: 4,
   },
   benefitDesc: {

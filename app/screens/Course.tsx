@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, TouchableOpacity } from "react-native";
 
 import { ScreenContainer } from "@/components/common/screen-container";
 
@@ -15,18 +15,29 @@ export default function CoursesScreen() {
   const { colors, fontScale } = useTheme();
   const { purchasedCourses } = useCourses();
 
-  const activeCourses = purchasedCourses.filter(c => 
-    c.lessons_list.some(l => !l.completed) || c.lessons_list.every(l => !l.completed)
+  const activeCourses = purchasedCourses.filter(
+    (c) =>
+      c.lessons_list.some((l) => !l.completed) ||
+      c.lessons_list.every((l) => !l.completed),
   );
-  
-  const completedCourses = purchasedCourses.filter(c => 
-    c.lessons_list.length > 0 && c.lessons_list.every(l => l.completed)
+
+  const completedCourses = purchasedCourses.filter(
+    (c) =>
+      c.lessons_list.length > 0 && c.lessons_list.every((l) => l.completed),
   );
 
   return (
     <ScreenContainer>
       <View style={styles.section}>
-        <ThemedText type="subtitle" style={[styles.sectionTitle, { color: colors.text, fontSize: 18 * fontScale }]}>Active Courses</ThemedText>
+        <ThemedText
+          type="subtitle"
+          style={[
+            styles.sectionTitle,
+            { color: colors.text, fontSize: 18 * fontScale },
+          ]}
+        >
+          Active Courses
+        </ThemedText>
         {activeCourses.length > 0 ? (
           activeCourses.map((course) => (
             <Card
@@ -35,31 +46,76 @@ export default function CoursesScreen() {
               title={course.title}
               subtitle={`Instructor: ${course.instructor}`}
               image={course.image}
-              onPress={() => router.push(`/screens/course-details?id=${course.id}`)}
+              onPress={() =>
+                router.push(`/screens/course-details?id=${course.id}`)
+              }
               style={styles.card}
             >
               <View style={styles.progressRow}>
-                <View style={[styles.progressBarContainer, { backgroundColor: colors.border }]}>
-                  <View style={[styles.progressBar, { 
-                    width: `${Math.round((course.lessons_list.filter(l => l.completed).length / course.lessons_list.length) * 100)}%`, 
-                    backgroundColor: colors.primary 
-                  }]} />
+                <View
+                  style={[
+                    styles.progressBarContainer,
+                    { backgroundColor: colors.border },
+                  ]}
+                >
+                  <View
+                    style={[
+                      styles.progressBar,
+                      {
+                        width: `${Math.round((course.lessons_list.filter((l) => l.completed).length / course.lessons_list.length) * 100)}%`,
+                        backgroundColor: colors.primary,
+                      },
+                    ]}
+                  />
                 </View>
-                <ThemedText style={[styles.progressText, { color: colors.textSecondary }]}>
-                  {Math.round((course.lessons_list.filter(l => l.completed).length / course.lessons_list.length) * 100)}%
+                <ThemedText
+                  style={[styles.progressText, { color: colors.textSecondary }]}
+                >
+                  {Math.round(
+                    (course.lessons_list.filter((l) => l.completed).length /
+                      course.lessons_list.length) *
+                      100,
+                  )}
+                  %
                 </ThemedText>
               </View>
-              <ThemedText style={[styles.statusLabelActive, { color: colors.primary }]}>Active</ThemedText>
+              <ThemedText
+                style={[styles.statusLabelActive, { color: colors.primary }]}
+              >
+                Active
+              </ThemedText>
             </Card>
           ))
         ) : (
-          <ThemedText style={{ color: colors.textSecondary, marginBottom: 20 }}>No active courses yet. Visit the Store to enroll!</ThemedText>
+          <View>
+            <ThemedText
+              style={{ color: colors.textSecondary, marginBottom: 16 }}
+            >
+              No active courses yet. Visit the Store to enroll!
+            </ThemedText>
+            <TouchableOpacity
+              style={[styles.storeButton, { backgroundColor: colors.pink }]}
+              onPress={() => router.push("/screens/(tabs)/Store" as any)}
+            >
+              <ThemedText style={styles.storeButtonText}>
+                Browse Courses
+              </ThemedText>
+            </TouchableOpacity>
+          </View>
         )}
       </View>
 
       {completedCourses.length > 0 && (
         <View style={[styles.section, { marginBottom: 20 }]}>
-          <ThemedText type="subtitle" style={[styles.sectionTitle, { color: colors.text, fontSize: 18 * fontScale }]}>Completed</ThemedText>
+          <ThemedText
+            type="subtitle"
+            style={[
+              styles.sectionTitle,
+              { color: colors.text, fontSize: 18 * fontScale },
+            ]}
+          >
+            Completed
+          </ThemedText>
           {completedCourses.map((course) => (
             <Card
               key={course.id}
@@ -67,10 +123,19 @@ export default function CoursesScreen() {
               title={course.title}
               subtitle={`Instructor: ${course.instructor}`}
               image={course.image}
-              onPress={() => router.push(`/screens/course-details?id=${course.id}`)}
+              onPress={() =>
+                router.push(`/screens/course-details?id=${course.id}`)
+              }
               style={styles.card}
             >
-              <ThemedText style={[styles.statusLabelCompleted, { color: colors.textSecondary }]}>Completed</ThemedText>
+              <ThemedText
+                style={[
+                  styles.statusLabelCompleted,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                Completed
+              </ThemedText>
             </Card>
           ))}
         </View>
@@ -121,5 +186,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "bold",
     marginTop: 4,
+  },
+
+  storeButton: {
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    width: "100%",
+  },
+  storeButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
