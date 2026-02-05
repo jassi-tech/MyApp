@@ -17,20 +17,17 @@ const TABS = ["Schedule", "Results"];
 
 import { useStudent } from "@/context/StudentContext";
 
-const RESULTS = [
-  { subject: "Mathematics", marks: 85, total: 100, grade: "A" },
-  { subject: "Science", marks: 92, total: 100, grade: "A+" },
-  { subject: "English", marks: 78, total: 100, grade: "B+" },
-  { subject: "History", marks: 88, total: 100, grade: "A" },
-];
-
 export default function ExaminationScreen() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"schedule" | "results">(
     "schedule",
   );
   const { colors, fontScale, isDark } = useTheme();
-  const { exams } = useStudent();
+  const { exams, examResults } = useStudent();
+ 
+  const overallPercentage = examResults.length > 0 
+    ? (examResults.reduce((acc, r) => acc + (r.marks / r.total), 0) / examResults.length * 100).toFixed(1)
+    : "0.0";
 
   const getGradeColor = (grade: string) => {
     if (grade.startsWith("A")) return "#22c55e";
@@ -119,11 +116,11 @@ export default function ExaminationScreen() {
               <ThemedText style={styles.performanceLabel}>
                 Overall Performance
               </ThemedText>
-              <ThemedText style={styles.performanceValue}>85.75%</ThemedText>
-              <ThemedText style={styles.performanceGrade}>Grade: A</ThemedText>
+              <ThemedText style={styles.performanceValue}>{overallPercentage}%</ThemedText>
+              <ThemedText style={styles.performanceGrade}>Exam: {examResults[0]?.examTitle || 'Mid-Term'}</ThemedText>
             </View>
 
-            {RESULTS.map((result, index) => (
+            {examResults.map((result, index) => (
               <View key={index} style={[styles.resultCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
                 <View style={styles.resultHeader}>
                   <ThemedText style={[styles.subjectText, { color: colors.text }]}>

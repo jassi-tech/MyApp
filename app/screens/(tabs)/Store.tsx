@@ -1,12 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 import Card from "@/components/common/cards";
 import { ScreenContainer } from "@/components/common/screen-container";
 import { ThemedText } from "@/components/themed-text";
-import { Course } from "@/constants/courses";
+import { Course } from "@/services/courseService";
 import { useCourses } from "@/context/CourseContext";
 import { useTheme } from "@/context/ThemeContext";
 
@@ -18,7 +19,7 @@ export default function StoreScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const { colors, fontScale } = useTheme();
-  const { allCourses, isCoursePurchased } = useCourses();
+  const { allCourses, isCoursePurchased, loading, error, refreshCourses } = useCourses();
 
   // Debounce search input (300ms delay)
   useEffect(() => {
@@ -78,8 +79,11 @@ export default function StoreScreen() {
               style={[
                 styles.categoryChip,
                 { 
-                  backgroundColor: activeCategory === category ? colors.primary : colors.backgroundSecondary,
-                  borderColor: activeCategory === category ? colors.primary : colors.border
+                  backgroundColor: activeCategory === category ? colors.primary : colors.card,
+                  borderColor: activeCategory === category ? colors.primary : colors.border,
+                  shadowColor: activeCategory === category ? colors.primary : '#000',
+                  shadowOpacity: activeCategory === category ? 0.3 : 0,
+                  elevation: activeCategory === category ? 4 : 0
                 }
               ]}
             >
@@ -98,24 +102,46 @@ export default function StoreScreen() {
       </View>
 
       <View style={[styles.section, { marginBottom: 30 }]}>
-        <View style={styles.sectionHeader}>
-          <ThemedText type="subtitle" style={[styles.sectionTitle, { color: colors.text }]}>Featured Courses</ThemedText>
-          <TouchableOpacity><ThemedText style={[styles.seeAll, { color: colors.primary }]}>See All</ThemedText></TouchableOpacity>
+        <View style={styles.resultsContainer}>
+          {loading ? (
+            <View style={styles.center}>
+              <ActivityIndicator size="large" color={colors.primary} />
+              <ThemedText style={{ marginTop: 10, color: colors.textSecondary }}>Loading courses...</ThemedText>
+            </View>
+          ) : error ? (
+            <View style={styles.errorContainer}>
+              <LinearGradient
+                colors={[colors.error + '20', colors.error + '10']}
+                style={styles.errorIconCircle}
+              >
+                <Ionicons name="cloud-offline-outline" size={40} color={colors.error} />
+              </LinearGradient>
+              <ThemedText style={[styles.errorTitle, { color: colors.text }]}>Connection Issue</ThemedText>
+              <ThemedText style={[styles.errorSubtitle, { color: colors.textSecondary }]}>
+                We couldn't reach the server. Please check your internet connection and try again.
+              </ThemedText>
+              <TouchableOpacity 
+                style={[styles.retryButton, { backgroundColor: colors.primary }]}
+                onPress={refreshCourses}
+              >
+                <ThemedText style={styles.retryButtonText}>Try Again</ThemedText>
+              </TouchableOpacity>
+            </View>
+          ) : filteredCourses.length > 0 ? (
+            filteredCourses.map((item) => (
+              <CourseCard key={item.id} item={item} />
+            ))
+          ) : (
+            <EmptyState 
+              activeCategory={activeCategory}
+              searchQuery={debouncedSearch}
+              onViewPurchased={() => router.push("/screens/categories/purchased" as any)}
+              onClearSearch={handleClearSearch}
+            />
+          )}
         </View>
-        {filteredCourses.length > 0 ? (
-          filteredCourses.map((item) => (
-            <CourseCard key={item.id} item={item} />
-          ))
-        ) : (
-          <EmptyState 
-            activeCategory={activeCategory}
-            searchQuery={debouncedSearch}
-            onViewPurchased={() => router.push("/screens/categories/purchased" as any)}
-            onClearSearch={handleClearSearch}
-          />
-        )}
       </View>
-    </ScreenContainer>
+  </ScreenContainer>
   );
 }
 
@@ -157,17 +183,17 @@ const EmptyState = ({
       </ThemedText>
       {isSearching ? (
         <TouchableOpacity 
-          style={[styles.purchasedButton, { backgroundColor: colors.primary }]}
+          style={[styles.emptyButton, { backgroundColor: colors.primary }]}
           onPress={onClearSearch}
         >
-          <ThemedText style={styles.purchasedButtonText}>Clear Search</ThemedText>
+          <ThemedText style={styles.emptyButtonText}>Reset Search</ThemedText>
         </TouchableOpacity>
       ) : (
         <TouchableOpacity 
-          style={[styles.purchasedButton, { backgroundColor: colors.primary }]}
+          style={[styles.emptyButton, { backgroundColor: colors.primary }]}
           onPress={onViewPurchased}
         >
-          <ThemedText style={styles.purchasedButtonText}>View My Courses</ThemedText>
+          <ThemedText style={styles.emptyButtonText}>Go to My Courses</ThemedText>
         </TouchableOpacity>
       )}
     </View>
@@ -186,7 +212,7 @@ const CourseCard = ({ item }: { item: Course }) => {
       variant="horizontal"
       title={item.title}
       subtitle={`${item.instructor} · ${item.duration}`}
-      image={item.image}
+      image={item.thumbnail}
       onPress={() => router.push(`/screens/course-details?id=${item.id}`)}
       style={[styles.card, { backgroundColor: colors.card, borderBlockColor: colors.border }]}
       imageStyle={styles.cardImage}
@@ -199,15 +225,19 @@ const CourseCard = ({ item }: { item: Course }) => {
              <ThemedText style={[styles.purchasedTag, { color: colors.primary, fontSize: 14 * fontScale }]}>Purchased</ThemedText>
           ) : (
             <>
-              <ThemedText style={[styles.price, { color: colors.text, fontSize: 16 * fontScale }]}>{item.price}</ThemedText>
-              <ThemedText style={[styles.originalPrice, { color: colors.textSecondary, fontSize: 13 * fontScale }]}>{item.originalPrice}</ThemedText>
+              <ThemedText style={[styles.price, { color: colors.text, fontSize: 16 * fontScale }]}>${item.price}</ThemedText>
+              {item.originalPrice && (
+                <ThemedText style={[styles.originalPrice, { color: colors.textSecondary, fontSize: 12 * fontScale }]}>
+                  ${item.originalPrice}
+                </ThemedText>
+              )}
             </>
           )}
         </View>
         
         <View style={styles.ratingRow}>
           <Ionicons name="star" size={12} color="#f59e0b" />
-          <ThemedText style={[styles.ratingText, { color: colors.textSecondary }]}>{item.rating} ({item.students})</ThemedText>
+          <ThemedText style={[styles.ratingText, { color: colors.textSecondary }]}>{item.rating} ({item.studentsCount})</ThemedText>
         </View>
       </View>
 
@@ -221,6 +251,11 @@ const CourseCard = ({ item }: { item: Course }) => {
 };
 
 const styles = StyleSheet.create({
+  center: {
+    // padding: 20,
+    // alignItems: "left",
+    // justifyContent: "center",
+  },
   header: {
     paddingVertical: 10,
     marginBottom: 15,
@@ -264,6 +299,9 @@ const styles = StyleSheet.create({
   },
   section: {
     marginTop: 5,
+  },
+  resultsContainer: {
+    width: '100%',
   },
   sectionHeader: {
     flexDirection: "row",
@@ -346,17 +384,63 @@ const styles = StyleSheet.create({
   },
   emptySubtitle: {
     textAlign: "center",
-    marginBottom: 20,
-    paddingHorizontal: 20,
+    marginBottom: 24,
+    paddingHorizontal: 30,
+    lineHeight: 20,
   },
-  purchasedButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
+  emptyButton: {
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 14,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  purchasedButtonText: {
+  emptyButtonText: {
     color: "#FFFFFF",
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  errorContainer: {
+    padding: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    width: '100%',
+  },
+  errorIconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  errorTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  errorSubtitle: {
+    textAlign: "center",
+    marginBottom: 24,
+    paddingHorizontal: 20,
+    lineHeight: 22,
+  },
+  retryButton: {
+    paddingHorizontal: 40,
+    paddingVertical: 14,
+    borderRadius: 14,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  retryButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
     fontWeight: "bold",
   },
 });

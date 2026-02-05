@@ -13,48 +13,20 @@ import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 
-const NOTICES = [
-  {
-    id: "1",
-    title: "School Reopening After Winter Break",
-    date: "2 Feb 2026",
-    category: "Important",
-    content: "School will reopen on 15th February 2026 after winter break.",
-  },
-  {
-    id: "2",
-    title: "Annual Sports Day",
-    date: "1 Feb 2026",
-    category: "Event",
-    content: "Annual Sports Day will be held on 20th February 2026.",
-  },
-  {
-    id: "3",
-    title: "Parent-Teacher Meeting",
-    date: "30 Jan 2026",
-    category: "Meeting",
-    content: "PTM scheduled for all classes on 25th February 2026.",
-  },
-  {
-    id: "4",
-    title: "Library Timings Update",
-    date: "28 Jan 2026",
-    category: "General",
-    content: "Library will remain open till 6 PM from next week.",
-  },
-];
+import { useStudent } from "../../context/StudentContext";
 
 export default function NoticeScreen() {
   const router = useRouter();
   const { colors, fontScale } = useTheme();
+  const { notifications } = useStudent();
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case "Important":
+      case "alert":
         return "#ef4444";
-      case "Event":
+      case "event":
         return "#8b5cf6";
-      case "Meeting":
+      case "academic":
         return "#f59e0b";
       default:
         return "#666";
@@ -63,7 +35,7 @@ export default function NoticeScreen() {
 
   return (
     <ScreenContainer header={<ScreenHeader title="Notice Board" />}>
-      {NOTICES.map((notice) => (
+      {notifications.map((notice) => (
           <TouchableOpacity 
             key={notice.id} 
             style={[styles.noticeCard, { backgroundColor: colors.card, borderColor: colors.border }]}
@@ -72,23 +44,23 @@ export default function NoticeScreen() {
               <View
                 style={[
                   styles.categoryBadge,
-                  { backgroundColor: getCategoryColor(notice.category) + "20" },
+                  { backgroundColor: getCategoryColor(notice.type) + "20" },
                 ]}
               >
                 <ThemedText
                   style={[
                     styles.categoryText,
-                    { color: getCategoryColor(notice.category) },
+                    { color: getCategoryColor(notice.type) },
                   ]}
                 >
-                  {notice.category}
+                  {(notice.type || 'General').toUpperCase()}
                 </ThemedText>
               </View>
               <ThemedText style={[styles.dateText, { color: colors.textSecondary }]}>{notice.date}</ThemedText>
             </View>
             <ThemedText style={[styles.titleText, { color: colors.text, fontSize: 18 * fontScale }]}>{notice.title}</ThemedText>
             <ThemedText style={[styles.contentText, { color: colors.textSecondary, fontSize: 14 * fontScale }]} numberOfLines={2}>
-              {notice.content}
+              {notice.message}
             </ThemedText>
             <TouchableOpacity style={styles.readMore}>
               <ThemedText style={styles.readMoreText}>Read More</ThemedText>

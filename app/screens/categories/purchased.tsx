@@ -13,7 +13,7 @@ import { useTheme } from "@/context/ThemeContext";
 export default function PurchasedCoursesScreen() {
   const router = useRouter();
   const { colors, fontScale } = useTheme();
-  const { purchasedCourses } = useCourses();
+  const { purchasedCourses, courseProgress } = useCourses();
 
   if (purchasedCourses.length === 0) {
     return (
@@ -48,12 +48,9 @@ export default function PurchasedCoursesScreen() {
   return (
     <ScreenContainer header={<ScreenHeader title="My Purchased Courses" />}>
       {purchasedCourses.map((course) => {
-        const completedLessons = course.lessons_list.filter(
-          (l) => l.completed,
-        ).length;
-        const totalLessons = course.lessons_list.length;
-        const progress = Math.round((completedLessons / totalLessons) * 100);
-        const isCompleted = completedLessons === totalLessons;
+        const progress = courseProgress[course.id] || 0;
+        const isCompleted = progress === 100;
+        const lessonCount = course.lessons?.length || 0;
 
         return (
           <TouchableOpacity
@@ -66,7 +63,7 @@ export default function PurchasedCoursesScreen() {
               router.push(`/screens/course-details?id=${course.id}`)
             }
           >
-            <Image source={{ uri: course.image }} style={styles.courseImage} />
+            <Image source={{ uri: course.thumbnail }} style={styles.courseImage} />
             <View style={styles.courseContent}>
               <ThemedText
                 style={[
@@ -112,7 +109,7 @@ export default function PurchasedCoursesScreen() {
                 <ThemedText
                   style={[styles.lessonsText, { color: colors.textSecondary }]}
                 >
-                  {course.lessons} lessons
+                  {lessonCount} lessons
                 </ThemedText>
               </View>
 

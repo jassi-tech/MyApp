@@ -25,6 +25,7 @@ import Animated, {
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 import { useUser } from "@/context/UserContext";
+import { authService } from "@/services/authService";
 
 
 
@@ -67,19 +68,24 @@ export default function LoginScreen() {
     }
 
     // Call Context Login
-    const name = (params.name as string) || "John Doe"; // Fallback name if not passed
-    const email = username.includes("@") ? username : "john@example.com";
-    
-    await login({
-      id: "123",
-      name,
-      email,
-      role: "student",
-      authToken: "sample-token",
-    });
+    try {
+      const response = await authService.login(username, password);
+      
+      await login({
+        id: response.user.id,
+        name: response.user.name,
+        email: response.user.email,
+        role: response.user.role as any,
+        authToken: response.access_token,
+      });
 
-    // Proceed to home
-    router.replace("/screens/(tabs)/Home" as any);
+      // Proceed to home
+      router.replace("/screens/(tabs)/Home" as any);
+    } catch (error: any) {
+      console.error('Login failed:', error);
+      triggerErrorFeedback();
+      // Optionally show a message to the user here
+    }
   };
 
   return (

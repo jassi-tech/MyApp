@@ -1,33 +1,28 @@
 import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, View, TouchableOpacity } from "react-native";
-
+import { ActivityIndicator, StyleSheet, View, TouchableOpacity } from "react-native";
 import { ScreenContainer } from "@/components/common/screen-container";
-
 import Card from "@/components/common/cards";
 import { ThemedText } from "@/components/themed-text";
-import { useTheme } from "@/context/ThemeContext";
-
+import { Course } from "@/services/courseService";
 import { useCourses } from "@/context/CourseContext";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function CoursesScreen() {
   const router = useRouter();
   const { colors, fontScale } = useTheme();
-  const { purchasedCourses } = useCourses();
+  const { purchasedCourses, courseProgress, loading, error, refreshCourses } = useCourses();
 
   const activeCourses = purchasedCourses.filter(
-    (c) =>
-      c.lessons_list.some((l) => !l.completed) ||
-      c.lessons_list.every((l) => !l.completed),
+    (c) => (courseProgress[c.id] || 0) < 100
   );
-
+ 
   const completedCourses = purchasedCourses.filter(
-    (c) =>
-      c.lessons_list.length > 0 && c.lessons_list.every((l) => l.completed),
+    (c) => (courseProgress[c.id] || 0) === 100
   );
 
   return (
-    <ScreenContainer>
+    <ScreenContainer scrollable>
       <View style={styles.section}>
         <ThemedText
           type="subtitle"
@@ -38,14 +33,24 @@ export default function CoursesScreen() {
         >
           Active Courses
         </ThemedText>
-        {activeCourses.length > 0 ? (
+        
+        {loading ? (
+          <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 20 }} />
+        ) : error ? (
+          <View style={{ alignItems: 'center', marginTop: 20 }}>
+            <ThemedText style={{ color: colors.text }}>{error}</ThemedText>
+            <TouchableOpacity onPress={refreshCourses} style={{ marginTop: 10 }}>
+              <ThemedText style={{ color: colors.primary }}>Retry</ThemedText>
+            </TouchableOpacity>
+          </View>
+        ) : activeCourses.length > 0 ? (
           activeCourses.map((course) => (
             <Card
               key={course.id}
               variant="horizontal"
               title={course.title}
               subtitle={`Instructor: ${course.instructor}`}
-              image={course.image}
+              image={course.thumbnail}
               onPress={() =>
                 router.push(`/screens/course-details?id=${course.id}`)
               }
@@ -62,7 +67,7 @@ export default function CoursesScreen() {
                     style={[
                       styles.progressBar,
                       {
-                        width: `${Math.round((course.lessons_list.filter((l) => l.completed).length / course.lessons_list.length) * 100)}%`,
+                        width: `${courseProgress[course.id] || 0}%`,
                         backgroundColor: colors.primary,
                       },
                     ]}
@@ -71,12 +76,7 @@ export default function CoursesScreen() {
                 <ThemedText
                   style={[styles.progressText, { color: colors.textSecondary }]}
                 >
-                  {Math.round(
-                    (course.lessons_list.filter((l) => l.completed).length /
-                      course.lessons_list.length) *
-                      100,
-                  )}
-                  %
+                  {courseProgress[course.id] || 0}%
                 </ThemedText>
               </View>
               <ThemedText
@@ -122,7 +122,7 @@ export default function CoursesScreen() {
               variant="horizontal"
               title={course.title}
               subtitle={`Instructor: ${course.instructor}`}
-              image={course.image}
+              image={course.thumbnail}
               onPress={() =>
                 router.push(`/screens/course-details?id=${course.id}`)
               }

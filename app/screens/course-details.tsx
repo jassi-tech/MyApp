@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ScreenOrientation from "expo-screen-orientation";
 import React, { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   ScrollView,
   StyleSheet,
@@ -26,20 +27,27 @@ export default function CourseDetailsScreen() {
   const courseId = params.id as string;
   const { colors, fontScale } = useTheme();
 
-  const { isCoursePurchased, allCourses } = useCourses();
-  const course = allCourses.find((c) => c.id === courseId);
-  const [selectedLesson, setSelectedLesson] = useState(
-    course?.lessons_list?.[0],
-  );
+  const { isCoursePurchased, allCourses, getCourseDetails, toggleLessonProgress } = useCourses();
+  const [course, setCourse] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedLesson, setSelectedLesson] = useState<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<Video>(null);
 
   useEffect(() => {
-    // Update selected lesson when course changes
-    if (course?.lessons_list?.[0]) {
-      setSelectedLesson(course.lessons_list[0]);
-    }
-  }, [course]);
+    const fetchDetails = async () => {
+      setLoading(true);
+      const details = await getCourseDetails(courseId);
+      if (details) {
+        setCourse(details);
+        if (details.lessons && details.lessons.length > 0) {
+          setSelectedLesson(details.lessons[0]);
+        }
+      }
+      setLoading(false);
+    };
+    fetchDetails();
+  }, [courseId]);
 
   /* Logic for handling lesson changes/playback */
   const purchased = course ? isCoursePurchased(course.id) : false;
@@ -82,6 +90,25 @@ export default function CourseDetailsScreen() {
     }
   };
 
+  const handleToggleComplete = async (lesson: any) => {
+    if (isLocked) return;
+    
+    const newStatus = !lesson.completed;
+    await toggleLessonProgress(courseId, lesson.id, newStatus);
+    
+    // Update local state to reflect change immediately
+    setCourse((prev: any) => ({
+      ...prev,
+      lessons: prev.lessons.map((l: any) => 
+        l.id === lesson.id ? { ...l, completed: newStatus } : l
+      )
+    }));
+    
+    if (selectedLesson?.id === lesson.id) {
+      setSelectedLesson((prev: any) => ({ ...prev, completed: newStatus }));
+    }
+  };
+
   const onFullscreenUpdate = async ({ fullscreenUpdate }: VideoFullscreenUpdateEvent) => {
     try {
       if (fullscreenUpdate === VideoFullscreenUpdate.PLAYER_DID_PRESENT) {
@@ -93,6 +120,17 @@ export default function CourseDetailsScreen() {
       // Handle error silently
     }
   };
+
+  if (loading) {
+    return (
+      <ScreenContainer header={<ScreenHeader title="Details" />}>
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <ThemedText style={{ marginTop: 10, color: colors.textSecondary }}>Loading details...</ThemedText>
+        </View>
+      </ScreenContainer>
+    );
+  }
 
   if (!course) {
     return (
@@ -253,9 +291,7 @@ export default function CourseDetailsScreen() {
                     { color: colors.text, fontSize: 14 * fontScale },
                   ]}
                 >
-                  {typeof course.students === "string"
-                    ? course.students
-                    : course.students.toLocaleString()}
+                  {course.studentsCount?.toLocaleString() || '0'}
                 </ThemedText>
                 <ThemedText
                   style={[
@@ -326,18 +362,18 @@ export default function CourseDetailsScreen() {
               >
                 Lessons
               </ThemedText>
-              <ThemedText
-                style={[
-                  styles.lessonsCount,
-                  { color: colors.textSecondary, fontSize: 13 * fontScale },
-                ]}
-              >
-                {course.lessons} videos
-              </ThemedText>
-            </View>
+                <ThemedText
+                  style={[
+                    styles.lessonsCount,
+                    { color: colors.textSecondary, fontSize: 13 * fontScale },
+                  ]}
+                >
+                  {course.lessons?.length || 0} videos
+                </ThemedText>
+              </View>
 
-            <View style={styles.lessonsList}>
-              {course.lessons_list.map((lesson: any, index: number) => {
+              <View style={styles.lessonsList}>
+                {(course.lessons || []).map((lesson: any, index: number) => {
                 const isActive = selectedLesson?.id === lesson.id;
                 return (
                   <TouchableOpacity
@@ -354,7 +390,8 @@ export default function CourseDetailsScreen() {
                     onPress={() => handleLessonChange(lesson)}
                   >
                     <View style={styles.lessonLeft}>
-                      <View
+                      <TouchableOpacity 
+                        onPress={() => handleToggleComplete(lesson)}
                         style={[
                           styles.indexCircle,
                           { backgroundColor: colors.border },
@@ -386,7 +423,7 @@ export default function CourseDetailsScreen() {
                             {index + 1}
                           </ThemedText>
                         )}
-                      </View>
+                      </TouchableOpacity>
                       <View style={styles.lessonInfo}>
                         <View
                           style={{
@@ -402,6 +439,7 @@ export default function CourseDetailsScreen() {
                               isActive && {
                                 color: colors.primary,
                                 fontWeight: "700",
+                                fontSize: 15 * fontScale,
                               },
                             ]}
                             numberOfLines={1}
@@ -482,7 +520,7 @@ export default function CourseDetailsScreen() {
             }
           >
             <ThemedText style={styles.buyButtonText}>
-              Enroll Now • {course.price || "$49.99"}
+              Enroll Now • ${course.price || "49.99"}
             </ThemedText>
           </TouchableOpacity>
         </View>

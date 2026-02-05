@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Define User Type
 export interface User {
@@ -91,31 +92,44 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const router = useRouter();
 
   useEffect(() => {
-    // Simulate checking local storage for potential session
     const checkSession = async () => {
-        // In a real app, check AsyncStorage or SecureStore here
-        // For now, we start unauthenticated
-        setIsLoading(false);
+        try {
+          const storedUser = await AsyncStorage.getItem('user_session');
+          if (storedUser) {
+            setUser(JSON.parse(storedUser));
+          }
+        } catch (err) {
+          console.error('Failed to rehydrate session:', err);
+        } finally {
+          setIsLoading(false);
+        }
     };
     checkSession();
   }, []);
 
   const login = async (userData: User) => {
     setIsLoading(true);
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    // Default courses for testing
-    const userWithCourses = { ...userData, courses: userData.courses || ['1', '3'] };
-    setUser(userWithCourses);
-    setIsLoading(false);
+    try {
+      await AsyncStorage.setItem('user_session', JSON.stringify(userData));
+      setUser(userData);
+    } catch (err) {
+      console.error('Failed to save session:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const logout = async () => {
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setUser(null);
-    setIsLoading(false);
-    router.replace('/screens/onboarding/GetStarted'); 
+    try {
+      await AsyncStorage.removeItem('user_session');
+      setUser(null);
+    } catch (err) {
+      console.error('Failed to clear session:', err);
+    } finally {
+      setIsLoading(false);
+      router.replace('/screens/onboarding/GetStarted'); 
+    }
   };
 
   const updateProfile = async (data: Partial<User>) => {

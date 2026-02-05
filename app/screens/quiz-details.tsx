@@ -13,7 +13,7 @@ import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 
-import { useStudent } from "@/context/StudentContext";
+import { useStudent, QuizQuestion } from "@/context/StudentContext";
 
 const { width } = Dimensions.get("window");
 
@@ -21,8 +21,20 @@ export default function QuizDetailsScreen() {
   const router = useRouter();
   const { id, title } = useLocalSearchParams();
   const { getQuizQuestions } = useStudent();
-  const questions = getQuizQuestions(id as string);
+  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [loadingQuestions, setLoadingQuestions] = useState(true);
   const { colors, fontScale } = useTheme();
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      if (id) {
+        const data = await getQuizQuestions(id as string);
+        setQuestions(data);
+        setLoadingQuestions(false);
+      }
+    };
+    fetchQuestions();
+  }, [id]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -61,6 +73,25 @@ export default function QuizDetailsScreen() {
     setShowResult(false);
     setTimeLeft(60);
   };
+
+  if (loadingQuestions) {
+    return (
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
+        <ThemedText>Loading Quiz Questions...</ThemedText>
+      </SafeAreaView>
+    );
+  }
+
+  if (questions.length === 0) {
+    return (
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
+        <ThemedText style={{ marginBottom: 20 }}>No questions found for this quiz.</ThemedText>
+        <TouchableOpacity style={styles.homeButton} onPress={() => router.back()}>
+          <ThemedText style={styles.homeButtonText}>Go Back</ThemedText>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
 
   if (showResult) {
     return (

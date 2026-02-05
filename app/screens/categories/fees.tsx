@@ -12,47 +12,21 @@ import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 
-const FEE_HISTORY = [
-  {
-    id: "1",
-    month: "January 2026",
-    amount: "₹5,000",
-    status: "paid",
-    date: "5 Jan 2026",
-  },
-  {
-    id: "2",
-    month: "February 2026",
-    amount: "₹5,000",
-    status: "pending",
-    dueDate: "10 Feb 2026",
-  },
-  {
-    id: "3",
-    month: "December 2025",
-    amount: "₹5,000",
-    status: "paid",
-    date: "3 Dec 2025",
-  },
-  {
-    id: "4",
-    month: "November 2025",
-    amount: "₹5,000",
-    status: "paid",
-    date: "5 Nov 2025",
-  },
-];
-
-const FEE_BREAKDOWN = [
-  { label: "Tuition Fee", amount: "₹3,500" },
-  { label: "Library Fee", amount: "₹500" },
-  { label: "Lab Fee", amount: "₹700" },
-  { label: "Sports Fee", amount: "₹300" },
-];
+import { useStudent } from "../../context/StudentContext";
 
 export default function FeesScreen() {
   const router = useRouter();
   const { colors, fontScale } = useTheme();
+  const { fees, submitFeePayment } = useStudent();
+
+  const pendingAmount = fees.filter(f => f.status !== 'paid')
+    .reduce((acc, f) => {
+        const amt = parseInt(f.amount.replace(/[^0-9]/g, '')) || 0;
+        return acc + amt;
+    }, 0);
+
+  const currentFee = fees.find(f => f.status !== 'paid') || fees[0];
+  const feeBreakdown = currentFee?.breakdown || [];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -71,15 +45,19 @@ export default function FeesScreen() {
     <ScreenContainer header={<ScreenHeader title="Fee Details" />}>
       <View style={styles.summaryCard}>
           <ThemedText style={styles.summaryLabel}>Total Pending</ThemedText>
-          <ThemedText style={[styles.summaryAmount, { fontSize: 36 * fontScale }]}>₹5,000</ThemedText>
-          <TouchableOpacity style={styles.payButton}>
-            <ThemedText style={styles.payButtonText}>Pay Now</ThemedText>
+          <ThemedText style={[styles.summaryAmount, { fontSize: 36 * fontScale }]}>₹{pendingAmount.toLocaleString()}</ThemedText>
+          <TouchableOpacity 
+            style={styles.payButton}
+            onPress={() => currentFee && submitFeePayment(currentFee.id)}
+            disabled={pendingAmount === 0}
+          >
+            <ThemedText style={styles.payButtonText}>{pendingAmount > 0 ? 'Pay Now' : 'All Paid'}</ThemedText>
           </TouchableOpacity>
         </View>
 
         <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>Fee Breakdown</ThemedText>
         <View style={[styles.breakdownCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          {FEE_BREAKDOWN.map((item, index) => (
+          {feeBreakdown.map((item, index) => (
             <View key={index} style={[styles.breakdownRow, { borderBottomColor: colors.border }]}>
               <ThemedText style={[styles.breakdownLabel, { color: colors.textSecondary }]}>
                 {item.label}
@@ -91,12 +69,12 @@ export default function FeesScreen() {
           ))}
           <View style={[styles.breakdownRow, styles.totalRow]}>
             <ThemedText style={[styles.totalLabel, { color: colors.text }]}>Total</ThemedText>
-            <ThemedText style={styles.totalAmount}>₹5,000</ThemedText>
+            <ThemedText style={styles.totalAmount}>{currentFee?.amount || '₹0'}</ThemedText>
           </View>
         </View>
 
         <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>Payment History</ThemedText>
-        {FEE_HISTORY.map((fee) => (
+        {fees.map((fee) => (
           <View key={fee.id} style={[styles.historyCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <View style={styles.historyHeader}>
               <ThemedText style={[styles.monthText, { color: colors.text }]}>{fee.month}</ThemedText>

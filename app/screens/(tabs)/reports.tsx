@@ -10,6 +10,7 @@ import {
 } from "react-native";
 
 import { ScreenContainer } from "@/components/common/screen-container";
+import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 
@@ -30,7 +31,7 @@ export default function ReportsScreen() {
   };
 
   return (
-    <ScreenContainer>
+    <ScreenContainer header={<ScreenHeader title="Report Cards" />}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}

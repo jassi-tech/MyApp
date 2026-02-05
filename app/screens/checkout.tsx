@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   TextInput,
@@ -38,8 +39,12 @@ export default function CheckoutScreen() {
   const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; amount: number } | null>(null);
   const [codeError, setCodeError] = useState<string | null>(null);
 
-  const parsePrice = (priceString: string) => {
-    return parseFloat(priceString.replace(/[^0-9.]/g, ''));
+  const { loading: contextLoading } = useCourses();
+
+  const parsePrice = (price: string | number | undefined) => {
+    if (price === undefined || price === null) return 0;
+    if (typeof price === 'number') return price;
+    return parseFloat(price.replace(/[^0-9.]/g, '')) || 0;
   };
 
   const originalPrice = course ? parsePrice(course.price) : 0;
@@ -63,11 +68,25 @@ export default function CheckoutScreen() {
     }
   };
 
+  if (contextLoading && !course) {
+    return (
+      <ScreenContainer header={<ScreenHeader title="Checkout" />}>
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <ThemedText style={{ marginTop: 10, color: colors.textSecondary }}>Loading course...</ThemedText>
+        </View>
+      </ScreenContainer>
+    );
+  }
+
   if (!course) {
     return (
       <ScreenContainer header={<ScreenHeader title="Checkout" />}>
         <View style={styles.centerContainer}>
           <ThemedText style={{ color: colors.text }}>Course not found</ThemedText>
+          <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 10 }}>
+            <ThemedText style={{ color: colors.primary }}>Go Back</ThemedText>
+          </TouchableOpacity>
         </View>
       </ScreenContainer>
     );
@@ -101,7 +120,7 @@ export default function CheckoutScreen() {
                <ThemedText style={[styles.courseTitle, { color: colors.text }]} numberOfLines={2}>{course.title}</ThemedText>
                <ThemedText style={[styles.courseInstructor, { color: colors.textSecondary }]}>{course.instructor}</ThemedText>
              </View>
-             <ThemedText style={[styles.coursePrice, { color: colors.primary }]}>{course.price}</ThemedText>
+              <ThemedText style={[styles.coursePrice, { color: colors.primary }]}>${course.price}</ThemedText>
           </View>
         </View>
 

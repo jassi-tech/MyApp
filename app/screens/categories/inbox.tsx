@@ -13,56 +13,25 @@ import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 
-const MESSAGES = [
-  {
-    id: "1",
-    sender: "Principal Office",
-    subject: "Annual Day Celebration",
-    date: "2 Feb",
-    isRead: false,
-    priority: "high",
-  },
-  {
-    id: "2",
-    sender: "Class Teacher",
-    subject: "Parent-Teacher Meeting",
-    date: "1 Feb",
-    isRead: false,
-    priority: "normal",
-  },
-  {
-    id: "3",
-    sender: "Accounts Department",
-    subject: "Fee Payment Reminder",
-    date: "31 Jan",
-    isRead: true,
-    priority: "normal",
-  },
-  {
-    id: "4",
-    sender: "Sports Department",
-    subject: "Inter-School Tournament",
-    date: "30 Jan",
-    isRead: true,
-    priority: "normal",
-  },
-  {
-    id: "5",
-    sender: "Library",
-    subject: "Book Return Notice",
-    date: "29 Jan",
-    isRead: true,
-    priority: "low",
-  },
-];
+import { useStudent } from "../../context/StudentContext";
 
 export default function InboxScreen() {
   const router = useRouter();
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const { colors, fontScale } = useTheme();
+  const { messages } = useStudent();
 
   const filteredMessages =
-    filter === "unread" ? MESSAGES.filter((m) => !m.isRead) : MESSAGES;
+    filter === "unread" ? messages.filter((m) => !m.isRead) : messages;
+
+  const formatDate = (dateStr: string) => {
+    try {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+    } catch (e) {
+        return dateStr;
+    }
+  };
 
   return (
     <ScreenContainer 
@@ -91,7 +60,7 @@ export default function InboxScreen() {
               { color: filter === "all" ? '#fff' : colors.textSecondary }
             ]}
           >
-            All ({MESSAGES.length})
+            All ({messages.length})
           </ThemedText>
         </TouchableOpacity>
         <TouchableOpacity
@@ -107,7 +76,7 @@ export default function InboxScreen() {
               { color: filter === "unread" ? '#fff' : colors.textSecondary }
             ]}
           >
-            Unread ({MESSAGES.filter((m) => !m.isRead).length})
+            Unread ({messages.filter((m) => !m.isRead).length})
           </ThemedText>
         </TouchableOpacity>
       </View>
@@ -146,7 +115,7 @@ export default function InboxScreen() {
                   />
                 )}
               </View>
-              <ThemedText style={[styles.dateText, { color: colors.textSecondary }]}>{message.date}</ThemedText>
+              <ThemedText style={[styles.dateText, { color: colors.textSecondary }]}>{formatDate(message.date)}</ThemedText>
             </View>
             <ThemedText
               style={[

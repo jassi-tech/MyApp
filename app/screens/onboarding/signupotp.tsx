@@ -35,7 +35,11 @@ export default function SignupOtpScreen() {
   const [otp, setOtp] = useState("");
   const [isError, setIsError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
   const shakeAnimation = useSharedValue(0);
+
+  const { password } = params;
+  const { authService } = require("@/services/authService");
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -202,18 +206,34 @@ export default function SignupOtpScreen() {
 
           {/* Verify Button */}
           <TouchableOpacity
-            style={styles.loginButtonContainer}
+            style={[styles.loginButtonContainer, isRegistering && { opacity: 0.7 }]}
             activeOpacity={0.9}
-            onPress={() => {
+            onPress={async () => {
               if (otp === "1234") {
-                setShowSuccess(true);
-                Haptics.notificationAsync(
-                  Haptics.NotificationFeedbackType.Success,
-                );
+                setIsRegistering(true);
+                try {
+                  await authService.register({
+                    email,
+                    name,
+                    password,
+                    role: 'student'
+                  });
+                  
+                  setShowSuccess(true);
+                  Haptics.notificationAsync(
+                    Haptics.NotificationFeedbackType.Success,
+                  );
+                } catch (err: any) {
+                  console.error('Registration failed:', err);
+                  triggerErrorFeedback();
+                } finally {
+                  setIsRegistering(false);
+                }
               } else {
                 triggerErrorFeedback();
               }
             }}
+            disabled={isRegistering}
           >
             <LinearGradient
               colors={[colors.primary, colors.primary + "DD"]}
@@ -221,7 +241,9 @@ export default function SignupOtpScreen() {
               end={{ x: 1, y: 0 }}
               style={styles.loginButton}
             >
-              <ThemedText style={styles.loginButtonText}>Verify</ThemedText>
+              <ThemedText style={styles.loginButtonText}>
+                {isRegistering ? "Verifying..." : "Verify"}
+              </ThemedText>
             </LinearGradient>
           </TouchableOpacity>
 

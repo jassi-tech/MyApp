@@ -74,7 +74,7 @@ export default function SignupScreen() {
     // Proceed to OTP if valid
     router.replace({
       pathname: "/screens/onboarding/signupotp",
-      params: { email, name: fullName }
+      params: { email, name: fullName, password }
     } as any);
   };
 
