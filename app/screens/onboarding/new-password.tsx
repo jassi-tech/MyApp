@@ -1,16 +1,24 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    View
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming
+} from "react-native-reanimated";
 
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
@@ -18,11 +26,42 @@ import { useTheme } from "@/context/ThemeContext";
 export default function NewPasswordScreen() {
   const router = useRouter();
   const { colors, fontScale } = useTheme();
-  
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState({ password: false, confirmPassword: false });
+  const shakeAnimation = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: shakeAnimation.value }],
+  }));
+
+  const triggerErrorFeedback = () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    shakeAnimation.value = withSequence(
+      withTiming(-10, { duration: 50 }),
+      withRepeat(withTiming(10, { duration: 100 }), 4, true),
+      withTiming(0, { duration: 50 })
+    );
+  };
+
+  const handleResetPassword = () => {
+    const newErrors = {
+      password: !password.trim(),
+      confirmPassword: !confirmPassword.trim() || password !== confirmPassword,
+    };
+
+    if (newErrors.password || newErrors.confirmPassword) {
+      setErrors(newErrors);
+      triggerErrorFeedback();
+      return;
+    }
+
+    // Proceed to login if valid
+    router.replace("/screens/onboarding/login" as any);
+  };
 
   return (
     <KeyboardAvoidingView
@@ -36,11 +75,11 @@ export default function NewPasswordScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
         >
-           <Ionicons name="arrow-back" size={24} color={colors.text} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
 
         <View style={styles.headerSection}>
@@ -50,25 +89,53 @@ export default function NewPasswordScreen() {
           >
             <Ionicons name="lock-closed-outline" size={40} color="#FFF" />
           </LinearGradient>
-          <ThemedText style={[styles.appTitle, { color: colors.text, fontSize: 32 * fontScale }]}>
+          <ThemedText
+            style={[
+              styles.appTitle,
+              { color: colors.text, fontSize: 32 * fontScale },
+            ]}
+          >
             New Password
           </ThemedText>
-          <ThemedText style={[styles.subtitle, { color: colors.textSecondary, fontSize: 16 * fontScale }]}>
+          <ThemedText
+            style={[
+              styles.subtitle,
+              { color: colors.textSecondary, fontSize: 16 * fontScale },
+            ]}
+          >
             Create a new, strong password for your account.
           </ThemedText>
         </View>
 
-        <View style={styles.formSection}>
-          
-          <View style={[styles.inputContainer, { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}>
-            <Ionicons name="lock-closed-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
+        <Animated.View style={[styles.formSection, animatedStyle]}>
+          <View
+            style={[
+              styles.inputContainer,
+              {
+                backgroundColor: colors.backgroundSecondary,
+                borderColor: errors.password ? colors.error : colors.border,
+              },
+            ]}
+          >
+            <Ionicons
+              name="lock-closed-outline"
+              size={20}
+              color={colors.textSecondary}
+              style={styles.inputIcon}
+            />
             <TextInput
-              style={[styles.input, { color: colors.text, fontSize: 16 * fontScale }]}
+              style={[
+                styles.input,
+                { color: colors.text, fontSize: 16 * fontScale },
+              ]}
               placeholder="New Password"
               placeholderTextColor={colors.textSecondary}
               secureTextEntry={!showPassword}
               value={password}
-              onChangeText={setPassword}
+              onChangeText={(text) => {
+                setPassword(text);
+                if (errors.password) setErrors((prev) => ({ ...prev, password: false }));
+              }}
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
               <Ionicons
@@ -80,17 +147,38 @@ export default function NewPasswordScreen() {
             </TouchableOpacity>
           </View>
 
-           <View style={[styles.inputContainer, { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}>
-            <Ionicons name="lock-closed-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
+          <View
+            style={[
+              styles.inputContainer,
+              {
+                backgroundColor: colors.backgroundSecondary,
+                borderColor: errors.confirmPassword ? colors.error : colors.border,
+              },
+            ]}
+          >
+            <Ionicons
+              name="lock-closed-outline"
+              size={20}
+              color={colors.textSecondary}
+              style={styles.inputIcon}
+            />
             <TextInput
-              style={[styles.input, { color: colors.text, fontSize: 16 * fontScale }]}
+              style={[
+                styles.input,
+                { color: colors.text, fontSize: 16 * fontScale },
+              ]}
               placeholder="Confirm Password"
               placeholderTextColor={colors.textSecondary}
               secureTextEntry={!showConfirmPassword}
               value={confirmPassword}
-              onChangeText={setConfirmPassword}
+              onChangeText={(text) => {
+                setConfirmPassword(text);
+                if (errors.confirmPassword) setErrors((prev) => ({ ...prev, confirmPassword: false }));
+              }}
             />
-            <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+            <TouchableOpacity
+              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
               <Ionicons
                 name={showConfirmPassword ? "eye-off-outline" : "eye-outline"}
                 size={20}
@@ -100,10 +188,10 @@ export default function NewPasswordScreen() {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.loginButtonContainer}
             activeOpacity={0.9}
-            onPress={() => router.replace("/screens/onboarding/login" as any)}
+            onPress={handleResetPassword}
           >
             <LinearGradient
               colors={[colors.primary, colors.primary + "DD"]}
@@ -111,12 +199,12 @@ export default function NewPasswordScreen() {
               end={{ x: 1, y: 0 }}
               style={styles.loginButton}
             >
-              <ThemedText style={styles.loginButtonText}>Reset Password</ThemedText>
+              <ThemedText style={styles.loginButtonText}>
+                Reset Password
+              </ThemedText>
             </LinearGradient>
           </TouchableOpacity>
-
-        </View>
-
+        </Animated.View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -129,7 +217,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   backButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 60,
     left: 20,
     zIndex: 10,

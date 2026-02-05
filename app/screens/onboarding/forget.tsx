@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -12,6 +13,13 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withSequence,
+    withTiming
+} from "react-native-reanimated";
 
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
@@ -23,6 +31,32 @@ export default function ForgetPasswordScreen() {
   const { colors, fontScale } = useTheme();
 
   const [email, setEmail] = useState("");
+  const [isError, setIsError] = useState(false);
+  const shakeAnimation = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: shakeAnimation.value }],
+  }));
+
+  const triggerErrorFeedback = () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    shakeAnimation.value = withSequence(
+      withTiming(-10, { duration: 50 }),
+      withRepeat(withTiming(10, { duration: 100 }), 4, true),
+      withTiming(0, { duration: 50 })
+    );
+  };
+
+  const handleForgetPassword = () => {
+    if (!email.trim() || !email.includes("@")) {
+      setIsError(true);
+      triggerErrorFeedback();
+      return;
+    }
+
+    // Proceed to OTP if valid
+    router.replace("/screens/onboarding/forgetotp" as any);
+  };
 
   return (
     <KeyboardAvoidingView
@@ -70,14 +104,14 @@ export default function ForgetPasswordScreen() {
         </View>
 
         {/* Form Section */}
-        <View style={styles.formSection}>
+        <Animated.View style={[styles.formSection, animatedStyle]}>
           {/* Email Input */}
           <View
             style={[
               styles.inputContainer,
               {
                 backgroundColor: colors.backgroundSecondary,
-                borderColor: colors.border,
+                borderColor: isError ? colors.error : colors.border,
               },
             ]}
           >
@@ -95,7 +129,10 @@ export default function ForgetPasswordScreen() {
               placeholder="Email Address"
               placeholderTextColor={colors.textSecondary}
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(text) => {
+                setEmail(text);
+                if (isError) setIsError(false);
+              }}
               keyboardType="email-address"
               autoCapitalize="none"
             />
@@ -105,7 +142,9 @@ export default function ForgetPasswordScreen() {
           <TouchableOpacity
             style={styles.loginButtonContainer}
             activeOpacity={0.9}
-            onPress={() => router.replace("/screens/onboarding/forgetotp" as any)} // Placeholder action
+            onPress={() =>
+              router.replace("/screens/onboarding/forgetotp" as any)
+            } // Placeholder action
           >
             <LinearGradient
               colors={[colors.primary, colors.primary + "DD"]}
@@ -118,7 +157,7 @@ export default function ForgetPasswordScreen() {
               </ThemedText>
             </LinearGradient>
           </TouchableOpacity>
-        </View>
+        </Animated.View>
       </ScrollView>
     </KeyboardAvoidingView>
   );

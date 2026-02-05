@@ -1,18 +1,26 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Dimensions,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
@@ -26,7 +34,37 @@ export default function LoginScreen() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  const [errors, setErrors] = useState({ username: false, password: false });
+  const shakeAnimation = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: shakeAnimation.value }],
+  }));
+
+  const triggerErrorFeedback = () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    shakeAnimation.value = withSequence(
+      withTiming(-10, { duration: 50 }),
+      withRepeat(withTiming(10, { duration: 100 }), 4, true),
+      withTiming(0, { duration: 50 }),
+    );
+  };
+
+  const handleLogin = () => {
+    const newErrors = {
+      username: !username.trim(),
+      password: !password.trim(),
+    };
+
+    if (newErrors.username || newErrors.password) {
+      setErrors(newErrors);
+      triggerErrorFeedback();
+      return;
+    }
+
+    // Proceed to home if valid
+    router.replace("/screens/(tabs)/Home" as any);
+  };
 
   return (
     <KeyboardAvoidingView
@@ -63,14 +101,14 @@ export default function LoginScreen() {
         </View>
 
         {/* Form Section */}
-        <View style={styles.formSection}>
+        <Animated.View style={[styles.formSection, animatedStyle]}>
           {/* Username Input */}
           <View
             style={[
               styles.inputContainer,
               {
                 backgroundColor: colors.backgroundSecondary,
-                borderColor: colors.border,
+                borderColor: errors.username ? colors.error : colors.border,
               },
             ]}
           >
@@ -88,7 +126,11 @@ export default function LoginScreen() {
               placeholder="Username"
               placeholderTextColor={colors.textSecondary}
               value={username}
-              onChangeText={setUsername}
+              onChangeText={(text) => {
+                setUsername(text);
+                if (errors.username)
+                  setErrors((prev) => ({ ...prev, username: false }));
+              }}
             />
           </View>
 
@@ -98,7 +140,7 @@ export default function LoginScreen() {
               styles.inputContainer,
               {
                 backgroundColor: colors.backgroundSecondary,
-                borderColor: colors.border,
+                borderColor: errors.password ? colors.error : colors.border,
               },
             ]}
           >
@@ -117,7 +159,11 @@ export default function LoginScreen() {
               placeholderTextColor={colors.textSecondary}
               secureTextEntry={!showPassword}
               value={password}
-              onChangeText={setPassword}
+              onChangeText={(text) => {
+                setPassword(text);
+                if (errors.password)
+                  setErrors((prev) => ({ ...prev, password: false }));
+              }}
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
               <Ionicons
@@ -129,37 +175,8 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Options: Remember Me & Forgot Password */}
-          <View style={styles.optionsRow}>
-            <TouchableOpacity
-              style={styles.rememberRow}
-              onPress={() => setRememberMe(!rememberMe)}
-              activeOpacity={0.8}
-            >
-              <View
-                style={[
-                  styles.checkbox,
-                  { borderColor: colors.border },
-                  rememberMe && {
-                    backgroundColor: colors.primary,
-                    borderColor: colors.primary,
-                  },
-                ]}
-              >
-                {rememberMe && (
-                  <Ionicons name="checkmark" size={12} color="#FFF" />
-                )}
-              </View>
-              <ThemedText
-                style={{
-                  color: colors.textSecondary,
-                  fontSize: 14 * fontScale,
-                }}
-              >
-                Remember me
-              </ThemedText>
-            </TouchableOpacity>
-
+          {/* Options: Forgot Password */}
+          <View style={[styles.optionsRow, { justifyContent: "flex-end" }]}>
             <TouchableOpacity
               onPress={() => {
                 router.push("/screens/onboarding/forget" as any);
@@ -180,7 +197,7 @@ export default function LoginScreen() {
           <TouchableOpacity
             style={styles.loginButtonContainer}
             activeOpacity={0.9}
-            onPress={() => router.replace("/screens/(tabs)/Home" as any)} // Corrected route
+            onPress={handleLogin}
           >
             <LinearGradient
               colors={[colors.primary, colors.primary + "DD"]} // Use primary color gradient
@@ -207,7 +224,7 @@ export default function LoginScreen() {
               </ThemedText>
             </TouchableOpacity>
           </View>
-        </View>
+        </Animated.View>
 
         {/* Social Login Section */}
         <View style={styles.socialSection}>
@@ -215,7 +232,7 @@ export default function LoginScreen() {
             Or continue with
           </ThemedText>
 
-          <View >
+          <View>
             <TouchableOpacity
               style={[
                 styles.socialButton,
@@ -293,10 +310,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 20,
-  },
-  rememberRow: {
-    flexDirection: "row",
-    alignItems: "center",
   },
   checkbox: {
     width: 20,

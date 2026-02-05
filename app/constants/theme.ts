@@ -45,6 +45,7 @@ export interface ThemeColorsType {
   success: string;
   error: string;
   pink: string;
+  shadow: string;
 }
 
 // Semantic Colors
@@ -65,6 +66,7 @@ export const ThemeColors: { light: ThemeColorsType; dark: ThemeColorsType } = {
     success: Palette.green,
     error: Palette.red,
     pink: Palette.pinky,
+    shadow: Palette.neutral950,
   },
   dark: {
     text: Palette.neutral100,
@@ -82,6 +84,7 @@ export const ThemeColors: { light: ThemeColorsType; dark: ThemeColorsType } = {
     success: Palette.green,
     error: Palette.red,
     pink: Palette.pinky,
+    shadow: Palette.neutral950,
   },
 };
 

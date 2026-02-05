@@ -1,16 +1,24 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    View
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
@@ -18,8 +26,26 @@ import { useTheme } from "@/context/ThemeContext";
 export default function ForgetOtpScreen() {
   const router = useRouter();
   const { colors, fontScale } = useTheme();
-  
+
   const [otp, setOtp] = useState("");
+  const [isError, setIsError] = useState(false);
+  const shakeAnimation = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: shakeAnimation.value }],
+    };
+  });
+
+  const triggerErrorFeedback = () => {
+    setIsError(true);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    shakeAnimation.value = withSequence(
+      withTiming(-10, { duration: 50 }),
+      withRepeat(withTiming(10, { duration: 100 }), 4, true),
+      withTiming(0, { duration: 50 }),
+    );
+  };
 
   return (
     <KeyboardAvoidingView
@@ -33,11 +59,11 @@ export default function ForgetOtpScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
         >
-           <Ionicons name="arrow-back" size={24} color={colors.text} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
 
         <View style={styles.headerSection}>
@@ -47,33 +73,91 @@ export default function ForgetOtpScreen() {
           >
             <Ionicons name="key-outline" size={40} color="#FFF" />
           </LinearGradient>
-          <ThemedText style={[styles.appTitle, { color: colors.text, fontSize: 32 * fontScale }]}>
+          <ThemedText
+            style={[
+              styles.appTitle,
+              { color: colors.text, fontSize: 32 * fontScale },
+            ]}
+          >
             Verify Code
           </ThemedText>
-          <ThemedText style={[styles.subtitle, { color: colors.textSecondary, fontSize: 16 * fontScale }]}>
+          <ThemedText
+            style={[
+              styles.subtitle,
+              { color: colors.textSecondary, fontSize: 16 * fontScale },
+            ]}
+          >
             Enter the code sent to your email to reset your password.
           </ThemedText>
         </View>
 
         <View style={styles.formSection}>
-          
-          <View style={[styles.inputContainer, { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}>
+          <View style={styles.inputContainer}>
+            {/* Visual Boxes */}
+            <Animated.View style={[styles.otpBoxesContainer, animatedStyle]}>
+              {Array(4)
+                .fill(0)
+                .map((_, index) => {
+                  const digit = otp[index] || "";
+                  const isFocused = otp.length === index;
+                  const isFilled = digit !== "";
+
+                  return (
+                    <View
+                      key={index}
+                      style={[
+                        styles.otpBox,
+                        {
+                          backgroundColor: colors.backgroundSecondary,
+                          borderColor: isError
+                            ? colors.error
+                            : isFocused
+                              ? colors.primary
+                              : isFilled
+                                ? colors.primary + "50"
+                                : colors.border,
+                          shadowColor: colors.shadow,
+                        },
+                      ]}
+                    >
+                      <ThemedText
+                        style={[styles.otpText, { color: colors.text }]}
+                      >
+                        {digit}
+                      </ThemedText>
+                    </View>
+                  );
+                })}
+            </Animated.View>
+
+            {/* Hidden Input Layer */}
             <TextInput
-              style={[styles.input, { color: colors.text, fontSize: 24 * fontScale }]}
-              placeholder="0 0 0 0"
-              placeholderTextColor={colors.textSecondary + "80"}
+              style={styles.hiddenInput}
               value={otp}
-              onChangeText={setOtp}
+              onChangeText={(text) => {
+                // Only allow numeric input
+                if (/^\d*$/.test(text)) {
+                  setOtp(text);
+                  if (isError) setIsError(false);
+                }
+              }}
               keyboardType="number-pad"
               maxLength={4}
-              textAlign="center"
+              autoFocus
+              caretHidden
             />
           </View>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.loginButtonContainer}
             activeOpacity={0.9}
-            onPress={() => router.replace("/screens/onboarding/new-password" as any)}
+            onPress={() => {
+              if (otp === "1234") {
+                router.replace("/screens/onboarding/new-password" as any);
+              } else {
+                triggerErrorFeedback();
+              }
+            }}
           >
             <LinearGradient
               colors={[colors.primary, colors.primary + "DD"]}
@@ -86,14 +170,20 @@ export default function ForgetOtpScreen() {
           </TouchableOpacity>
 
           <View style={styles.signupRow}>
-            <ThemedText style={{ color: colors.textSecondary }}>Didn't receive code? </ThemedText>
-            <TouchableOpacity onPress={() => {/* Handle Resend */}}>
-              <ThemedText style={{ color: colors.primary, fontWeight: "600" }}>Resend</ThemedText>
+            <ThemedText style={{ color: colors.textSecondary }}>
+              Didn't receive code?{" "}
+            </ThemedText>
+            <TouchableOpacity
+              onPress={() => {
+                /* Handle Resend */
+              }}
+            >
+              <ThemedText style={{ color: colors.primary, fontWeight: "600" }}>
+                Resend
+              </ThemedText>
             </TouchableOpacity>
           </View>
-
         </View>
-
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -106,7 +196,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   backButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 60,
     left: 20,
     zIndex: 10,
@@ -142,20 +232,42 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
     height: 60,
-    borderRadius: 16,
-    borderWidth: 1,
     marginBottom: 24,
-    paddingHorizontal: 16,
-    justifyContent: 'center'
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
   },
-  input: {
-    flex: 1,
+  // Hidden input handles the actual typing
+  hiddenInput: {
+    position: "absolute",
+    width: "100%",
     height: "100%",
-    fontWeight: 'bold',
-    letterSpacing: 10
+    opacity: 0,
+  },
+  // Container for the 4 visual boxes
+  otpBoxesContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    paddingHorizontal: 20,
+  },
+  // Individual box styling
+  otpBox: {
+    width: 65,
+    height: 65,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  otpText: {
+    fontSize: 28,
+    fontWeight: "bold",
   },
   loginButtonContainer: {
     width: "100%",
