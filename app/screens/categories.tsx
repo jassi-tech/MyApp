@@ -2,9 +2,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-  StyleSheet,
-  TouchableOpacity,
-  View,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { ScreenContainer } from "@/components/common/screen-container";
@@ -23,6 +23,7 @@ const CATEGORIES = [
   { id: "7", label: "Purchased", icon: "school-outline" },
   { id: "8", label: "Leave Request", icon: "document-outline" },
   { id: "9", label: "Examination", icon: "school-outline" },
+  { id: "10", label: "Free Notes", icon: "document-text-outline" },
 ];
 
 export default function CategoriesScreen() {
@@ -51,6 +52,7 @@ export default function CategoriesScreen() {
                   "Purchased": "/screens/categories/purchased",
                   "Leave Request": "/screens/categories/leave-request",
                   "Examination": "/screens/categories/examination",
+                  "Free Notes": "/screens/categories/notes",
                 };
                 const route = routes[cat.label];
                 if (route) router.push(route as any);

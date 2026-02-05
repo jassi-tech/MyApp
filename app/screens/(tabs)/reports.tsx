@@ -1,6 +1,6 @@
 // ...existing code...
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React from "react";
 import {
     Alert,
     ScrollView,
@@ -13,27 +13,14 @@ import { ScreenContainer } from "@/components/common/screen-container";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 
-interface ReportItem {
-  id: string;
-  name: string;
-  status: "Completed" | "Pending" | "Review";
-}
-
-const SUBMITTED_REPORTS: ReportItem[] = [
-  { id: "1", name: "Medical Board Exam Result", status: "Completed" },
-  { id: "2", name: "Semester 1 Transcript", status: "Review" },
-];
-
-const PENDING_DOCUMENTS: ReportItem[] = [
-  { id: "3", name: "Lab Report - Biology", status: "Pending" },
-  { id: "4", name: "Vaccination Record", status: "Pending" },
-  { id: "5", name: "ID Proof / Adhaar Card", status: "Pending" },
-];
+import { useStudent } from "@/context/StudentContext";
 
 export default function ReportsScreen() {
-  const [submittedData] = useState<ReportItem[]>(SUBMITTED_REPORTS);
-  const [pendingData] = useState<ReportItem[]>(PENDING_DOCUMENTS);
   const { colors, fontScale, isDark } = useTheme();
+  const { reports } = useStudent();
+
+  const submittedData = reports.filter(r => r.status === 'Completed' || r.status === 'Review');
+  const pendingData = reports.filter(r => r.status === 'Pending');
 
   const handleUpload = (docName: string) => {
     Alert.alert("Professional Upload", `Ready to upload: ${docName}`, [
@@ -96,40 +83,44 @@ export default function ReportsScreen() {
         </View>
 
         <View style={[styles.listCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          {pendingData.map((item, index) => (
-            <TouchableOpacity
-              key={item.id}
-              activeOpacity={0.7}
-              style={[
-                styles.itemRow,
-                { borderBottomColor: colors.border },
-                index === pendingData.length - 1 && { borderBottomWidth: 0 },
-              ]}
-              onPress={() => handleUpload(item.name)}
-            >
-              <View style={styles.itemNameContainer}>
-                <View style={[styles.iconCirclePending, { backgroundColor: colors.backgroundSecondary }]}>
-                  <Ionicons
-                    name="document-outline"
-                    size={20}
-                    color={colors.text}
-                  />
+          {pendingData.length > 0 ? (
+             pendingData.map((item, index) => (
+              <TouchableOpacity
+                key={item.id}
+                activeOpacity={0.7}
+                style={[
+                  styles.itemRow,
+                  { borderBottomColor: colors.border },
+                  index === pendingData.length - 1 && { borderBottomWidth: 0 },
+                ]}
+                onPress={() => handleUpload(item.name)}
+              >
+                <View style={styles.itemNameContainer}>
+                  <View style={[styles.iconCirclePending, { backgroundColor: colors.backgroundSecondary }]}>
+                    <Ionicons
+                      name="document-outline"
+                      size={20}
+                      color={colors.text}
+                    />
+                  </View>
+                  <View style={styles.textStack}>
+                    <ThemedText style={[styles.itemName, { color: colors.text, fontSize: 14 * fontScale }]} numberOfLines={1}>
+                      {item.name}
+                    </ThemedText>
+                    <ThemedText style={[styles.itemSubText, { color: colors.textSecondary }]}>
+                      Click to upload document
+                    </ThemedText>
+                  </View>
                 </View>
-                <View style={styles.textStack}>
-                  <ThemedText style={[styles.itemName, { color: colors.text, fontSize: 14 * fontScale }]} numberOfLines={1}>
-                    {item.name}
-                  </ThemedText>
-                  <ThemedText style={[styles.itemSubText, { color: colors.textSecondary }]}>
-                    Click to upload document
-                  </ThemedText>
-                </View>
-              </View>
 
-              <View style={[styles.actionButton, { backgroundColor: isDark ? "rgba(52, 199, 89, 0.1)" : "#dcfce7" }]}>
-                <Ionicons name="add" size={18} color={isDark ? "#34C759" : "#10b981"} />
-              </View>
-            </TouchableOpacity>
-          ))}
+                <View style={[styles.actionButton, { backgroundColor: isDark ? "rgba(52, 199, 89, 0.1)" : "#dcfce7" }]}>
+                  <Ionicons name="add" size={18} color={isDark ? "#34C759" : "#10b981"} />
+                </View>
+              </TouchableOpacity>
+            ))
+          ) : (
+             <ThemedText style={{ padding: 16, color: colors.textSecondary, textAlign: 'center' }}>No pending actions.</ThemedText>
+          )}
         </View>
 
         {/* History Section */}
@@ -148,45 +139,49 @@ export default function ReportsScreen() {
         </View>
 
         <View style={[styles.listCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          {submittedData.map((item, index) => (
-            <View
-              key={item.id}
-              style={[
-                styles.itemRow,
-                { borderBottomColor: colors.border },
-                index === submittedData.length - 1 && { borderBottomWidth: 0 },
-              ]}
-            >
-              <View style={styles.itemNameContainer}>
-                <View style={[styles.iconCircleSubmitted, { backgroundColor: colors.backgroundSecondary }]}>
-                  <Ionicons
-                    name="document-text-outline"
-                    size={20}
-                    color={colors.textSecondary}
-                  />
-                </View>
-                <View style={styles.textStack}>
-                  <ThemedText style={[styles.itemName, { color: colors.text, fontSize: 14 * fontScale }]} numberOfLines={1}>
-                    {item.name}
-                  </ThemedText>
-                  <ThemedText style={[styles.itemSubText, { color: colors.textSecondary }]}>
-                    Verified and Stored
-                  </ThemedText>
-                </View>
-              </View>
-
+          {submittedData.length > 0 ? (
+             submittedData.map((item, index) => (
               <View
+                key={item.id}
                 style={[
-                  styles.statusBadge,
-                  item.status === "Completed"
-                    ? { backgroundColor: isDark ? "rgba(52, 199, 89, 0.12)" : "#dcfce7" }
-                    : { backgroundColor: isDark ? "rgba(10, 132, 255, 0.12)" : "#e0f2fe" },
+                  styles.itemRow,
+                  { borderBottomColor: colors.border },
+                  index === submittedData.length - 1 && { borderBottomWidth: 0 },
                 ]}
               >
-                <ThemedText style={[styles.statusText, { color: colors.text }]}>{item.status}</ThemedText>
+                <View style={styles.itemNameContainer}>
+                  <View style={[styles.iconCircleSubmitted, { backgroundColor: colors.backgroundSecondary }]}>
+                    <Ionicons
+                      name="document-text-outline"
+                      size={20}
+                      color={colors.textSecondary}
+                    />
+                  </View>
+                  <View style={styles.textStack}>
+                    <ThemedText style={[styles.itemName, { color: colors.text, fontSize: 14 * fontScale }]} numberOfLines={1}>
+                      {item.name}
+                    </ThemedText>
+                    <ThemedText style={[styles.itemSubText, { color: colors.textSecondary }]}>
+                      Verified and Stored
+                    </ThemedText>
+                  </View>
+                </View>
+
+                <View
+                  style={[
+                    styles.statusBadge,
+                    item.status === "Completed"
+                      ? { backgroundColor: isDark ? "rgba(52, 199, 89, 0.12)" : "#dcfce7" }
+                      : { backgroundColor: isDark ? "rgba(10, 132, 255, 0.12)" : "#e0f2fe" },
+                  ]}
+                >
+                  <ThemedText style={[styles.statusText, { color: colors.text }]}>{item.status}</ThemedText>
+                </View>
               </View>
-            </View>
-          ))}
+            ))
+          ) : (
+              <ThemedText style={{ padding: 16, color: colors.textSecondary, textAlign: 'center' }}>No submission history.</ThemedText>
+          )}
         </View>
       </ScrollView>
     </ScreenContainer>

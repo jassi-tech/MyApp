@@ -15,44 +15,7 @@ import { useTheme } from "@/context/ThemeContext";
 
 const TABS = ["Schedule", "Results"];
 
-const EXAM_SCHEDULE = [
-  {
-    id: "1",
-    subject: "Mathematics",
-    date: "15 Feb 2026",
-    time: "9:00 AM - 12:00 PM",
-    room: "Hall A",
-    icon: "calculator-outline",
-    color: "#e0f2fe",
-  },
-  {
-    id: "2",
-    subject: "Science",
-    date: "17 Feb 2026",
-    time: "9:00 AM - 12:00 PM",
-    room: "Hall B",
-    icon: "flask-outline",
-    color: "#f0fdf4",
-  },
-  {
-    id: "3",
-    subject: "English",
-    date: "19 Feb 2026",
-    time: "9:00 AM - 12:00 PM",
-    room: "Hall A",
-    icon: "book-outline",
-    color: "#fff7ed",
-  },
-  {
-    id: "4",
-    subject: "History",
-    date: "21 Feb 2026",
-    time: "9:00 AM - 12:00 PM",
-    room: "Hall C",
-    icon: "earth-outline",
-    color: "#faf5ff",
-  },
-];
+import { useStudent } from "@/context/StudentContext";
 
 const RESULTS = [
   { subject: "Mathematics", marks: 85, total: 100, grade: "A" },
@@ -67,6 +30,7 @@ export default function ExaminationScreen() {
     "schedule",
   );
   const { colors, fontScale, isDark } = useTheme();
+  const { exams } = useStudent();
 
   const getGradeColor = (grade: string) => {
     if (grade.startsWith("A")) return "#22c55e";
@@ -82,7 +46,7 @@ export default function ExaminationScreen() {
             styles.tab, 
             activeTab === "schedule" && { backgroundColor: keyToColor(activeTab, colors) },
             activeTab !== "schedule" && { backgroundColor: "transparent" }
-          ]} // Simplified logic, let's fix this properly
+          ]} 
           onPress={() => setActiveTab("schedule")}
         >
           <ThemedText
@@ -117,7 +81,7 @@ export default function ExaminationScreen() {
 
       {activeTab === "schedule" ? (
           <>
-            {EXAM_SCHEDULE.map((exam) => (
+            {exams.map((exam) => (
               <View key={exam.id} style={[styles.examCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
                 <View style={styles.examHeader}>
                   <ThemedText style={[styles.subjectText, { color: colors.text }]}>

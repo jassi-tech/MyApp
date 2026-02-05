@@ -1,486 +1,328 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 
 import { ScreenContainer } from "@/components/common/screen-container";
 
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
+import { useStudent } from "@/context/StudentContext";
 import { useTheme } from "@/context/ThemeContext";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-// ... keep data as is ...
-const TIMETABLE_DATA: Record<string, any[]> = {
-  Mon: [
-    {
-      time: "08:00 - 08:45 AM",
-      subject: "Mathematics",
-      teacher: "Dr. Smith",
-      room: "Room 101",
-      icon: "calculator-outline",
-      color: "#e0f2fe",
-      iconColor: "#0284c7",
-    },
-    {
-      time: "08:45 - 09:30 AM",
-      subject: "Physics",
-      teacher: "Prof. Johnson",
-      room: "Lab 2",
-      icon: "flash-outline",
-      color: "#fef2f2",
-      iconColor: "#dc2626",
-    },
-    {
-      time: "09:30 - 10:15 AM",
-      subject: "English",
-      teacher: "Ms. Davis",
-      room: "Room 204",
-      icon: "book-outline",
-      color: "#fff7ed",
-      iconColor: "#ea580c",
-    },
-    {
-      time: "10:15 - 10:45 AM",
-      subject: "Break",
-      teacher: "-",
-      room: "Cafeteria",
-      icon: "cafe-outline",
-      color: "#f0fdf4",
-      iconColor: "#16a34a",
-    },
-    {
-      time: "10:45 - 11:30 AM",
-      subject: "History",
-      teacher: "Mr. Miller",
-      room: "Room 301",
-      icon: "earth-outline",
-      color: "#faf5ff",
-      iconColor: "#9333ea",
-    },
-    {
-      time: "11:30 - 12:15 PM",
-      subject: "Computer Science",
-      teacher: "Dr. Lee",
-      room: "Lab 3",
-      icon: "desktop-outline",
-      color: "#f0f9ff",
-      iconColor: "#0891b2",
-    },
-  ],
-  Tue: [
-    {
-      time: "08:00 - 08:45 AM",
-      subject: "Biology",
-      teacher: "Dr. Wilson",
-      room: "Bio Lab",
-      icon: "leaf-outline",
-      color: "#f0fdf4",
-      iconColor: "#16a34a",
-    },
-    {
-      time: "08:45 - 09:30 AM",
-      subject: "Chemistry",
-      teacher: "Dr. Brown",
-      room: "Chem Lab",
-      icon: "flask-outline",
-      color: "#ecfdf5",
-      iconColor: "#059669",
-    },
-    {
-      time: "09:30 - 10:15 AM",
-      subject: "Mathematics",
-      teacher: "Dr. Smith",
-      room: "Room 101",
-      icon: "calculator-outline",
-      color: "#e0f2fe",
-      iconColor: "#0284c7",
-    },
-    {
-      time: "10:15 - 10:45 AM",
-      subject: "Break",
-      teacher: "-",
-      room: "Cafeteria",
-      icon: "cafe-outline",
-      color: "#f0fdf4",
-      iconColor: "#16a34a",
-    },
-    {
-      time: "10:45 - 11:30 AM",
-      subject: "Geography",
-      teacher: "Ms. Taylor",
-      room: "Room 205",
-      icon: "map-outline",
-      color: "#fef3c7",
-      iconColor: "#d97706",
-    },
-  ],
-  Wed: [
-    {
-      time: "08:00 - 08:45 AM",
-      subject: "English",
-      teacher: "Ms. Davis",
-      room: "Room 204",
-      icon: "book-outline",
-      color: "#fff7ed",
-      iconColor: "#ea580c",
-    },
-    {
-      time: "08:45 - 09:30 AM",
-      subject: "Physics",
-      teacher: "Prof. Johnson",
-      room: "Lab 2",
-      icon: "flash-outline",
-      color: "#fef2f2",
-      iconColor: "#dc2626",
-    },
-    {
-      time: "09:30 - 10:15 AM",
-      subject: "Art",
-      teacher: "Mr. Garcia",
-      room: "Art Studio",
-      icon: "color-palette-outline",
-      color: "#fce7f3",
-      iconColor: "#db2777",
-    },
-  ],
-  Thu: [
-    {
-      time: "08:00 - 08:45 AM",
-      subject: "Mathematics",
-      teacher: "Dr. Smith",
-      room: "Room 101",
-      icon: "calculator-outline",
-      color: "#e0f2fe",
-      iconColor: "#0284c7",
-    },
-    {
-      time: "08:45 - 09:30 AM",
-      subject: "History",
-      teacher: "Mr. Miller",
-      room: "Room 301",
-      icon: "earth-outline",
-      color: "#faf5ff",
-      iconColor: "#9333ea",
-    },
-    {
-      time: "09:30 - 10:15 AM",
-      subject: "Music",
-      teacher: "Ms. Anderson",
-      room: "Music Room",
-      icon: "musical-notes-outline",
-      color: "#fef3c7",
-      iconColor: "#ca8a04",
-    },
-  ],
-  Fri: [
-    {
-      time: "08:00 - 08:45 AM",
-      subject: "Computer Science",
-      teacher: "Dr. Lee",
-      room: "Lab 3",
-      icon: "desktop-outline",
-      color: "#f0f9ff",
-      iconColor: "#0891b2",
-    },
-    {
-      time: "08:45 - 09:30 AM",
-      subject: "Chemistry",
-      teacher: "Dr. Brown",
-      room: "Chem Lab",
-      icon: "flask-outline",
-      color: "#ecfdf5",
-      iconColor: "#059669",
-    },
-    {
-      time: "09:30 - 10:15 AM",
-      subject: "Physical Education",
-      teacher: "Coach Roberts",
-      room: "Gym",
-      icon: "fitness-outline",
-      color: "#fef2f2",
-      iconColor: "#dc2626",
-    },
-  ],
-  Sat: [
-    {
-      time: "08:00 - 08:45 AM",
-      subject: "Biology",
-      teacher: "Dr. Wilson",
-      room: "Bio Lab",
-      icon: "leaf-outline",
-      color: "#f0fdf4",
-      iconColor: "#16a34a",
-    },
-    {
-      time: "08:45 - 09:30 AM",
-      subject: "English",
-      teacher: "Ms. Davis",
-      room: "Room 204",
-      icon: "book-outline",
-      color: "#fff7ed",
-      iconColor: "#ea580c",
-    },
-  ],
-};
+// ... keep data as is ... -> Removed static data
 
 export default function TimetableScreen() {
   const router = useRouter();
-  const [selectedDay, setSelectedDay] = useState("Mon");
-  const { colors, fontScale, isDark } = useTheme();
+  const { colors, fontScale } = useTheme();
+  const { timetable } = useStudent();
 
-  const schedule = TIMETABLE_DATA[selectedDay] || TIMETABLE_DATA["Mon"];
+  const [selectedDay, setSelectedDay] = useState("Mon");
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  // Filter timetable for selected day
+  const dailyTimetable = timetable[selectedDay] || [];
+
+  // Animation values
+  const fadeAnim = useSharedValue(0);
+  const slideAnim = useSharedValue(50);
+
+  useEffect(() => {
+    fadeAnim.value = withTiming(1, { duration: 500 });
+    slideAnim.value = withSpring(0, { damping: 15 });
+  }, [selectedDay]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: fadeAnim.value,
+      transform: [{ translateY: slideAnim.value }],
+    };
+  });
 
   return (
-    <ScreenContainer 
-      scrollable={false}
-      header={
-        <ScreenHeader
-          title="Class Timetable"
-          subtitle={`${selectedDay}day's Schedule`}
-        />
-      }
-    >
-      <View style={[styles.daySelectorContainer, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.daySelectorScroll}
-        >
-          {DAYS.map((day) => (
-            <TouchableOpacity
-              key={day}
-              onPress={() => setSelectedDay(day)}
-              style={[
-                styles.dayTab,
-                { 
-                    backgroundColor: colors.card,
-                    borderColor: colors.border
-                },
-                selectedDay === day && styles.activeDayTab,
-              ]}
-            >
-              <ThemedText
+    <ScreenContainer header={<ScreenHeader title="Class Timetable" />}>
+      <View style={styles.contentContainer}>
+        {/* Day Selector */}
+        <View style={styles.daySelectorContainer}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.daySelectorContent}
+          >
+            {days.map((day) => (
+              <TouchableOpacity
+                key={day}
                 style={[
-                  styles.dayTabText,
-                  { color: colors.textSecondary },
-                  selectedDay === day && { color: "#fff" },
+                  styles.dayButton,
+                  selectedDay === day && styles.dayButtonActive,
+                  {
+                    backgroundColor:
+                      selectedDay === day
+                        ? colors.primary
+                        : colors.backgroundSecondary,
+                    borderColor: colors.border,
+                  },
+                ]}
+                onPress={() => {
+                  setSelectedDay(day);
+                  fadeAnim.value = 0;
+                  slideAnim.value = 50;
+                  // Trigger re-render/animation effect
+                }}
+              >
+                <ThemedText
+                  style={[
+                    styles.dayText,
+                    selectedDay === day && styles.dayTextActive,
+                    {
+                      color:
+                        selectedDay === day ? "#FFFFFF" : colors.textSecondary,
+                    },
+                  ]}
+                >
+                  {day}
+                </ThemedText>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* Timetable List */}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContainer}
+        >
+          {dailyTimetable.length > 0 ? (
+            dailyTimetable.map((item, index) => (
+              <Animated.View
+                key={index}
+                style={[
+                    styles.timelineItem,
+                    animatedStyle,
+                    // Stagger animation if desired, otherwise simple fade/slide
                 ]}
               >
-                {day}
-              </ThemedText>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <Animated.View
-          key={selectedDay}
-          entering={FadeInRight.duration(300)}
-          exiting={FadeOutLeft.duration(200)}
-        >
-          {schedule.map((item, index) => (
-            <View key={index} style={styles.periodWrapper}>
-              <View style={styles.timelineSection}>
-                <View style={[styles.timelineDot, { borderColor: colors.background }]} />
-                {index < schedule.length - 1 && (
-                  <View style={[styles.timelineLine, { backgroundColor: colors.border }]} />
-                )}
-              </View>
-
-              <View style={[styles.periodCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                <View style={[styles.timeSection, { borderBottomColor: colors.border }]}>
-                  <ThemedText style={[styles.timeText, { color: colors.textSecondary }]}>
-                    {item.time.split(" - ")[0]}
+                {/* Time Column */}
+                <View style={styles.timeColumn}>
+                  <ThemedText style={[styles.timeText, { color: colors.text }]}>
+                    {item.time.split(" ")[0]}
                   </ThemedText>
-                  <View style={[styles.timeDivider, { backgroundColor: colors.border }]} />
-                  <ThemedText style={[styles.timeText, { color: colors.textSecondary }]}>
-                    {item.time.split(" - ")[1]}
+                  <ThemedText
+                    style={[styles.ampmText, { color: colors.textSecondary }]}
+                  >
+                    {item.time.split(" ")[1]}
                   </ThemedText>
+                  <View
+                    style={[styles.timeLine, { backgroundColor: colors.border }]}
+                  />
                 </View>
 
-                <View style={styles.contentSection}>
-                  <View
-                    style={[
-                        styles.iconBox, 
-                        { backgroundColor: isDark ? "rgba(255,255,255,0.05)" : item.color }
-                    ]}
-                  >
-                    <Ionicons
-                      name={item.icon}
-                      size={28}
-                      color={item.iconColor}
-                    />
-                  </View>
-                  <View style={styles.infoBox}>
-                    <ThemedText style={[styles.subjectText, { color: colors.text, fontSize: 18 * fontScale }]}>
-                      {item.subject}
-                    </ThemedText>
-                    <View style={styles.detailsRow}>
+                {/* Card */}
+                <View
+                  style={[
+                    styles.cardContainer,
+                    {
+                      backgroundColor: item.color, // Using pre-defined lightly colored backgrounds
+                      shadowColor: colors.shadow,
+                    },
+                  ]}
+                >
+                  <View style={styles.cardHeader}>
+                    <View
+                      style={[
+                        styles.iconContainer,
+                        { backgroundColor: "rgba(255,255,255,0.7)" },
+                      ]}
+                    >
                       <Ionicons
-                        name="person-outline"
-                        size={12}
-                        color={colors.textSecondary}
-                        style={{ marginRight: 4 }}
+                        name={item.icon as any}
+                        size={24}
+                        color={item.iconColor}
                       />
-                      <ThemedText style={[styles.detailsText, { color: colors.textSecondary }]}>
+                    </View>
+                    <View style={styles.subjectInfo}>
+                      <ThemedText style={[styles.subjectName, { color: "#1f2937" }]}> 
+                         {/* Force dark text for contrast on light cards, or use theme aware logic if cards can be dark */}
+                        {item.subject}
+                      </ThemedText>
+                      <ThemedText style={[styles.teacherName, { color: "#4b5563" }]}>
                         {item.teacher}
                       </ThemedText>
                     </View>
-                    <View style={styles.detailsRow}>
-                      <Ionicons
-                        name="location-outline"
-                        size={12}
-                        color={colors.textSecondary}
-                        style={{ marginRight: 4 }}
-                      />
-                      <ThemedText style={styles.roomText}>
-                        {item.room}
-                      </ThemedText>
-                    </View>
                   </View>
+                  
+                  <View style={[styles.divider, { backgroundColor: "rgba(0,0,0,0.05)" }]} />
+                  
+                  <View style={styles.cardFooter}>
+                    <View style={styles.footerItem}>
+                       <Ionicons name="location-outline" size={16} color="#4b5563" />
+                       <ThemedText style={[styles.roomText, { color: "#4b5563" }]}>
+                         Room {item.room}
+                       </ThemedText>
+                    </View>
+                     <View style={[styles.statusBadge, { backgroundColor: "rgba(255,255,255,0.5)" }]}>
+                        <ThemedText style={[styles.statusText, { color: item.iconColor }]}>
+                            On Time
+                        </ThemedText>
+                     </View>
+                  </View>
+
                 </View>
-              </View>
+              </Animated.View>
+            ))
+          ) : (
+            <View style={styles.emptyState}>
+              <Ionicons
+                name="calendar-clear-outline"
+                size={64}
+                color={colors.border}
+              />
+              <ThemedText
+                style={[styles.emptyText, { color: colors.textSecondary }]}
+              >
+                No classes scheduled for this day.
+              </ThemedText>
             </View>
-          ))}
-        </Animated.View>
-      </ScrollView>
+          )}
+          <View style={{ height: 20 }} />
+        </ScrollView>
+      </View>
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
+  contentContainer: {
+    flex: 1,
+  },
   daySelectorContainer: {
-    paddingVertical: 20,
-    borderBottomWidth: 1,
+    paddingVertical: 15,
   },
-  daySelectorScroll: {
-    paddingHorizontal: 16,
-    gap: 12,
+  daySelectorContent: {
+    paddingHorizontal: 20,
   },
-  dayTab: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 30,
-    marginRight: 8,
-    borderWidth: 1,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-  },
-  activeDayTab: {
-    backgroundColor: "#00bfff",
-    borderColor: "#00bfff",
-    elevation: 4,
-    shadowColor: "#00bfff",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-  },
-  dayTabText: {
-    fontSize: 15,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 40,
-  },
-  periodWrapper: {
-    flexDirection: "row",
-    marginBottom: 16,
-  },
-  timelineSection: {
-    width: 30,
-    alignItems: "center",
-    marginRight: 12,
-  },
-  timelineDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: "#00bfff",
-    borderWidth: 3,
-    zIndex: 2,
-  },
-  timelineLine: {
-    flex: 1,
-    width: 2,
-    marginTop: 4,
-  },
-  periodCard: {
-    flex: 1,
+  dayButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 20,
     borderRadius: 20,
-    padding: 16,
+    marginRight: 10,
     borderWidth: 1,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
-  timeSection: {
+  dayButtonActive: {
+    borderWidth: 0,
+  },
+  dayText: {
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  dayTextActive: {
+    // color handled inline
+  },
+  listContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 20,
+  },
+  timelineItem: {
+    flexDirection: "row",
+    marginBottom: 20,
+  },
+  timeColumn: {
+    width: 60,
+    alignItems: "center",
+    marginRight: 10,
+  },
+  timeText: {
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  ampmText: {
+    fontSize: 12,
+    fontWeight: "500",
+    marginBottom: 4,
+  },
+  timeLine: {
+    width: 2,
+    flex: 1,
+    borderRadius: 1,
+    marginTop: 5,
+  },
+  cardContainer: {
+    flex: 1,
+    borderRadius: 16,
+    padding: 16,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  cardHeader: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 12,
-    paddingBottom: 12,
-    borderBottomWidth: 1,
   },
-  timeText: {
-    fontSize: 11,
-    fontWeight: "600",
-    letterSpacing: 0.5,
-  },
-  timeDivider: {
-    width: 20,
-    height: 1,
-    marginHorizontal: 8,
-  },
-  contentSection: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  iconBox: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
+  iconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 16,
+    marginRight: 12,
   },
-  infoBox: {
+  subjectInfo: {
     flex: 1,
   },
-  subjectText: {
+  subjectName: {
+    fontSize: 18,
     fontWeight: "700",
-    marginBottom: 8,
-    letterSpacing: 0.3,
+    marginBottom: 2,
   },
-  detailsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 4,
-  },
-  detailsText: {
-    fontSize: 13,
+  teacherName: {
+    fontSize: 14,
     fontWeight: "500",
   },
+  divider: {
+      height: 1,
+      marginBottom: 12,
+  },
+  cardFooter: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+  },
+  footerItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+  },
   roomText: {
+    marginLeft: 4,
     fontSize: 13,
-    color: "#00bfff",
-    fontWeight: "600",
+    fontWeight: '500',
+  },
+  statusBadge: {
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 8,
+  },
+  statusText: {
+      fontSize: 12,
+      fontWeight: '700',
+  },
+  emptyState: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 50,
+  },
+  emptyText: {
+    marginTop: 10,
+    fontSize: 16,
   },
 });

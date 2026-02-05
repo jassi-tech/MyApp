@@ -1,22 +1,40 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 
 import { ScreenContainer } from "@/components/common/screen-container";
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
+import { useUser } from "@/context/UserContext";
 
 export default function AccountScreen() {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const { colors, fontScale, isDark } = useTheme();
+  const { user, updateProfile } = useUser();
 
+  // Local state for editing
+  const [formData, setFormData] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    dob: user?.dob || "",
+  });
+
+  const handleSave = async () => {
+    await updateProfile(formData);
+    setIsEditing(false);
+  };
+  
   const HeaderRight = () => (
     <TouchableOpacity
       style={[styles.editButton, { backgroundColor: colors.card }]}
-      onPress={() => setIsEditing(!isEditing)}
+      onPress={() => {
+        if (isEditing) handleSave();
+        else setIsEditing(true);
+      }}
     >
       <Ionicons
         name={isEditing ? "checkmark" : "create-outline"}
@@ -38,7 +56,11 @@ export default function AccountScreen() {
               { backgroundColor: colors.card, borderColor: colors.primary },
             ]}
           >
-            <Ionicons name="person" size={48} color={colors.text} />
+             {user?.profileImage ? (
+                <Image source={{ uri: user.profileImage }} style={{ width: 94, height: 94, borderRadius: 47 }} />
+             ) : (
+                <Ionicons name="person" size={48} color={colors.text} />
+             )}
           </View>
           {isEditing && (
             <TouchableOpacity
@@ -57,10 +79,10 @@ export default function AccountScreen() {
             { color: colors.text, fontSize: 24 * fontScale },
           ]}
         >
-          John Doe
+          {user?.name || "John Doe"}
         </ThemedText>
         <ThemedText style={[styles.userRole, { color: colors.textSecondary }]}>
-          Student
+          {user?.role || "Student"}
         </ThemedText>
       </View>
 
@@ -79,26 +101,30 @@ export default function AccountScreen() {
           <InfoField
             icon="person-outline"
             label="Full Name"
-            value="John Doe"
+            value={isEditing ? formData.name : (user?.name || "John Doe")}
             editable={isEditing}
+            onChangeText={(text) => setFormData(prev => ({ ...prev, name: text }))}
           />
           <InfoField
             icon="mail-outline"
             label="Email"
-            value="john.doe@example.com"
+            value={isEditing ? formData.email : (user?.email || "john.doe@example.com")}
             editable={isEditing}
+            onChangeText={(text) => setFormData(prev => ({ ...prev, email: text }))}
           />
           <InfoField
             icon="call-outline"
             label="Phone"
-            value="+1 234 567 8900"
+            value={isEditing ? formData.phone : (user?.phone || "+1 234 567 8900")}
             editable={isEditing}
+            onChangeText={(text) => setFormData(prev => ({ ...prev, phone: text }))}
           />
           <InfoField
             icon="calendar-outline"
             label="Date of Birth"
-            value="15 Jan 2005"
+            value={isEditing ? formData.dob : (user?.dob || "15 Jan 2005")}
             editable={isEditing}
+            onChangeText={(text) => setFormData(prev => ({ ...prev, dob: text }))}
           />
         </View>
       </View>
@@ -210,11 +236,13 @@ const InfoField = ({
   label,
   value,
   editable,
+  onChangeText,
 }: {
   icon: any;
   label: string;
   value: string;
   editable: boolean;
+  onChangeText?: (text: string) => void;
 }) => {
   const { colors, fontScale } = useTheme();
   return (
@@ -242,6 +270,7 @@ const InfoField = ({
             },
           ]}
           value={value}
+          onChangeText={onChangeText}
         />
       ) : (
         <ThemedText

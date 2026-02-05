@@ -8,11 +8,16 @@ import { ScreenContainer } from "@/components/common/screen-container";
 import { LifetimeDealBanner } from "@/components/marketing/LifetimeDealBanner";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
+import { useUser } from "@/context/UserContext";
 import CoursesScreen from "@/screens/Course";
 
 export default function HomeScreen() {
   const router = useRouter();
   const { colors, fontScale } = useTheme();
+  const { user } = useUser();
+
+  const displayName = user?.name || "Guest User";
+  const displayImage = user?.profileImage;
 
   return (
     <ScreenContainer scrollable>
@@ -20,13 +25,13 @@ export default function HomeScreen() {
         <View style={styles.userInfo}>
           <TouchableOpacity onPress={() => router.push("/screens/profile")}>
             <Image
-              source="https://i.pravatar.cc/300?img=11"
+              source={displayImage || "https://i.pravatar.cc/300?img=11"}
               style={styles.avatar}
               contentFit="cover"
             />
           </TouchableOpacity>
           <View style={styles.titleContainer}>
-            <ThemedText style={[styles.userName, { color: colors.text }]}>Rumi Aktar</ThemedText>
+            <ThemedText style={[styles.userName, { color: colors.text }]}>{displayName}</ThemedText>
             <ThemedText style={[styles.welcomeText, { color: colors.textSecondary }]}>
               Let&apos;s learn something new
             </ThemedText>

@@ -14,40 +14,34 @@ import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 
-const LEAVE_HISTORY = [
-  {
-    id: "1",
-    reason: "Medical Emergency",
-    from: "5 Feb",
-    to: "7 Feb",
-    status: "approved",
-    days: 3,
-  },
-  {
-    id: "2",
-    reason: "Family Function",
-    from: "20 Jan",
-    to: "21 Jan",
-    status: "approved",
-    days: 2,
-  },
-  {
-    id: "3",
-    reason: "Sick Leave",
-    from: "10 Jan",
-    to: "10 Jan",
-    status: "rejected",
-    days: 1,
-  },
-];
+import { useStudent } from "@/context/StudentContext";
 
 export default function LeaveRequestScreen() {
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
   const { colors, fontScale, isDark } = useTheme();
+  const { leaveRequests, addLeaveRequest, isLoading } = useStudent();
+  
+  const [reason, setReason] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
+  const handleApply = async () => {
+      if (!reason || !fromDate || !toDate) return; // Simple validation
+      await addLeaveRequest({
+          reason,
+          fromDate,
+          toDate,
+          type: 'Casual Leave' // Default for now
+      });
+      setShowForm(false);
+      setReason("");
+      setFromDate("");
+      setToDate("");
+  };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case "approved":
         return "#22c55e";
       case "pending":
@@ -94,6 +88,8 @@ export default function LeaveRequestScreen() {
               ]}
               placeholder="Reason for leave"
               placeholderTextColor={colors.textSecondary}
+              value={reason}
+              onChangeText={setReason}
             />
             <View style={styles.dateRow}>
               <TextInput
@@ -106,8 +102,10 @@ export default function LeaveRequestScreen() {
                         color: colors.text
                     }
                 ]}
-                placeholder="From Date"
+                placeholder="From (YYYY-MM-DD)"
                 placeholderTextColor={colors.textSecondary}
+                value={fromDate}
+                onChangeText={setFromDate}
               />
               <TextInput
                 style={[
@@ -119,20 +117,22 @@ export default function LeaveRequestScreen() {
                         color: colors.text
                     }
                 ]}
-                placeholder="To Date"
+                placeholder="To (YYYY-MM-DD)"
                 placeholderTextColor={colors.textSecondary}
+                value={toDate}
+                onChangeText={setToDate}
               />
             </View>
-            <TouchableOpacity style={styles.submitButton}>
+            <TouchableOpacity style={styles.submitButton} onPress={handleApply} disabled={isLoading}>
               <ThemedText style={styles.submitButtonText}>
-                Submit Request
+                {isLoading ? "Submitting..." : "Submit Request"}
               </ThemedText>
             </TouchableOpacity>
           </View>
         )}
 
         <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>Leave History</ThemedText>
-        {LEAVE_HISTORY.map((leave) => (
+        {leaveRequests.map((leave) => (
           <View key={leave.id} style={[styles.leaveCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <View style={styles.leaveHeader}>
               <ThemedText style={[styles.reasonText, { color: colors.text }]}>{leave.reason}</ThemedText>
@@ -156,8 +156,8 @@ export default function LeaveRequestScreen() {
               <View style={styles.detailRow}>
                 <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
                 <ThemedText style={[styles.detailText, { color: colors.textSecondary }]}>
-                  {leave.from} to {leave.to} ({leave.days}{" "}
-                  {leave.days === 1 ? "day" : "days"})
+                  {leave.fromDate} to {leave.toDate}
+                  {/* Calculate days if needed or add to interface */}
                 </ThemedText>
               </View>
             </View>

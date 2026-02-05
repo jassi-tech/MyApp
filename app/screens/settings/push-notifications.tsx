@@ -4,20 +4,19 @@ import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import { StyleSheet, Switch, View } from "react-native";
+
+import { useUser } from "@/context/UserContext";
 
 export default function PushNotificationsScreen() {
   const router = useRouter();
-  const [allNotifications, setAllNotifications] = useState(true);
-  const [messages, setMessages] = useState(true);
-  const [assignments, setAssignments] = useState(true);
-  const [grades, setGrades] = useState(true);
-  const [attendance, setAttendance] = useState(false);
-  const [events, setEvents] = useState(true);
-  const [sound, setSound] = useState(true);
-  const [vibration, setVibration] = useState(true);
   const { colors, fontScale } = useTheme();
+  const { preferences, updatePreferences } = useUser();
+
+  const handleToggle = (key: keyof typeof preferences, value: boolean) => {
+      updatePreferences({ [key]: value });
+  };
 
   return (
     <ScreenContainer header={<ScreenHeader title="Push Notifications" />}>
@@ -37,8 +36,8 @@ export default function PushNotificationsScreen() {
             icon="notifications"
             label="All Notifications"
             description="Enable or disable all push notifications"
-            value={allNotifications}
-            onValueChange={setAllNotifications}
+            value={preferences.allNotifications}
+            onValueChange={(val) => handleToggle('allNotifications', val)}
           />
         </View>
       </View>
@@ -59,36 +58,36 @@ export default function PushNotificationsScreen() {
             icon="chatbubbles-outline"
             label="Messages"
             description="New messages and announcements"
-            value={messages}
-            onValueChange={setMessages}
+            value={preferences.messages}
+            onValueChange={(val) => handleToggle('messages', val)}
           />
           <NotificationToggle
             icon="document-text-outline"
             label="Assignments"
             description="New homework and deadlines"
-            value={assignments}
-            onValueChange={setAssignments}
+            value={preferences.assignments}
+            onValueChange={(val) => handleToggle('assignments', val)}
           />
           <NotificationToggle
             icon="star-outline"
             label="Grades"
             description="Grade updates and results"
-            value={grades}
-            onValueChange={setGrades}
+            value={preferences.grades}
+            onValueChange={(val) => handleToggle('grades', val)}
           />
           <NotificationToggle
             icon="calendar-outline"
             label="Attendance"
             description="Attendance reminders"
-            value={attendance}
-            onValueChange={setAttendance}
+            value={preferences.attendance}
+            onValueChange={(val) => handleToggle('attendance', val)}
           />
           <NotificationToggle
             icon="megaphone-outline"
             label="Events"
             description="School events and activities"
-            value={events}
-            onValueChange={setEvents}
+            value={preferences.events}
+            onValueChange={(val) => handleToggle('events', val)}
             isLast
           />
         </View>
@@ -110,15 +109,15 @@ export default function PushNotificationsScreen() {
             icon="volume-high-outline"
             label="Sound"
             description="Play sound for notifications"
-            value={sound}
-            onValueChange={setSound}
+            value={preferences.sound}
+            onValueChange={(val) => handleToggle('sound', val)}
           />
           <NotificationToggle
             icon="phone-portrait-outline"
             label="Vibration"
             description="Vibrate for notifications"
-            value={vibration}
-            onValueChange={setVibration}
+            value={preferences.vibration}
+            onValueChange={(val) => handleToggle('vibration', val)}
             isLast
           />
         </View>

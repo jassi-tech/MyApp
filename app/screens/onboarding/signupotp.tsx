@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -28,6 +28,8 @@ import { useTheme } from "@/context/ThemeContext";
 
 export default function SignupOtpScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const { email, name } = params;
   const { colors, fontScale } = useTheme();
 
   const [otp, setOtp] = useState("");
@@ -75,7 +77,10 @@ export default function SignupOtpScreen() {
             style={styles.modalButton}
             onPress={() => {
               setShowSuccess(false);
-              router.replace("/screens/onboarding/login" as any);
+              router.replace({
+                pathname: "/screens/onboarding/login",
+                params: { email, name }
+              } as any);
             }}
           >
             <LinearGradient
@@ -133,7 +138,7 @@ export default function SignupOtpScreen() {
               { color: colors.textSecondary, fontSize: 16 * fontScale },
             ]}
           >
-            We've sent a code to your email. Please enter it below.
+            We've sent a code to your email {email ? `(${email})` : ""}. Please enter it below.
           </ThemedText>
         </View>
 

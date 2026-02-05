@@ -1,7 +1,8 @@
+
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Image,
@@ -23,19 +24,23 @@ import Animated, {
 
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
+import { useUser } from "@/context/UserContext";
 
 
 
 export default function LoginScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
   const { colors, fontScale } = useTheme();
+  const { login, isLoading } = useUser();
 
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState((params.email as string) || "");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({ username: false, password: false });
   const shakeAnimation = useSharedValue(0);
 
+  // ... (animations) ...
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: shakeAnimation.value }],
   }));
@@ -49,7 +54,7 @@ export default function LoginScreen() {
     );
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const newErrors = {
       username: !username.trim(),
       password: !password.trim(),
@@ -61,7 +66,19 @@ export default function LoginScreen() {
       return;
     }
 
-    // Proceed to home if valid
+    // Call Context Login
+    const name = (params.name as string) || "John Doe"; // Fallback name if not passed
+    const email = username.includes("@") ? username : "john@example.com";
+    
+    await login({
+      id: "123",
+      name,
+      email,
+      role: "student",
+      authToken: "sample-token",
+    });
+
+    // Proceed to home
     router.replace("/screens/(tabs)/Home" as any);
   };
 
@@ -92,7 +109,7 @@ export default function LoginScreen() {
           <ThemedText
             style={[
               styles.appTitle,
-              { color: colors.text, fontSize: 32 * fontScale },
+              { color: colors.text, fontSize: 26 * fontScale },
             ]}
           >
             MobileApp

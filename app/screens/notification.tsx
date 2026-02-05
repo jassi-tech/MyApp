@@ -7,57 +7,31 @@ import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 
-const MOCK_NOTIFICATIONS = [
-  {
-    id: "1",
-    title: "New Course Available!",
-    description: "Check out our new 'React Native Masterclass' course.",
-    time: "2h ago",
-    icon: "book-outline",
-    read: false,
-  },
-  {
-    id: "2",
-    title: "Assignment Graded",
-    description: "Your assignment for 'UI Design' has been graded. Good job!",
-    time: "5h ago",
-    icon: "school-outline",
-    read: true,
-  },
-  {
-    id: "3",
-    title: "Update Available",
-    description: "A new update for the app is available. Please update for new features.",
-    time: "1d ago",
-    icon: "cloud-upload-outline",
-    read: true,
-  },
-  {
-    id: "4",
-    title: "Welcome to MyApp!",
-    description: "Thanks for joining us. Let's start learning!",
-    time: "2d ago",
-    icon: "happy-outline",
-    read: true,
-  },
-];
+import { useStudent } from "@/context/StudentContext";
 
 export default function NotificationScreen() {
   const { colors, fontScale } = useTheme();
+  const { notifications, markNotificationAsRead } = useStudent();
 
-  const renderItem = ({ item }: { item: typeof MOCK_NOTIFICATIONS[0] }) => (
+  const handlePress = (id: string, read: boolean) => {
+      if (!read) {
+          markNotificationAsRead(id);
+      }
+  };
+
+  const renderItem = ({ item }: { item: typeof notifications[0] }) => (
     <View style={[
       styles.notificationItem, 
       { borderBottomColor: colors.border },
       !item.read && { backgroundColor: colors.backgroundSecondary }
     ]}>
       <View style={[styles.iconContainer, { backgroundColor: colors.card }]}>
-        <Ionicons name={item.icon as any} size={24} color={colors.text} />
+        <Ionicons name={(item.icon || "notifications-outline") as any} size={24} color={colors.text} />
         {!item.read && <View style={[styles.unreadDot, { borderColor: colors.backgroundSecondary }]} />}
       </View>
       <View style={styles.contentContainer}>
         <ThemedText style={[styles.title, { color: colors.text, fontSize: 14 * fontScale }]}>{item.title}</ThemedText>
-        <ThemedText style={[styles.description, { color: colors.textSecondary }]}>{item.description}</ThemedText>
+        <ThemedText style={[styles.description, { color: colors.textSecondary }]}>{item.message}</ThemedText>
         <ThemedText style={[styles.time, { color: colors.textSecondary }]}>{item.time}</ThemedText>
       </View>
     </View>
@@ -66,11 +40,16 @@ export default function NotificationScreen() {
   return (
     <ScreenContainer header={<ScreenHeader title="Notifications" />}>
       <FlatList
-        data={MOCK_NOTIFICATIONS}
+        data={notifications}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+            <View style={{ padding: 20, alignItems: 'center' }}>
+                <ThemedText style={{ color: colors.textSecondary }}>No notifications.</ThemedText>
+            </View>
+        }
       />
     </ScreenContainer>
   );

@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React from "react";
 import {
     Alert,
     FlatList,
@@ -13,15 +13,11 @@ import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 
-const INITIAL_DEVICES = [
-  { id: '1', name: 'iPhone 15 Pro (This Device)', location: 'Mumbai, India', lastActive: 'Active now', icon: 'phone-portrait-outline', isCurrent: true },
-  { id: '2', name: 'MacBook Pro 14"', location: 'Mumbai, India', lastActive: '2 hours ago', icon: 'laptop-outline', isCurrent: false },
-  { id: '3', name: 'Windows PC - Chrome', location: 'London, UK', lastActive: 'Yesterday', icon: 'desktop-outline', isCurrent: false },
-];
+import { useUser } from "@/context/UserContext";
 
 export default function ManageDevicesScreen() {
   const { colors, fontScale } = useTheme();
-  const [devices, setDevices] = useState(INITIAL_DEVICES);
+  const { devices, logoutDevice } = useUser();
 
   const handleLogoutDevice = (id: string, name: string) => {
     Alert.alert(
@@ -30,7 +26,7 @@ export default function ManageDevicesScreen() {
       [
         { text: "Cancel", style: "cancel" },
         { text: "Log Out", style: "destructive", onPress: () => {
-            setDevices(prev => prev.filter(d => d.id !== id));
+            logoutDevice(id);
         }}
       ]
     );
@@ -43,16 +39,20 @@ export default function ManageDevicesScreen() {
       [
         { text: "Cancel", style: "cancel" },
         { text: "Log Out All", style: "destructive", onPress: () => {
-            setDevices(prev => prev.filter(d => d.isCurrent));
+            // Logic to logout all would go here, maybe added to context later
+            // For now, filtering locally not ideal for "All", but sufficient for refactor step
+             devices.forEach(d => {
+                 if (!d.isCurrent) logoutDevice(d.id);
+             });
         }}
       ]
     );
   };
 
-  const renderDevice = ({ item }: { item: typeof INITIAL_DEVICES[0] }) => (
+  const renderDevice = ({ item }: { item: typeof devices[0] }) => (
     <View style={[styles.deviceCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
       <View style={[styles.deviceIconWrapper, { backgroundColor: colors.backgroundSecondary }]}>
-        <Ionicons name={item.icon as any} size={24} color={colors.text} />
+        <Ionicons name={(item.icon || "phone-portrait-outline") as any} size={24} color={colors.text} />
       </View>
       <View style={styles.deviceInfo}>
         <View style={styles.deviceNameRow}>

@@ -11,20 +11,26 @@ import "react-native-reanimated";
 
 import { CourseProvider } from "./context/CourseContext";
 import { LanguageProvider } from "./context/LanguageContext";
+import { StudentProvider } from "./context/StudentContext";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
+import { UserProvider } from "./context/UserContext";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   return (
-    <CourseProvider>
-      <LanguageProvider>
-        <ThemeProvider>
-          <RootLayoutNav />
-        </ThemeProvider>
-      </LanguageProvider>
-    </CourseProvider>
+    <UserProvider>
+      <StudentProvider>
+        <CourseProvider>
+          <LanguageProvider>
+            <ThemeProvider>
+              <RootLayoutNav />
+            </ThemeProvider>
+          </LanguageProvider>
+        </CourseProvider>
+      </StudentProvider>
+    </UserProvider>
   );
 }
 

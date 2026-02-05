@@ -13,57 +13,20 @@ import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 
-const SUBJECTS = [
-  {
-    id: "1",
-    name: "Mathematics",
-    chapters: 12,
-    completed: 8,
-    icon: "calculator-outline",
-    color: "#e0f2fe",
-  },
-  {
-    id: "2",
-    name: "Science",
-    chapters: 10,
-    completed: 6,
-    icon: "flask-outline",
-    color: "#f0fdf4",
-  },
-  {
-    id: "3",
-    name: "English",
-    chapters: 8,
-    completed: 5,
-    icon: "book-outline",
-    color: "#fff7ed",
-  },
-  {
-    id: "4",
-    name: "History",
-    chapters: 9,
-    completed: 4,
-    icon: "earth-outline",
-    color: "#faf5ff",
-  },
-  {
-    id: "5",
-    name: "Geography",
-    chapters: 7,
-    completed: 3,
-    icon: "map-outline",
-    color: "#fef3c7",
-  },
-];
+import { useStudent } from "@/context/StudentContext";
 
 export default function SyllabusScreen() {
   const router = useRouter();
   const { colors, fontScale, isDark } = useTheme();
+  const { syllabus } = useStudent();
 
   return (
     <ScreenContainer header={<ScreenHeader title="Syllabus" />}>
-      {SUBJECTS.map((subject) => {
-          const progress = (subject.completed / subject.chapters) * 100;
+      {syllabus.map((subject) => {
+          const completedTopics = subject.topics.filter(t => t.completed).length;
+          const totalTopics = subject.topics.length;
+          const progress = subject.progress * 100;
+          
           return (
             <TouchableOpacity 
               key={subject.id} 
@@ -76,10 +39,10 @@ export default function SyllabusScreen() {
               </View>
               <View style={styles.subjectContent}>
                 <ThemedText style={[styles.subjectName, { color: colors.text }]}>
-                  {subject.name}
+                  {subject.subject}
                 </ThemedText>
                 <ThemedText style={[styles.chaptersText, { color: colors.textSecondary }]}>
-                  {subject.completed} of {subject.chapters} chapters completed
+                  {completedTopics} of {totalTopics} topics completed
                 </ThemedText>
                 <View style={[styles.progressBarBg, { backgroundColor: colors.border }]}>
                   <View

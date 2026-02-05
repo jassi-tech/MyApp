@@ -3,18 +3,20 @@
 import { AttendanceCalendar } from "@/components/attendance-calendar";
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
+import { useStudent } from "@/context/StudentContext";
 import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
-  StyleSheet,
-  View,
+    StyleSheet,
+    View,
 } from "react-native";
 
 import { ScreenContainer } from "@/components/common/screen-container";
 
 export default function AttendanceScreen() {
   const { colors, fontScale, isDark } = useTheme();
+  const { attendance } = useStudent();
 
   return (
     <ScreenContainer header={<ScreenHeader title="My Attendance" />}>
@@ -28,7 +30,7 @@ export default function AttendanceScreen() {
         <View style={styles.summaryGrid}>
           <SummaryCard
             label="Present"
-            value="1 Days"
+            value={`${attendance.present} Days`}
             icon="person"
             color={isDark ? "#064e3b" : "#ecfdf5"} 
             iconColor="#10b981"
@@ -36,7 +38,7 @@ export default function AttendanceScreen() {
           />
           <SummaryCard
             label="Absent"
-            value="1 Days"
+            value={`${attendance.absent} Days`}
             icon="calendar"
             color={isDark ? "#450a0a" : "#fff1f2"} 
             iconColor="#f43f5e" 
@@ -44,7 +46,7 @@ export default function AttendanceScreen() {
           />
           <SummaryCard
             label="Leave"
-            value="1 Days"
+            value={`${attendance.leave} Days`}
             icon="calendar"
             color={isDark ? "#451a03" : "#fff7ed"} 
             iconColor="#f59e0b" // Orange
@@ -52,7 +54,7 @@ export default function AttendanceScreen() {
           />
           <SummaryCard
             label="Holiday"
-            value="1 Days"
+            value={`${attendance.holiday} Days`}
             icon="calendar"
             color={isDark ? "#3b0764" : "#faf5ff"} 
             iconColor="#a855f7" // Purple
@@ -67,31 +69,31 @@ export default function AttendanceScreen() {
         <View style={styles.academicList}>
           <AcademicItem
             label="Total Attendance Days"
-            value="99"
+            value={attendance.totalDays}
             icon="calendar-outline"
             badgeColor="#fbcfe8"
           />
           <AcademicItem
             label="Total No of Present Days"
-            value="99"
+            value={attendance.present}
             icon="help-outline"
             badgeColor="#dcfce7"
           />
           <AcademicItem
             label="Total No of Absent Days"
-            value="99"
+            value={attendance.absent}
             icon="help-outline"
             badgeColor="#fee2e2"
           />
           <AcademicItem
             label="Total No of Leave Days"
-            value="3"
+            value={attendance.leave}
             icon="help-outline"
             badgeColor="#fef3c7"
           />
           <AcademicItem
             label="Annual Percentage till Date"
-            value="2.0"
+            value={`${attendance.percentage}%`}
             icon="help-outline"
             badgeColor="#e0f2fe"
           />

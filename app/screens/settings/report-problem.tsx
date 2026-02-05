@@ -5,7 +5,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 
 const PROBLEM_CATEGORIES = [
   { id: "login", label: "Login Issues", icon: "lock-closed-outline" },
@@ -15,15 +15,21 @@ const PROBLEM_CATEGORIES = [
   { id: "other", label: "Other", icon: "ellipsis-horizontal-outline" },
 ];
 
+import { useUser } from "@/context/UserContext";
+
 export default function ReportProblemScreen() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [description, setDescription] = useState("");
   const { colors, fontScale } = useTheme();
+  const { submitProblemReport } = useUser();
 
-  const handleSubmit = () => {
-    // Handle problem submission
-    router.back();
+  const handleSubmit = async () => {
+    if (selectedCategory && description) {
+        await submitProblemReport(selectedCategory, description);
+        Alert.alert("Report Submitted", "Thank you for your feedback. We will look into it.");
+        router.back();
+    }
   };
 
   return (

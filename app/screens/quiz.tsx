@@ -2,15 +2,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-    SafeAreaView,
-    ScrollView,
     StyleSheet,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
 
+import { ScreenContainer } from "@/components/common/screen-container";
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
+import { useStudent } from "@/context/StudentContext";
 import { useTheme } from "@/context/ThemeContext";
 
 const SUBJECTS = [
@@ -32,78 +32,93 @@ export default function QuizScreen() {
       params: { id: subject.id, title: subject.label },
     });
   };
+  const { subjects: quizSubjects } = useStudent();
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <ScreenHeader title="Select Subject" />
-
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>Choose a subject to start your quiz</ThemedText>
-        
-        <View style={styles.grid}>
-          {SUBJECTS.map((subject) => (
-            <TouchableOpacity
-              key={subject.id}
-              style={[styles.subjectCard, { backgroundColor: colors.card, borderColor: colors.border }]}
-              onPress={() => handleSubjectPress(subject)}
+    <ScreenContainer header={<ScreenHeader title="Quiz" />}>
+      <View style={styles.gridContainer}>
+        {quizSubjects.map((subject) => (
+          <TouchableOpacity
+            key={subject.id}
+            style={[
+              styles.card,
+              {
+                backgroundColor: subject.color,
+                shadowColor: colors.shadow,
+              },
+            ]}
+            onPress={() => router.push("/screens/quiz-details" as any)}
+            activeOpacity={0.8}
+          >
+            <View
+              style={[
+                styles.iconCircle,
+                { backgroundColor: "rgba(255,255,255,0.6)" },
+              ]}
             >
-              <View style={[styles.iconWrapper, { backgroundColor: subject.color }]}>
-                <Ionicons name={subject.icon as any} size={32} color={subject.iconColor} />
-              </View>
-              <ThemedText style={[styles.subjectLabel, { color: colors.text }]}>{subject.label}</ThemedText>
-              <ThemedText style={[styles.quizInfo, { color: colors.textSecondary }]}>10 Questions</ThemedText>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+              <Ionicons
+                name={subject.icon as any}
+                size={32}
+                color={subject.iconColor}
+              />
+            </View>
+            <ThemedText style={[styles.cardTitle, { color: "#1f2937" }]}>
+              {subject.label}
+            </ThemedText>
+            <View style={styles.badge}>
+              <ThemedText style={[styles.badgeText, { color: subject.iconColor }]}>
+                {subject.questionCount} Questions
+              </ThemedText>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 16,
-  },
-  subtitle: {
-    fontSize: 14,
-    marginBottom: 24,
-    textAlign: "center",
-  },
-  grid: {
+  gridContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
+    padding: 15,
   },
-  subjectCard: {
+  card: {
     width: "48%",
     borderRadius: 20,
     padding: 20,
+    marginBottom: 15,
     alignItems: "center",
-    marginBottom: 16,
-    borderWidth: 1,
+    justifyContent: "center",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
     elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    aspectRatio: 0.8, // Taller cards
   },
-  iconWrapper: {
+  iconCircle: {
     width: 60,
     height: 60,
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 15,
   },
-  subjectLabel: {
-    fontSize: 16,
+  cardTitle: {
+    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 4,
+    marginBottom: 8,
+    textAlign: "center",
   },
-  quizInfo: {
+  badge: {
+    backgroundColor: "rgba(255,255,255,0.7)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  badgeText: {
     fontSize: 12,
+    fontWeight: "700",
   },
 });

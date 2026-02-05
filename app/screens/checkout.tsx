@@ -15,6 +15,7 @@ import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { useCourses } from "@/context/CourseContext";
 import { useTheme } from "@/context/ThemeContext";
+import { PaymentService } from "@/services/paymentService";
 
 const PAYMENT_METHODS = [
   { id: 'card', name: 'Credit/Debit Card', icon: 'card-outline' },
@@ -47,20 +48,18 @@ export default function CheckoutScreen() {
     : 0;
   const finalPrice = Math.max(0, originalPrice - discountAmount);
   
-  const handleApplyCode = () => {
+  const handleApplyCode = async () => {
     setCodeError(null);
-    const code = referralCode.trim().toUpperCase();
+    const code = referralCode.trim();
     
     if (!code) return;
 
-    // Mock validation logic
-    if (code === "SAVE10") {
-      setAppliedDiscount({ code, amount: 0.1 }); // 10% off
-    } else if (code === "WELCOME20") {
-      setAppliedDiscount({ code, amount: 20 }); // $20 off
-    } else {
-      setCodeError("Invalid referral code");
-      setAppliedDiscount(null);
+    try {
+        const discount = await PaymentService.validateReferralCode(code);
+        setAppliedDiscount(discount);
+    } catch (error: any) {
+        setCodeError(error.message || "Invalid referral code");
+        setAppliedDiscount(null);
     }
   };
 
@@ -74,17 +73,21 @@ export default function CheckoutScreen() {
     );
   }
 
-  const handlePurchase = () => {
+  const handlePurchase = async () => {
     setIsProcessing(true);
-    // Simulate network request
-    setTimeout(() => {
-      purchaseCourse(courseId);
-      setIsProcessing(false);
-      router.push({
-        pathname: "/screens/payment-success",
-        params: { courseId: course.id }
-      });
-    }, 2000);
+    try {
+        await PaymentService.processPayment(courseId, selectedMethod, finalPrice);
+        purchaseCourse(courseId);
+        router.push({
+            pathname: "/screens/payment-success",
+            params: { courseId: course.id }
+        });
+    } catch (error) {
+        // Handle error (could add an alert here later)
+        console.error("Payment failed", error);
+    } finally {
+        setIsProcessing(false);
+    }
   };
 
   return (

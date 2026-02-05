@@ -15,10 +15,12 @@ import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 
+import { useUser } from "@/context/UserContext";
+
 export default function RecoveryEmailScreen() {
   const router = useRouter();
   const { colors, fontScale } = useTheme();
-  const [email, setEmail] = useState("em***@gmail.com");
+  const { recoveryEmail, updateRecoveryEmail } = useUser();
   const [newEmail, setNewEmail] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
@@ -32,7 +34,7 @@ export default function RecoveryEmailScreen() {
       "Verification Sent",
       `A verification code has been sent to ${newEmail}. Please check your inbox.`,
       [{ text: "OK", onPress: () => {
-          setEmail(newEmail);
+          updateRecoveryEmail(newEmail);
           setIsEditing(false);
           setNewEmail("");
       }}]
@@ -59,7 +61,7 @@ export default function RecoveryEmailScreen() {
 
         <View style={[styles.infoCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <ThemedText style={[styles.label, { color: colors.textSecondary }]}>Current Email</ThemedText>
-          <ThemedText style={[styles.emailText, { color: colors.text }]}>{email}</ThemedText>
+          <ThemedText style={[styles.emailText, { color: colors.text }]}>{recoveryEmail || "Not set"}</ThemedText>
           <View style={[styles.statusBadge, { backgroundColor: colors.primary + '20' }]}>
             <Ionicons name="checkmark-circle" size={14} color={colors.primary} />
             <ThemedText style={[styles.statusText, { color: colors.primary }]}>Verified</ThemedText>

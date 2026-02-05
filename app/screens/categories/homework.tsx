@@ -13,51 +13,15 @@ import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 
-const HOMEWORK = [
-  {
-    id: "1",
-    subject: "Mathematics",
-    title: "Chapter 5 - Exercises 5.1 to 5.3",
-    dueDate: "5 Feb",
-    status: "pending",
-    icon: "calculator-outline",
-    color: "#e0f2fe",
-  },
-  {
-    id: "2",
-    subject: "English",
-    title: "Essay on 'My Favorite Book'",
-    dueDate: "6 Feb",
-    status: "pending",
-    icon: "book-outline",
-    color: "#fff7ed",
-  },
-  {
-    id: "3",
-    subject: "Science",
-    title: "Lab Report - Chemical Reactions",
-    dueDate: "3 Feb",
-    status: "submitted",
-    icon: "flask-outline",
-    color: "#f0fdf4",
-  },
-  {
-    id: "4",
-    subject: "History",
-    title: "Project on Ancient Civilizations",
-    dueDate: "10 Feb",
-    status: "pending",
-    icon: "earth-outline",
-    color: "#faf5ff",
-  },
-];
+import { useStudent } from "@/context/StudentContext";
 
 export default function HomeworkScreen() {
   const router = useRouter();
   const { colors, fontScale, isDark } = useTheme();
+  const { homework } = useStudent();
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case "submitted":
         return "#22c55e";
       case "pending":
@@ -69,25 +33,30 @@ export default function HomeworkScreen() {
     }
   };
 
+  const pendingCount = homework.filter(h => h.status === 'Pending').length;
+  const submittedCount = homework.filter(h => h.status === 'Submitted').length;
+  // Upcoming could be Start or just another status logic, for now assume 'Start' is upcoming or essentially pending action
+  const upcomingCount = homework.filter(h => h.status === 'Start').length;
+
   return (
     <ScreenContainer header={<ScreenHeader title="Homework" />}>
       <View style={styles.statsRow}>
           <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <ThemedText style={[styles.statValue, { fontSize: 24 * fontScale }]}>2</ThemedText>
+            <ThemedText style={[styles.statValue, { fontSize: 24 * fontScale }]}>{pendingCount}</ThemedText>
             <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>Pending</ThemedText>
           </View>
           <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <ThemedText style={[styles.statValue, { fontSize: 24 * fontScale }]}>1</ThemedText>
+            <ThemedText style={[styles.statValue, { fontSize: 24 * fontScale }]}>{submittedCount}</ThemedText>
             <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>Submitted</ThemedText>
           </View>
           <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <ThemedText style={[styles.statValue, { fontSize: 24 * fontScale }]}>1</ThemedText>
+            <ThemedText style={[styles.statValue, { fontSize: 24 * fontScale }]}>{upcomingCount}</ThemedText>
             <ThemedText style={[styles.statLabel, { color: colors.textSecondary }]}>Upcoming</ThemedText>
           </View>
         </View>
 
         <ThemedText style={[styles.sectionTitle, { color: colors.text, fontSize: 18 * fontScale }]}>All Assignments</ThemedText>
-        {HOMEWORK.map((hw) => (
+        {homework.map((hw) => (
           <TouchableOpacity 
             key={hw.id} 
             style={[styles.homeworkCard, { backgroundColor: colors.card, borderColor: colors.border }]}
@@ -118,7 +87,7 @@ export default function HomeworkScreen() {
               <View style={styles.dueRow}>
                 <Ionicons name="time-outline" size={14} color={colors.textSecondary} />
                 <ThemedText style={[styles.dueText, { color: colors.textSecondary }]}>
-                  Due: {hw.dueDate}
+                  Due: {hw.deadline}
                 </ThemedText>
               </View>
             </View>

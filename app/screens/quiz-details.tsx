@@ -2,69 +2,26 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  Dimensions,
-  SafeAreaView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
+    Dimensions,
+    SafeAreaView,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 
-const { width } = Dimensions.get("window");
+import { useStudent } from "@/context/StudentContext";
 
-const MOCK_QUESTIONS: Record<string, any[]> = {
-  "1": [
-    {
-      id: "q1",
-      question: "What is 15 + 27?",
-      options: ["32", "42", "52", "45"],
-      correct: 1,
-    },
-    {
-      id: "q2",
-      question: "What is the value of Pi (to 2 decimal places)?",
-      options: ["3.12", "3.16", "3.14", "3.18"],
-      correct: 2,
-    },
-    {
-      id: "q3",
-      question: "What is the square root of 144?",
-      options: ["10", "11", "12", "13"],
-      correct: 2,
-    },
-  ],
-  "2": [
-      {
-          id: "q1",
-          question: "What is the chemical symbol for Water?",
-          options: ["H2O", "O2", "CO2", "HO2"],
-          correct: 0,
-      }
-  ],
-  // Fallback for other subjects
-  default: [
-    {
-      id: "qd1",
-      question: "Sample Question 1?",
-      options: ["Option A", "Option B", "Option C", "Option D"],
-      correct: 0,
-    },
-    {
-      id: "qd2",
-      question: "Sample Question 2?",
-      options: ["Option A", "Option B", "Option C", "Option D"],
-      correct: 1,
-    },
-  ],
-};
+const { width } = Dimensions.get("window");
 
 export default function QuizDetailsScreen() {
   const router = useRouter();
   const { id, title } = useLocalSearchParams();
-  const questions = MOCK_QUESTIONS[id as string] || MOCK_QUESTIONS.default;
+  const { getQuizQuestions } = useStudent();
+  const questions = getQuizQuestions(id as string);
   const { colors, fontScale } = useTheme();
 
   const [currentIndex, setCurrentIndex] = useState(0);

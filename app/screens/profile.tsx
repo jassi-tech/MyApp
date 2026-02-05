@@ -8,26 +8,32 @@ import { ScreenContainer } from "@/components/common/screen-container";
 import { ScreenHeader } from "@/components/common/screen-header";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
+import { useUser } from "@/context/UserContext";
 
 export default function Profile() {
   const router = useRouter();
   const { colors, fontScale } = useTheme();
+  const { user } = useUser();
+
+  const displayName = user?.name || "Guest User";
+  const displayEmail = user?.email || "guest@example.com";
+  const displayImage = user?.profileImage;
 
   return (
     <ScreenContainer header={<ScreenHeader title="Profile" />}>
       <View style={styles.profileSection}>
           <View style={styles.avatarContainer}>
             <Image
-              source="https://i.pravatar.cc/300?img=11"
+              source={displayImage || "https://i.pravatar.cc/300?img=11"}
               style={[styles.avatar, { borderColor: colors.border }]}
               contentFit="cover"
             />
             <View style={[styles.onlineStatus, { borderColor: colors.background }]} />
           </View>
           <ThemedText type="subtitle" style={[styles.userName, { color: colors.text }]}>
-            Name
+            {displayName}
           </ThemedText>
-          <ThemedText style={[styles.userEmail, { color: colors.textSecondary }]}>Email@gmail.com</ThemedText>
+          <ThemedText style={[styles.userEmail, { color: colors.textSecondary }]}>{displayEmail}</ThemedText>
         </View>
 
         <View style={styles.menuContainer}>
@@ -36,6 +42,7 @@ export default function Profile() {
             title="Settings"
             onPress={() => router.push("/screens/settings")}
           />
+
 
           <TouchableOpacity 
             style={styles.securitySection}
@@ -61,11 +68,6 @@ export default function Profile() {
             </View>
           </TouchableOpacity>
 
-          <MenuItem 
-            icon="time-outline" 
-            title="Activity History" 
-            onPress={() => router.push("/screens/activity-history")}
-          />
           <MenuItem 
             icon="mail-outline" 
             title="Contact Us" 
