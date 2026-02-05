@@ -4,7 +4,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  Dimensions,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -25,7 +24,7 @@ import Animated, {
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 
-const { width } = Dimensions.get("window");
+
 
 export default function LoginScreen() {
   const router = useRouter();
