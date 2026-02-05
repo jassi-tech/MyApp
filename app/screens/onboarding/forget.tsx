@@ -4,27 +4,26 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Dimensions,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View
 } from "react-native";
 import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withSequence,
-    withTiming
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming
 } from "react-native-reanimated";
 
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/context/ThemeContext";
 
-const { width } = Dimensions.get("window");
+
 
 export default function ForgetPasswordScreen() {
   const router = useRouter();

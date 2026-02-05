@@ -1,7 +1,7 @@
 import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider as NavigationThemeProvider,
+    DarkTheme,
+    DefaultTheme,
+    ThemeProvider as NavigationThemeProvider,
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -35,10 +35,8 @@ function RootLayoutNav() {
   useEffect(() => {
     async function prepare() {
       try {
-        // Pre-load fonts, make any API calls you need to do here
-        // For now, we'll just simulate a delay or wait for nothing 
-        // as we don't have custom fonts yet.
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Pre-load fonts or make API calls here
+        // await Font.loadAsync({...});
       } catch (e) {
         console.warn(e);
       } finally {
